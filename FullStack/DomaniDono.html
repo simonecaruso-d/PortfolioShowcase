@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domani Dono</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
+  --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
+  --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
+  --accent:#14B8A6;
+  --accent-2:#F97316;
+  --accent-3:#34D399;
+  --warn:#FBBF24; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:56px 56px;
+  background-position:-1px -1px;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#000}
+
+/* ── Layout ── */
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+.wide{max-width:1440px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+
+/* ── Topbar ── */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:20px;color:var(--muted)}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3);animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--accent-3)}50%{opacity:.5;box-shadow:0 0 4px var(--accent-3)}}
+.tb-nav{display:flex;gap:20px}
+.tb-nav a{color:var(--muted);transition:color .15s}
+.tb-nav a:hover{color:var(--text)}
+
+/* ── Hero ── */
+.hero{padding:136px 0 96px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(56,189,248,.06) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(129,140,248,.04) 0%,transparent 65%);pointer-events:none}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
+.hero .meta .line{width:48px;height:1px;background:var(--accent);opacity:.6}
+.hero h1{font-size:clamp(52px,8vw,100px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
+.hero h1 .dim{color:var(--muted);font-weight:400}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:600}
+.hero .lede{font-size:21px;line-height:1.5;color:var(--text-dim);max-width:90ch;margin-bottom:20px;font-weight:400}
+.hero .sublede{font-size:16px;color:var(--muted);max-width:82ch;margin-bottom:48px;line-height:1.6}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);transition:background .15s,transform .1s}
+.btn-primary:hover{background:#7dd3fc;transform:translateY(-1px)}
+.btn-primary svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
+.chip.accent{color:var(--accent);border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.07)}
+.chip.purple{color:var(--accent-2);border-color:rgba(129,140,248,.25);background:rgba(129,140,248,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.07)}
+
+/* ── Stats strip ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 24px;border-right:1px solid var(--border);position:relative}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.stat .num{font-size:52px;line-height:1;letter-spacing:-.04em;font-weight:700;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:20px;color:var(--muted);margin-left:4px;font-weight:500}
+.stat .sub{margin-top:10px;font-size:12px;color:var(--text-dim)}
+.stat .num.cyan{color:var(--accent)}
+.stat .num.purple{color:var(--accent-2)}
+.stat .num.green{color:var(--accent-3)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}.stat:nth-child(-n+4){border-bottom:1px solid var(--border)}}
+
+/* ── Section header ── */
+.sh{margin-bottom:64px;display:grid;grid-template-columns:180px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.12em;padding-top:10px}
+.sh-no span{color:var(--accent)}
+.sh-title h2{font-size:clamp(44px,5vw,64px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin-bottom:18px}
+.sh-title p{font-size:19px;color:var(--text-dim);max-width:72ch;line-height:1.6}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}}
+
+/* ── Problem/Solution ── */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+.prob-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
+.prob-col.before{background:rgba(248,113,113,.05);border-color:rgba(248,113,113,.3)}
+.prob-col.after{background:rgba(52,211,153,.05);border-color:rgba(52,211,153,.3)}
+.prob-col h3{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.prob-col.before h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--danger)}
+.prob-col.after h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent-3)}
+.prob-col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.prob-col li{display:flex;gap:14px;font-size:15px;line-height:1.55;color:var(--text-dim)}
+.prob-col li .marker{color:var(--dim);font-family:var(--mono);flex-shrink:0;margin-top:2px}
+.prob-col.after li .marker{color:var(--accent-3)}
+@media(max-width:760px){.problem-grid{grid-template-columns:1fr}}
+
+/* ── Insight bar ── */
+.insight{background:var(--panel);border:1px solid var(--border-bright);border-left:3px solid var(--accent);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start}
+.insight svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.insight p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.insight p strong{color:var(--text)}
+
+/* ── Architecture diagram ── */
+.arch-wrap{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;overflow:hidden;position:relative}
+.arch-wrap::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(circle at 10% 50%,rgba(56,189,248,.04),transparent 45%),
+  radial-gradient(circle at 90% 50%,rgba(129,140,248,.04),transparent 45%);pointer-events:none}
+.arch-diagram{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr 40px 1fr 40px 1fr;gap:0;align-items:center;position:relative}
+.arch-node{background:var(--panel-2);border:1px solid var(--border-bright);border-radius:var(--radius);padding:18px 16px;text-align:center;position:relative;transition:border-color .2s,box-shadow .2s}
+.arch-node:hover{border-color:var(--accent);box-shadow:0 0 24px rgba(56,189,248,.1)}
+.arch-node .n-icon{font-size:22px;margin-bottom:10px}
+.arch-node .n-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.arch-node .n-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.arch-node .n-sub{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+.arch-node.source{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.05)}
+.arch-node.source .n-label{color:var(--warn)}
+.arch-node.engine{border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.06)}
+.arch-node.ui{border-color:rgba(129,140,248,.35);background:rgba(129,140,248,.06)}
+.arch-node.ui .n-label{color:var(--accent-2)}
+.arch-node.ai{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.06)}
+.arch-node.ai .n-label{color:var(--accent-3)}
+.arch-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim)}
+.arch-arrow svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.arch-footer{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px}
+.arch-badge{display:flex;align-items:center;gap:6px;color:var(--muted);padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg)}
+.arch-badge .dot{width:6px;height:6px;border-radius:50%}
+@media(max-width:900px){.arch-diagram{grid-template-columns:1fr;grid-template-rows:auto}.arch-arrow svg{transform:rotate(90deg)}}
+
+/* ── Pipeline ── */
+.pipeline-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.pl-step{background:var(--panel);padding:24px 20px}
+.pl-step .ps-num{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;margin-bottom:12px}
+.pl-step .ps-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.pl-step .ps-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px}
+.pl-step ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.pl-step li{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.pl-step li::before{content:"›";color:var(--dim);flex-shrink:0}
+@media(max-width:760px){.pipeline-row{grid-template-columns:1fr}}
+
+/* ── Code block ── */
+.code-block{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.code-bar{height:36px;background:var(--panel-3);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.code-bar .cb-dots{display:flex;gap:6px}
+.code-bar .cbd{width:10px;height:10px;border-radius:50%;background:var(--border-bright)}
+.code-bar .filename{margin-left:6px;color:var(--text-dim)}
+.code-bar .lang{margin-left:auto;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--text-dim)}
+.kw{color:#c084fc}.fn{color:var(--accent)}.str{color:var(--accent-3)}.cm{color:var(--dim);font-style:italic}.num{color:var(--warn)}.cls{color:#fb923c}
+
+/* ── Impact quadrant ── */
+.quadrant-shell{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.quad{padding:20px 24px;display:flex;flex-direction:column;justify-content:space-between;cursor:default;transition:background .2s;position:relative;overflow:hidden}
+.quad::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .2s}
+.quad:hover::before{opacity:1}
+.quad-hi{background:rgba(52,211,153,.07);border-right:1px solid var(--border)}
+.quad-hi::before{background:rgba(52,211,153,.04)}
+.quad-reach{background:rgba(56,189,248,.07)}
+.quad-reach::before{background:rgba(56,189,248,.04)}
+.quad-scale{background:rgba(129,140,248,.07);border-right:1px solid var(--border)}
+.quad-scale::before{background:rgba(129,140,248,.04)}
+.quad-dev{background:rgba(251,191,36,.05)}
+.quad-dev::before{background:rgba(251,191,36,.03)}
+.quad-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.quad-hi .quad-label{color:var(--accent-3)}
+.quad-reach .quad-label{color:var(--accent)}
+.quad-scale .quad-label{color:var(--accent-2)}
+.quad-dev .quad-label{color:var(--warn)}
+.quad-title{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin-top:8px}
+.quad-desc{font-size:13px;color:var(--text-dim);line-height:1.55;margin-top:8px}
+.quad-corner{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em}
+.quad-axes{display:flex;align-items:center;justify-content:center;padding:16px 0;position:relative}
+.quad-axes .x-label{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:8px 0}
+.quad-axes .y-label{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);padding:0 8px}
+
+/* ── Ranking table ── */
+.ranking-table{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.rt-head{display:grid;grid-template-columns:200px repeat(7,1fr);background:var(--panel-2);border-bottom:1px solid var(--border);padding:0}
+.rt-head .rh{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:14px 12px;border-right:1px solid var(--border)}
+.rt-head .rh:last-child{border-right:none}
+.rt-head .rh.accent{color:var(--accent)}
+.rt-row{display:grid;grid-template-columns:200px repeat(7,1fr);border-bottom:1px solid var(--border);transition:background .15s}
+.rt-row:last-child{border-bottom:none}
+.rt-row:hover{background:var(--panel-2)}
+.rt-cell{padding:14px 12px;border-right:1px solid var(--border);font-size:13px;display:flex;align-items:center}
+.rt-cell:last-child{border-right:none}
+.rt-cell.org{font-weight:600;color:var(--text);font-size:14px}
+.score-bar{height:6px;border-radius:3px;background:var(--panel-3);overflow:hidden;width:100%}
+.score-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.score-fill.s-impact{background:var(--accent-3)}
+.score-fill.s-mature{background:var(--accent)}
+.score-fill.s-eff{background:var(--accent-2)}
+.score-fill.s-glob{background:var(--warn)}
+.score-fill.s-dim{background:#fb923c}
+.score-fill.s-trust{background:var(--danger)}
+.score-fill.s-grow{background:#e879f9}
+@media(max-width:1000px){.rt-head,.rt-row{grid-template-columns:160px repeat(4,1fr)}.rt-head .rh:nth-child(n+6),.rt-row .rt-cell:nth-child(n+6){display:none}}
+
+/* ── Features grid ── */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;transition:border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+.feat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:transparent;transition:background .2s}
+.feat-card:hover{border-color:var(--border-bright);box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.feat-card.c-cyan::before{background:var(--accent)}
+.feat-card.c-purple::before{background:var(--accent-2)}
+.feat-card.c-green::before{background:var(--accent-3)}
+.feat-card.c-warn::before{background:var(--warn)}
+.feat-card.c-danger::before{background:var(--danger)}
+.feat-card.c-orange::before{background:#fb923c}
+.feat-card .fc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.c-cyan .fc-tag{color:var(--accent)}
+.c-purple .fc-tag{color:var(--accent-2)}
+.c-green .fc-tag{color:var(--accent-3)}
+.c-warn .fc-tag{color:var(--warn)}
+.c-danger .fc-tag{color:var(--danger)}
+.c-orange .fc-tag{color:#fb923c}
+.feat-card h3{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin-bottom:10px}
+.feat-card p{font-size:14px;color:var(--muted);line-height:1.6}
+.feat-card .fc-items{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.feat-card .fc-item{font-family:var(--mono);font-size:11px;color:var(--text-dim);display:flex;gap:8px;align-items:flex-start;line-height:1.4}
+.feat-card .fc-item::before{content:"→";color:var(--dim);flex-shrink:0}
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.feat-grid{grid-template-columns:1fr}}
+
+/* ── Decision log ── */
+.decision-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.decision{display:grid;grid-template-columns:280px 1fr 1fr;border-bottom:1px solid var(--border);transition:background .15s}
+.decision:last-child{border-bottom:none}
+.decision:hover{background:var(--panel-2)}
+.decision>div{padding:22px 24px;border-right:1px solid var(--border)}
+.decision>div:last-child{border-right:none}
+.dec-context .dc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.dec-context .dc-title{font-size:15px;font-weight:600;color:var(--text)}
+.dec-context .dc-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.dec-chosen h4{font-size:13px;font-weight:600;color:var(--accent-3);font-family:var(--mono);letter-spacing:.04em;margin-bottom:8px}
+.dec-chosen p{font-size:13px;color:var(--text-dim);line-height:1.55}
+.dec-why h4{font-size:13px;font-weight:600;color:var(--muted);font-family:var(--mono);letter-spacing:.04em;margin-bottom:8px}
+.dec-why p{font-size:13px;color:var(--muted);line-height:1.55}
+@media(max-width:900px){.decision{grid-template-columns:1fr}.decision>div{border-right:none}}
+
+/* ── Business case ── */
+.biz-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+.biz-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px}
+.biz-card .bz-num{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.1em;margin-bottom:12px}
+.biz-card h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:10px;letter-spacing:-.01em}
+.biz-card p{font-size:13px;color:var(--muted);line-height:1.6}
+.biz-card .bz-tag{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:4px 10px;border-radius:3px;text-transform:uppercase}
+.bz-tag.rev{background:rgba(52,211,153,.1);color:var(--accent-3);border:1px solid rgba(52,211,153,.2)}
+.bz-tag.exp{background:rgba(56,189,248,.1);color:var(--accent);border:1px solid rgba(56,189,248,.2)}
+.bz-tag.tech{background:rgba(129,140,248,.1);color:var(--accent-2);border:1px solid rgba(129,140,248,.2)}
+@media(max-width:760px){.biz-grid{grid-template-columns:1fr}}
+
+/* ── Roadmap ── */
+.roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.rm-col{border-right:1px solid var(--border)}
+.rm-col:last-child{border-right:none}
+.rm-head{padding:16px 20px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--panel-2);display:flex;align-items:center;gap:8px}
+.rm-head .rh-dot{width:8px;height:8px;border-radius:50%}
+.rm-items{padding:16px;display:flex;flex-direction:column;gap:10px}
+.rm-item{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--text-dim);line-height:1.4;position:relative;padding-left:20px}
+.rm-item::before{content:"";position:absolute;left:8px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:var(--dim)}
+.rm-col.col-done .rm-item::before{background:var(--accent-3)}
+.rm-col.col-now .rm-item::before{background:var(--accent)}
+.rm-col.col-next .rm-item::before{background:var(--accent-2)}
+.rm-col.col-later .rm-item::before{background:var(--dim)}
+@media(max-width:760px){.roadmap{grid-template-columns:1fr 1fr}.rm-col{border-right:none;border-bottom:1px solid var(--border)}}
+
+/* ── Tech stack ── */
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tech-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s}
+.tech-card:hover{border-color:var(--border-bright)}
+.tech-card .tc-cat{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+.tech-card .tc-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+.tech-card .tc-why{font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:760px){.tech-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── Footer ── */
+footer{border-top:1px solid var(--border);padding:48px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text)}
+.footer-brand span{color:var(--accent)}
+.footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.footer-links a{transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-note{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+/* ── Scroll animation ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- ─── Topbar ─── -->
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <a class="tb-back" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portfolio
+    </a>
+    <div class="tb-path">
+      <span class="slash">/</span>Full Stack<span class="slash">/</span><span class="here">Domani Dono</span>
+    </div>
+    <div class="tb-status">
+      <nav class="tb-nav">
+        <a href="#problem">Problem</a>
+        <a href="#architecture">Arch</a>
+        <a href="#engine">Engine</a>
+        <a href="#product">Product</a>
+        <a href="#stack">Stack</a>
+        <a href="#roadmap">Roadmap</a>
+      </nav>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── Hero ─── -->
+<div class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="hero-meta meta" style="font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px">
+      Full-Stack Data Product &nbsp;·&nbsp; 2026
+    </div>
+    <h1>Domani <span class="accent">Dono</span></h1>
+    <p class="lede">An end-to-end donation intelligence platform built around one question: <em>"Where can I donate to maximize social impact, with confidence?"</em></p>
+    <p class="sublede">Not just a directory or a search engine. A decision-support system for donating responsibly</p>
+    <div class="hero-cta">
+      <a class="btn-primary" href="https://domanidono.streamlit.app/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Live App
+      </a>
+      <a class="btn-ghost" href="https://github.com/simonecaruso-d/DomaniDono" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub Repo
+      </a>
+    </div>
+    <div class="chips">
+      <span class="chip accent">Python</span>
+      <span class="chip accent">Streamlit</span>
+      <span class="chip purple">Prompt Engineering</span>
+      <span class="chip green">Data Pipeline</span>
+      <span class="chip green">Open Cooperazione</span>
+      <span class="chip">CI/CD</span>
+      <span class="chip">UI/UX Engineering</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Stats strip ─── -->
+<div class="stats reveal">
+  <div class="stat">
+    <div class="label">Scope</div>
+    <div class="num cyan">5 layers<span class="unit"></span></div>
+    <div class="sub">Pipeline · Analytics · UI · AI · Ops</div>
+  </div>
+  <div class="stat">
+    <div class="label">Ranking dimensions</div>
+    <div class="num purple">7 KPIs</div>
+    <div class="sub">Impact · Maturity · Efficiency · Globalization · Dimension · Trust · Growth</div>
+  </div>
+  <div class="stat">
+    <div class="label">Impact quadrants</div>
+    <div class="num green">4 sections</div>
+    <div class="sub">High Impact · Efficient Reach · Scale to Unlock · Under Development</div>
+  </div>
+  <div class="stat">
+    <div class="label">Data source</div>
+    <div class="num" style="font-size:36px;padding-top:8px;color:var(--warn)">Open<br>Cooperazione</div>
+    <div class="sub">Italian nonprofit open data harmonized & normalized</div>
+  </div>
+</div>
+
+<!-- ─── Problem ─── -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>01</span> - Problem</div>
+      <div class="sh-title">
+        <h2>Donating blindly is the default</h2>
+        <p>Italian nonprofit data exists publicly but is fragmented, raw, and impossible for a regular person to act on. I built DomaniDono to close that gap and allow people to make better-informed decisions</p>
+      </div>
+    </div>
+    <div class="problem-grid reveal">
+      <div class="prob-col before">
+        <h3>Before DomaniDono</h3>
+        <ul>
+          <li><span class="marker">|</span>Donors face thousands of NGOs with no comparative framework</li>
+          <li><span class="marker">|</span>Open data exists but requires technical skill to parse and normalize</li>
+          <li><span class="marker">|</span>Impact is not measured: only legal registration and revenue figures</li>
+          <li><span class="marker">|</span>Peer benchmarking is impossible without building an engine from scratch</li>
+          <li><span class="marker">|</span>No one translates the numbers into an actionable recommendation</li>
+        </ul>
+      </div>
+      <div class="prob-col after">
+        <h3>After DomaniDono</h3>
+        <ul>
+          <li><span class="marker">→</span>Multi-dimension ranking surfaces best candidates across 7 axes</li>
+          <li><span class="marker">→</span>Pipeline normalizes open data into decision-ready DataFrames automatically</li>
+          <li><span class="marker">→</span>Impact quadrant classifies every organization by reach and beneficiary scale</li>
+          <li><span class="marker">→</span>Year-over-year deltas and peer benchmarks exposed in one click</li>
+          <li><span class="marker">→</span>AI concierge turns structured data into a personalized recommendation</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight reveal">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Strategic framing:</strong> the insight driving the whole design is that the problem isn't a lack of data, but a lack of <em>translation</em>. Every product decision flows from this: pipeline normalizes → engine computes → UI visualizes → AI recommends. Each layer serves the one above it</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Architecture ─── -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>02</span> - Architecture</div>
+      <div class="sh-title">
+        <h2>Five layers, one product</h2>
+        <p>Designed as a linear pipeline where each layer produces a clean output for the next. No database: pure in-memory DataFrames with caching. Modular enough to swap any layer independently.</p>
+      </div>
+    </div>
+    <div class="arch-wrap reveal">
+      <div class="arch-diagram">
+        <div class="arch-node source">
+          <div class="n-icon">🗂️</div>
+          <div class="n-label">Source</div>
+          <div class="n-name">Open Cooperazione</div>
+          <div class="n-sub">Raw Italian nonprofit registry and metrics</div>
+        </div>
+        <div class="arch-arrow">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="arch-node engine">
+          <div class="n-icon">⚙️</div>
+          <div class="n-label">Pipeline</div>
+          <div class="n-name">Normalization Layer</div>
+          <div class="n-sub">Clean · typed · harmonized DataFrames</div>
+        </div>
+        <div class="arch-arrow">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="arch-node engine">
+          <div class="n-icon">📐</div>
+          <div class="n-label">Engine</div>
+          <div class="n-name">Impact Intelligence</div>
+          <div class="n-sub">KPIs · deltas · benchmarks · quadrants · ranking</div>
+        </div>
+        <div class="arch-arrow">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="arch-node ui">
+          <div class="n-icon">🖥️</div>
+          <div class="n-label">UI</div>
+          <div class="n-name">Streamlit Product</div>
+          <div class="n-sub">Home · Impacts · Registry · AI Concierge</div>
+        </div>
+        <div class="arch-arrow">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="arch-node ai">
+          <div class="n-icon">🤖</div>
+          <div class="n-label">AI</div>
+          <div class="n-name">OpenRouter Concierge</div>
+          <div class="n-sub">Grounded recommendations · retry logic · fallback</div>
+        </div>
+      </div>
+      <div class="arch-footer">
+        <div class="arch-badge"><div class="dot" style="background:var(--accent-3)"></div>Modular Python (app / db / configuration / files)</div>
+        <div class="arch-badge"><div class="dot" style="background:var(--accent)"></div>st.cache_data throughout</div>
+        <div class="arch-badge"><div class="dot" style="background:var(--accent-2)"></div>Streamlit fragments for isolated re-render</div>
+        <div class="arch-badge"><div class="dot" style="background:var(--warn)"></div>GitHub Actions CI/CD</div>
+      </div>
+    </div>
+    <div class="insight reveal" style="margin-top:28px">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Why Streamlit, not React:</strong> pipeline and UI share the same runtime, the same DataFrames, the same language: no API layer, no serialization, no split deploy. A custom web stack would triple the complexity with zero user-visible benefit at this scale. Hard module boundaries (app / db / configuration) keep each layer independently testable and swappable without that tradeoff changing</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Data Pipeline ─── -->
+<section id="pipeline">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>03</span> - Data Pipeline</div>
+      <div class="sh-title">
+        <h2>Raw → Decision ready in four steps</h2>
+        <p>The pipeline applies typed conversions, text harmonization, and quality gates so every downstream component can trust what it receives</p>
+      </div>
+    </div>
+    <div class="pipeline-row reveal">
+      <div class="pl-step">
+        <div class="ps-num">01</div>
+        <div class="ps-label">Ingestion</div>
+        <div class="ps-title">Load from Open Cooperazione</div>
+        <ul>
+          <li>Registry dataset</li>
+          <li>Metrics dataset</li>
+          <li>Geography dataset</li>
+          <li>Multi-year historical files</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">02</div>
+        <div class="ps-label">Normalization</div>
+        <div class="ps-title">Type coercion + text harmonization</div>
+        <ul>
+          <li>Numeric casting with null safety</li>
+          <li>String normalization</li>
+          <li>Category deduplication</li>
+          <li>Date parsing and validation</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">03</div>
+        <div class="ps-label">Enrichment</div>
+        <div class="ps-title">Derived metrics + joins</div>
+        <ul>
+          <li>Year-over-year delta calculation</li>
+          <li>Category peer group assignment</li>
+          <li>Geographic aggregations</li>
+          <li>KPI composition per organization</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">04</div>
+        <div class="ps-label">Output</div>
+        <div class="ps-title">Reusable cached DataFrames</div>
+        <ul>
+          <li>st.cache_data decorators</li>
+          <li>Single load per session</li>
+          <li>Shared across all app pages</li>
+          <li>Deterministic for AI input</li>
+        </ul>
+      </div>
+    </div>
+</section>
+
+<!-- ─── Impact Engine ─── -->
+<section id="engine">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>04</span> - Impact Engine</div>
+      <div class="sh-title">
+        <h2>From raw numbers to ranked insight</h2>
+        <p>The engine is the intellectual core of the product. It converts normalized data into a multi-axis ranking and a spatial quadrant model that makes comparison intuitive</p>
+      </div>
+    </div>
+
+    <div style="margin-bottom:40px" class="reveal">
+      <p style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:24px">Impact Quadrant: Organizations are classified by project reach and beneficiary scale</p>
+      <div style="display:grid;grid-template-columns:40px 1fr;gap:0;align-items:center">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;padding-right:8px">
+        </div>
+        <div>
+          <div class="quadrant-shell">
+            <div class="quad quad-hi">
+              <div>
+                <div class="quad-label">High Impact</div>
+                <div class="quad-title">Scale Leaders</div>
+                <div class="quad-desc">Many projects and broad beneficiary reach. Priority tier for donation recommendations</div>
+              </div>
+              <div class="quad-corner">High projects · High beneficiaries</div>
+            </div>
+            <div class="quad quad-reach">
+              <div>
+                <div class="quad-label">Efficient Reach</div>
+                <div class="quad-title">Lean Operators</div>
+                <div class="quad-desc">Fewer projects but outsized beneficiary impact per initiative: high efficiency signal</div>
+              </div>
+              <div class="quad-corner">Low projects · High beneficiaries</div>
+            </div>
+            <div class="quad quad-scale">
+              <div>
+                <div class="quad-label">Scale to Unlock</div>
+                <div class="quad-title">Growth Stage</div>
+                <div class="quad-desc">Broad project portfolio not yet converted to beneficiary scale: latent potential</div>
+              </div>
+              <div class="quad-corner">High projects · Low beneficiaries</div>
+            </div>
+            <div class="quad quad-dev">
+              <div>
+                <div class="quad-label">Under Development</div>
+                <div class="quad-title">Early Stage</div>
+                <div class="quad-desc">Limited reach and activity. May be newly formed: context-dependent interpretation</div>
+              </div>
+              <div class="quad-corner">Low projects · Low beneficiaries</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<!-- ─── Product ─── -->
+<section id="product">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>05</span> - Product</div>
+      <div class="sh-title">
+        <h2>Three views, one coherent journey</h2>
+        <p>There was a specific user mental model in mind. Home builds trust, Impacts drives exploration, Registry enables verification</p>
+      </div>
+    </div>
+    <div class="feat-grid reveal">
+      <div class="feat-card c-cyan">
+        <div class="fc-tag">Home</div>
+        <h3>Product Story + Transparency</h3>
+        <p>Sets expectations, names the data source, explains the methodology. Trust is a prerequisite to acting on a recommendation</p>
+        <div class="fc-items">
+          <div class="fc-item">Ecosystem spotlight with top-line numbers</div>
+          <div class="fc-item">Source transparency (Open Cooperazione)</div>
+        </div>
+      </div>
+      <div class="feat-card c-cyan">
+        <div class="fc-tag">Impacts</div>
+        <h3>Data Explorer</h3>
+        <p>KPI cards, geographic map, Sankey flows, impact scatter, ranked summaries: layered from macro to micro so users can orient before they dive in</p>
+        <div class="fc-items">
+          <div class="fc-item">KPI boxes with delta badges</div>
+          <div class="fc-item">Interactive map by geography</div>
+          <div class="fc-item">Sankey flows: money → category → impact</div>
+          <div class="fc-item">Impact quadrant scatter plot</div>
+        </div>
+      </div>
+      <div class="feat-card c-cyan">
+        <div class="fc-tag">Registry</div>
+        <h3>Organization Search</h3>
+        <p>Full searchable registry with key profile info, operational indicators, and peer benchmarks per organization</p>
+        <div class="fc-items">
+          <div class="fc-item">Full-text search across org names</div>
+          <div class="fc-item">Filters by category, geography, size</div>
+          <div class="fc-item">Adjustable parameters for flexible exploration</div>
+          <div class="fc-item">Operational indicators per org</div>
+          <div class="fc-item">Category peer benchmarks inline</div>
+        </div>
+      </div>
+      <div class="feat-card c-warn">
+        <div class="fc-tag">AI Concierge</div>
+        <h3>Donation Recommendation Engine</h3>
+        <p>Grounded AI, not hallucinating: reading the actual ranking table (deterministic input) and structuring the allows a trustworthy output</p>
+        <div class="fc-items">
+          <div class="fc-item">OpenRouter-powered (model-agnostic)</div>
+          <div class="fc-item">Ranking table injected as structured context</div>
+          <div class="fc-item">Retry logic + fallback model chain</div>
+          <div class="fc-item">User-friendly transient error handling</div>
+        </div>
+      </div>
+      <div class="feat-card c-orange">
+        <div class="fc-tag">Performance</div>
+        <h3>UX Engineering</h3>
+        <p>Streamlit has real performance constraints. I worked around them deliberately: fragments, caching, and resolution-aware layout all serve snappiness across every device</p>
+        <div class="fc-items">
+          <div class="fc-item">st.cache_data on all data builders</div>
+          <div class="fc-item">Isolated fragments prevent full re-render</div>
+          <div class="fc-item">Adaptive layout detects screen resolution: column count, chart sizing, and spacing adjust automatically</div>
+          <div class="fc-item">Staged loading with branded progress UI</div>
+        </div>
+      </div>
+      <div class="feat-card c-danger">
+        <div class="fc-tag">Resilience</div>
+        <h3>Maintainability &amp; Scalability</h3>
+        <p>Every layer is independently swappable. Add a data source, swap the AI model, or extend the UI without touching the rest of the stack</p>
+        <div class="fc-items">
+          <div class="fc-item">Hard module boundaries: db / app / configuration</div>
+          <div class="fc-item">Stateless engine: composable and testable in isolation</div>
+          <div class="fc-item">Model-agnostic AI layer: swap providers without code changes</div>
+          <div class="fc-item">Pipeline designed to ingest additional data sources</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight reveal" style="margin-top:28px">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>AI design decisions:</strong> OpenRouter over a direct provider gives a model-agnostic fallback chain: if the primary model hits a rate limit or outage, the fallback kicks in without touching the integration code. Ranking table injected directly as prompt context rather than RAG: the dataset is bounded, structured, and deterministic. Direct injection is faster, cheaper, and fully auditable: when output is wrong, you can trace exactly what data the model saw</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Screenshots ─── -->
+<section id="screenshots">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>06</span> - Preview</div>
+      <div class="sh-title">
+        <h2>See it in action</h2>
+        <p>Four views from the live app</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" class="reveal">
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+        <img src="screenshots/DDLoader.png" alt="DomaniDono — Loader" style="width:100%;height:340px;object-fit:cover;object-position:top;display:block;border-bottom:1px solid var(--border)">
+        <div style="padding:14px 18px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Branded loading experience</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+        <img src="screenshots/DDHome.png" alt="DomaniDono — Home" style="width:100%;height:340px;object-fit:cover;object-position:top;display:block;border-bottom:1px solid var(--border)">
+        <div style="padding:14px 18px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Home: Product story &amp; ecosystem overview</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+        <img src="screenshots/DDImpacts.png" alt="DomaniDono — Impacts" style="width:100%;height:340px;object-fit:cover;object-position:top;display:block;border-bottom:1px solid var(--border)">
+        <div style="padding:14px 18px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Impacts: KPIs, quadrant, maps &amp; flows</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+        <img src="screenshots/DDRegistry.png" alt="DomaniDono — Registry" style="width:100%;height:340px;object-fit:cover;object-position:top;display:block;border-bottom:1px solid var(--border)">
+        <div style="padding:14px 18px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Registry: Search, filters &amp; org benchmarks</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Tech Stack ─── -->
+<section id="stack">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>07</span> - Stack</div>
+      <div class="sh-title">
+        <h2>Technology choices</h2>
+        <p>Every tool chosen for a reason</p>
+      </div>
+    </div>
+    <div class="tech-grid reveal">
+      <div class="tech-card">
+        <div class="tc-cat">Language</div>
+        <div class="tc-name">Python 3.11+</div>
+        <div class="tc-why">Unified language for data pipeline, analytics, and UI</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">UI Framework</div>
+        <div class="tc-name">Streamlit</div>
+        <div class="tc-why">Data products belong in Python. Fragments + cache_data + custom CSS get 90% of React with 10% of the complexity</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Data Processing</div>
+        <div class="tc-name">Pandas</div>
+        <div class="tc-why">Vectorized ops, groupby, pct_change, transform: all the analytics primitives without writing them from scratch</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">AI Gateway</div>
+        <div class="tc-name">OpenRouter</div>
+        <div class="tc-why">Model-agnostic routing with fallback chain. Swap models without touching integration code</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Data Source</div>
+        <div class="tc-name">Open Cooperazione</div>
+        <div class="tc-why">Italian government open data for nonprofits: authoritative, structured, and free to use commercially</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">CI/CD</div>
+        <div class="tc-name">GitHub Actions</div>
+        <div class="tc-why">Automated pipeline for tests and deploy. Foundation for scheduled data refresh jobs</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Deploy</div>
+        <div class="tc-name">Streamlit Cloud</div>
+        <div class="tc-why">Zero-config deploy from repo. Handles secrets, scaling, and SSL</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Styling</div>
+        <div class="tc-name">Custom CSS</div>
+        <div class="tc-why">Streamlit's default UI communicates "prototype". Custom CSS communicates "product". The difference matters to users</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Roadmap ─── -->
+<section id="roadmap">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>08</span> - Roadmap</div>
+      <div class="sh-title">
+        <h2>What's next</h2>
+        <p>The foundation is complete. These are the next layers: prioritized by user value</p>
+      </div>
+    </div>
+    <div class="roadmap reveal">
+      <div class="rm-col col-done">
+        <div class="rm-head">
+          <div class="rh-dot" style="background:var(--accent-3)"></div>
+          Done
+        </div>
+        <div class="rm-items">
+          <div class="rm-item">Data pipeline + normalization</div>
+          <div class="rm-item">Impact intelligence engine</div>
+          <div class="rm-item">4-quadrant classification model</div>
+          <div class="rm-item">7-dimension ranking table</div>
+          <div class="rm-item">Streamlit product (3 views)</div>
+          <div class="rm-item">AI donation concierge</div>
+          <div class="rm-item">Custom UX + branded loading</div>
+          <div class="rm-item">CI/CD via GitHub Actions</div>
+          <div class="rm-item">Live deploy on Streamlit Cloud</div>
+        </div>
+      </div>
+      <div class="rm-col col-now">
+        <div class="rm-head">
+          <div class="rh-dot" style="background:var(--accent)"></div>
+          Next
+        </div>
+        <div class="rm-items">
+          <div class="rm-item">Scheduled data refresh automation</div>
+          <div class="rm-item">Historical snapshot storage</div>
+          <div class="rm-item">Trend analysis view</div>
+          <div class="rm-item">Per-dimension score explainability</div>
+        </div>
+      </div>
+      <div class="rm-col col-next">
+        <div class="rm-head">
+          <div class="rh-dot" style="background:var(--accent-2)"></div>
+          Later
+        </div>
+        <div class="rm-items">
+          <div class="rm-item">Donor profile persistence</div>
+          <div class="rm-item">Goal-based recommendation filters</div>
+          <div class="rm-item">Downloadable audit trail PDF</div>
+          <div class="rm-item">NGO scoring API endpoint</div>
+        </div>
+      </div>
+      <div class="rm-col col-later">
+        <div class="rm-head">
+          <div class="rh-dot" style="background:var(--dim)"></div>
+          Horizon
+        </div>
+        <div class="rm-items">
+          <div class="rm-item">White-label dashboard mode</div>
+          <div class="rm-item">Multi-country data sources</div>
+          <div class="rm-item">Real-time donation tracking</div>
+          <div class="rm-item">Embeddable ranking widget</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Footer ─── -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Simone Caruso</div>
+      <div class="footer-links">
+        <a href="https://domanidono.streamlit.app/" target="_blank" rel="noopener">Live App ↗</a>
+        <a href="https://github.com/simonecaruso-d/DomaniDono" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="../index.html">← Portfolio</a>
+      </div>
+      <div class="footer-note">Full-Stack · Data Product · 2026</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Stagger children in grid/list parents
+document.querySelectorAll('.feat-grid, .biz-grid, .tech-grid').forEach(parent => {
+  [...parent.children].forEach((child, i) => {
+    child.style.transitionDelay = `${i * 60}ms`;
+  });
+});
+</script>
+</body>
+</html>

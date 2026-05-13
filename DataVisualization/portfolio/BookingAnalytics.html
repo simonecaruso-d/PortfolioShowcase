@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
+  --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
+  --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
+  --accent:#38BDF8; --accent-2:#818CF8; --accent-3:#34D399;
+  --warn:#FBBF24; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Inter Tight',ui-sans-serif,system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:56px 56px;background-position:-1px -1px}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#000}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+.wide{max-width:1440px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:0.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted)}
+.tb-status .nav{display:flex;gap:18px}
+.tb-status .nav a{color:var(--muted);transition:color .15s}
+.tb-status .nav a:hover{color:var(--text)}
+.hero{padding:128px 0 96px;position:relative}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:32px}
+.hero h1{font-size:clamp(44px,7vw,90px);line-height:0.98;letter-spacing:-0.04em;font-weight:700;margin-bottom:32px}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:500;white-space:nowrap}
+.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:100%;margin-bottom:48px;font-weight:400}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--accent);padding:6px 14px;border:1px solid rgba(56,189,248,0.25);border-radius:999px;background:rgba(56,189,248,0.08);display:inline-flex;align-items:center;transition:background .18s,border-color .18s}
+.chip:hover{background:rgba(56,189,248,0.18);border-color:rgba(56,189,248,0.5)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 32px;border-right:1px solid var(--border);position:relative}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.stat .label .tag{color:var(--dim)}
+.stat .num{font-size:64px;line-height:1;letter-spacing:-0.04em;font-weight:600;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:24px;color:var(--muted);margin-left:6px;font-weight:500;letter-spacing:0.06em}
+.stat .sub{margin-top:12px;font-size:13px;color:var(--text-dim)}
+.sh{margin-bottom:56px;display:grid;grid-template-columns:200px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.12em}
+.sh-no span{color:var(--accent)}
+.sh-title h2{font-size:48px;line-height:1.05;letter-spacing:-0.03em;font-weight:600;margin-bottom:16px;max-width:18ch}
+.sh-title p{font-size:17px;color:var(--text-dim);max-width:60ch}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}.sh-title h2{font-size:36px}}
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.problem-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px}
+.problem-col.before{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.35)}
+.problem-col.after{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.35)}
+.problem-col h3{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.problem-col h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--danger)}
+.problem-col.after h3::before{background:var(--accent-3)}
+.problem-col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.problem-col li{display:flex;gap:14px;font-size:15px;line-height:1.55;color:var(--text-dim)}
+.problem-col li::before{content:"|";color:var(--dim);font-family:var(--mono);flex-shrink:0}
+@media(max-width:760px){.problem-grid{grid-template-columns:1fr}}
+/* Feature cards */
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.feature-card{background:var(--panel);padding:32px 24px}
+.fc-glyph{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.08em;margin-bottom:12px;text-transform:uppercase}
+.fc-name{font-size:20px;font-weight:600;letter-spacing:-0.02em;margin-bottom:8px}
+.fc-detail{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.6}
+@media(max-width:900px){.feature-grid{grid-template-columns:repeat(2,1fr)}}
+.pipeline{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;margin-bottom:24px}
+.pipeline-title{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px}
+.pipeline-flow{display:grid;grid-template-columns:1fr 24px 1.6fr 24px 2fr;gap:0;align-items:stretch}
+.pl-stage{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.pl-stage .stg-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pl-stage .stg-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.pl-stage .stg-items{display:flex;flex-direction:column;gap:6px}
+.pl-stage .pn{font-family:var(--mono);font-size:12px;padding:6px 10px;background:var(--panel-3);border:1px solid var(--border);border-radius:4px;color:var(--text-dim)}
+.pl-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim);font-family:var(--mono)}
+@media(max-width:900px){.pipeline-flow{grid-template-columns:1fr}.pl-arrow{padding:8px;transform:rotate(90deg)}}
+.schema-shell{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0;overflow:hidden;display:grid;grid-template-columns:1fr 320px}
+.schema-canvas{background-image:radial-gradient(circle at 20% 20%,rgba(56,189,248,.04),transparent 50%),radial-gradient(circle at 80% 80%,rgba(129,140,248,.04),transparent 50%),linear-gradient(var(--panel-2) 1px,transparent 1px),linear-gradient(90deg,var(--panel-2) 1px,transparent 1px);background-size:100% 100%,100% 100%,32px 32px,32px 32px;position:relative;min-height:560px;padding:16px;border-right:1px solid var(--border)}
+.schema-canvas svg{display:block;width:100%;height:auto;max-height:560px}
+.tbl{cursor:pointer;transition:opacity .2s}
+.schema-canvas[data-active] .tbl:not(.active){opacity:.25}
+.schema-canvas[data-active] .conn:not(.active){opacity:.1}
+.tbl.active rect.tbl-bg{stroke:var(--accent);stroke-width:2}
+.tbl rect.tbl-bg{stroke:var(--border-bright);stroke-width:1.5;fill:var(--panel-2);transition:stroke .2s,stroke-width .2s}
+.tbl.fact rect.tbl-bg{stroke:var(--accent);stroke-width:2}
+.tbl rect.tbl-header{fill:var(--panel-3)}
+.tbl.fact rect.tbl-header{fill:rgba(56,189,248,.18)}
+.conn{transition:opacity .2s}
+.schema-side{padding:24px;background:var(--panel-2);overflow-y:auto;max-height:560px}
+.schema-side .ss-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px}
+.schema-side .ss-title{font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.schema-side .ss-title .kind{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--accent);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);padding:2px 6px;border-radius:3px;text-transform:uppercase}
+.schema-side .ss-desc{font-size:13px;color:var(--text-dim);line-height:1.55;margin-bottom:20px}
+.schema-side .ss-cols{display:flex;flex-direction:column;border-top:1px solid var(--border)}
+.schema-side .col{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px;align-items:center}
+.schema-side .col .name{color:var(--text)}
+.schema-side .col .type{color:var(--muted);font-size:11px}
+.schema-side .col .name.pk{color:var(--accent)}
+.schema-side .col .name.fk{color:var(--accent-2)}
+.schema-side .col-tag{font-size:9px;letter-spacing:0.08em;font-weight:700;padding:2px 5px;border-radius:2px;margin-left:6px}
+.schema-side .col-tag.pk{background:rgba(56,189,248,.1);color:var(--accent)}
+.schema-side .col-tag.fk{background:rgba(129,140,248,.1);color:var(--accent-2)}
+.schema-side .ss-empty{font-family:var(--mono);font-size:12px;color:var(--muted);padding:24px 0;text-align:center;border:1px dashed var(--border);border-radius:6px}
+@media(max-width:900px){.schema-shell{grid-template-columns:1fr}.schema-canvas{border-right:none;border-bottom:1px solid var(--border)}}
+.dax-tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);overflow-x:auto}
+.dax-tab{font-family:var(--mono);font-size:12px;color:var(--muted);padding:12px 16px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;transition:color .15s,border-color .15s;white-space:nowrap}
+.dax-tab:hover{color:var(--text)}
+.dax-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.dax-tab .count{margin-left:6px;color:var(--dim);font-size:11px}
+.dax-tab.active .count{color:var(--accent)}
+.dax-panel{display:none;flex-direction:column;gap:24px}
+.dax-panel.active{display:flex}
+.measure{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.measure-head{padding:20px 24px;display:flex;align-items:flex-start;gap:24px;border-bottom:1px solid var(--border)}
+.measure-head .meta{flex:1;min-width:0}
+.measure-head .name{font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:4px;display:flex;align-items:baseline;gap:10px}
+.measure-head .name .tag{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--accent);background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600}
+.measure-head .desc{font-size:14px;color:var(--text-dim);line-height:1.55;max-width:none}
+.measure-head .actions{display:flex;gap:8px;flex-shrink:0}
+.btn-icon{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--panel-2);border:1px solid var(--border);padding:6px 10px;border-radius:4px;cursor:pointer;letter-spacing:0.06em;display:flex;align-items:center;gap:6px;transition:color .15s,border-color .15s}
+.btn-icon:hover{color:var(--text);border-color:var(--border-bright)}
+.btn-icon.copied{color:var(--accent-3);border-color:var(--accent-3)}
+.code-bar{background:var(--panel-2);padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
+.code-bar .lang{color:var(--accent)}
+.code-bar .lang::before{content:"●";margin-right:8px}
+.code-bar .lines{margin-left:auto;color:var(--dim);text-transform:none;letter-spacing:0}
+pre.dax{margin:0;padding:24px;background:#06080B;font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto;color:var(--text-dim)}
+pre.dax .ln{display:inline-block;width:32px;color:var(--dim);text-align:right;margin-right:16px;user-select:none;font-size:11px}
+.dx-kw{color:var(--accent-2);font-weight:500}
+.dx-fn{color:var(--accent)}
+.dx-str{color:var(--accent-3)}
+.dx-num{color:var(--warn)}
+.dx-com{color:var(--dim);font-style:italic}
+.dx-tbl{color:var(--text)}
+.dx-col{color:var(--text-dim)}
+.dx-op{color:var(--muted)}
+.pages-stack{display:flex;flex-direction:column;gap:64px}
+.page-row{display:grid;grid-template-columns:380px 1fr;gap:48px;align-items:start}
+.page-meta .num{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.12em;margin-bottom:16px}
+.page-meta h3{font-size:28px;letter-spacing:-0.02em;font-weight:600;margin-bottom:16px}
+.page-meta p{font-size:15px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
+.page-meta .features{display:flex;flex-wrap:wrap;gap:6px}
+.page-meta .features span{font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:4px 8px;border-radius:4px}
+.page-frame{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;position:relative;width:560px}
+.page-frame .frame-bar{height:32px;background:var(--panel-2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.page-frame .frame-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.page-frame .frame-bar .filename{margin-left:8px;color:var(--text-dim)}
+.page-frame .frame-bar .badge{margin-left:auto;color:var(--accent);background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);padding:2px 8px;border-radius:3px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase}
+.page-frame .ph{aspect-ratio:16/9;background:
+  repeating-linear-gradient(135deg,var(--panel) 0,var(--panel) 12px,var(--panel-2) 12px,var(--panel-2) 24px);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:0.04em;position:relative}
+.page-frame .ph .filepath{color:var(--text-dim);font-size:13px}
+.page-frame .ph .hint{color:var(--dim);font-size:11px}
+.page-frame{width:fit-content}
+.page-frame img{display:block;width:auto;height:300px;max-width:100%}
+.page-frame.blurred::after{content:"REDACTED FOR PRIVACY";position:absolute;inset:32px 0 0;backdrop-filter:blur(8px);background:rgba(8,9,12,.4);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--text);letter-spacing:0.16em;font-weight:600}
+@media(max-width:900px){.page-row{grid-template-columns:1fr;gap:24px}.page-frame{width:100%}}
+footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.04em}
+.foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.foot-inner a{color:var(--text-dim);transition:color .15s}
+.foot-inner a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="wide topbar-inner">
+    <a href="index.html" class="tb-back">← Portfolio</a>
+    <span class="tb-path">
+      <span class="slash">/</span>Data Visualization<span class="slash">/</span><span class="here">Booking Analytics</span>
+    </span>
+    <div class="tb-status">
+      <span class="nav">
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#dax">DAX</a>
+        <a href="#pages">Pages</a>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero wrap">
+  <div class="meta">Data Visualization Project · Power BI · 2024</div>
+  <h1>Workplace occupancy,<br><span class="accent">in real time</span></h1>
+  <p class="lede">A multi-tenant workplace analytics platform sourced from two Azure PostgreSQL databases: tracking booking utilization, desk saturation, people coverage, and physical access anomalies across a coworking environment with GDPR-compliant guest data handling</p>
+  <div class="chips">
+    <span class="chip">Power BI</span>
+    <span class="chip">DAX</span>
+    <span class="chip">Power Query (M)</span>
+    <span class="chip">PostgreSQL (Azure)</span>
+    <span class="chip">Multi-tenant</span>
+    <span class="chip">PGP Encryption</span>
+  </div>
+</header>
+
+<!-- STAT STRIP -->
+<div class="stats">
+  <div class="stat">
+    <div class="label"><span>DAX measures</span><span class="tag">model</span></div>
+    <div class="num">45+</div>
+    <div class="sub">Across utilization, saturation, people, and access analytics</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>Reservations</span><span class="tag">workload</span></div>
+    <div class="num">1M+</div>
+    <div class="sub">Number of rows in the reservations table, resulting in a complex analytics workload</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>Users</span><span class="tag">people</span></div>
+    <div class="num">50k+</div>
+    <div class="sub">Active users, across all tenants (750+)</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>Guest privacy</span><span class="tag">GDPR</span></div>
+    <div class="num" style="font-size:36px;line-height:1.2">PGP<span class="unit">enc.</span></div>
+    <div class="sub">Guest email addresses stored PGP-encrypted in the access-service database</div>
+  </div>
+</div>
+
+<!-- 01 PROBLEM -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>01</span> · Problem</div>
+      <div class="sh-title">
+        <h2 style="max-width:none">No visibility into how the workplace was actually used</h2>
+        <p style="max-width:none">Reservations existed in the system but no one could tell whether booked spaces were actually occupied, whether capacity was being hit, or whether physical access matched digital bookings</p>
+      </div>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-col before">
+        <h3>Before</h3>
+        <ul>
+          <li>Booking data locked in the PostgreSQL backend: no aggregated view of utilization or saturation across the coworking space</li>
+          <li>No way to compare physical entry/exit events from time-keeper hardware against digital reservation data: access anomalies invisible</li>
+          <li>Capacity planning based on headcount alone, without hour-by-hour occupancy snapshots or frequency distribution analysis</li>
+          <li>Multi-tenant guest data handled without a formal GDPR-compliant analytics layer: PGP-encrypted fields not surfaced safely</li>
+        </ul>
+      </div>
+      <div class="problem-col after">
+        <h3>After</h3>
+        <ul>
+          <li>Live connection to two Azure PostgreSQL databases via native SQL folding: reservation and access data available to eFM and clients as well</li>
+          <li>Physical entry/exit events reconciled against digital check-in/out: access anomalies flagged and filterable by tenant, date, and resource</li>
+          <li>Hour-by-hour saturation snapshots on a 30-minute calendar: frequency bands show under / medium / over capacity distribution</li>
+          <li>PGP-encrypted guest email columns handled safely: data segregation and dynamic filtering upon access, based on permissions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 SOLUTION -->
+<section id="solution">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>02</span> · Solution</div>
+      <div class="sh-title">
+        <h2 style="max-width:none">Four analytics surfaces, one platform</h2>
+        <p style="max-width:none">Each surface answers a different operational question: how much of the space is used, when it peaks, who is using it, and whether physical presence matches digital intent</p>
+      </div>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="fc-glyph">UTL</div>
+        <div class="fc-name">Utilization</div>
+        <div class="fc-detail">Actual booking duration as a fraction of total offered resource-hours. Primary workspace efficiency KPI</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-glyph">SAT</div>
+        <div class="fc-name">Saturation</div>
+        <div class="fc-detail">Hour-by-hour occupancy snapshot: present occupants vs. resource capacity at each 30-minute slot. Frequency distribution across categorized capacity bands</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-glyph">PPL</div>
+        <div class="fc-name">People Coverage</div>
+        <div class="fc-detail">Bookers as a fraction of total active employees: workspace adoption rate. Guest volume, active guest count, and breakdown by company, division, and generation</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-glyph">ACC</div>
+        <div class="fc-name">Access Anomalies</div>
+        <div class="fc-detail">Physical entry/exit device events vs. digital reservation check-in/out. Mismatches flagged per tenant for security and compliance monitoring</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ARCHITECTURE -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>03</span> · Architecture</div>
+      <div class="sh-title">
+        <h2 style="max-width:none">Snowflake-like schema across multiple databases</h2>
+        <p style="max-width:none">Reservation and Thing as the most important tables, surrounded by resource, zone, user, calendar, and more. Two Azure PostgreSQL databases, two API calls, and an embedded Excel classification lookup for space categorisation</p>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-title">Power Query Pipeline</div>
+      <div class="pipeline-flow">
+        <div class="pl-stage">
+          <div class="stg-label">Sources</div>
+          <div class="stg-items">
+            <div class="pn">PostgreSQL<br><span style="color:var(--muted);font-size:11px">3 micro services</span></div>
+            <div class="pn">Proprietary API<br><span style="color:var(--muted);font-size:11px">Segregated data</span></div>
+            <div class="pn">Excel & Static data</div>
+          </div>
+        </div>
+        <div class="pl-arrow">→</div>
+        <div class="pl-stage">
+          <div class="stg-label">Power Query (M)</div>
+          <div class="stg-items">
+            <div class="pn">Access</div>
+            <div class="pn">Equipment</div>
+            <div class="pn">Feedback</div>
+            <div class="pn">Opening Hours</div>
+            <div class="pn">Places Classifications</div>
+            <div class="pn">Reservation</div>
+            <div class="pn">Thing</div>
+          </div>
+        </div>
+        <div class="pl-arrow">→</div>
+        <div class="pl-stage">
+          <div class="stg-label">Model Tables</div>
+          <div class="stg-items" style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div class="pn">Access</div>
+            <div class="pn">Calendar</div>
+            <div class="pn">Cluster Authorizations</div>
+            <div class="pn">Equipment</div>
+            <div class="pn">Feedback</div>
+            <div class="pn">Get Guests</div>
+            <div class="pn">Get Users</div>
+            <div class="pn">Guest</div>
+            <div class="pn">Items Offered</div>
+            <div class="pn">Opening Hours</div>
+            <div class="pn">Reservation</div>
+            <div class="pn">Thing</div>
+            <div class="pn">UTC Offset</div>
+            <div class="pn">Zone</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="schema-shell">
+      <div class="schema-canvas" id="schema">
+        <svg viewBox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--mono)">
+          <defs>
+            <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <polygon points="0,0 6,3 0,6" fill="#4B7FA8"/>
+            </marker>
+          </defs>
+
+          <!-- Connections (straight diagonal) -->
+          <g class="connections" stroke="#4B7FA8" stroke-width="1.25" fill="none">
+            <!-- Reservation → Calendar -->
+            <path class="conn" data-pair="Reservation,Calendar" d="M380,310 L220,190" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Reservation → Items Offered -->
+            <path class="conn" data-pair="Reservation,Items Offered" d="M380,350 L220,350" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Reservation → Thing -->
+            <path class="conn" data-pair="Reservation,Thing" d="M540,310 L700,190" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Thing → Zone -->
+            <path class="conn" data-pair="Thing,Zone" d="M780,220 L780,300" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Zone → Opening Hours -->
+            <path class="conn" data-pair="Zone,Opening Hours" d="M780,400 L780,480" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Thing → Cluster Auth -->
+            <path class="conn" data-pair="Thing,Cluster Authorizations" d="M700,150 L540,130" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Reservation → Equipment -->
+            <path class="conn" data-pair="Reservation,Equipment" d="M380,380 L220,480" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+          </g>
+
+
+          <!-- Row 1 -->
+          <!-- Calendar DIM (left) -->
+          <g class="tbl dim" data-table="Calendar" transform="translate(60,80)">
+            <rect class="tbl-bg" width="160" height="110" rx="6"/>
+            <rect class="tbl-header" width="160" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="160" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Calendar</text>
+            <text x="128" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Date</text>
+            <text x="132" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Year</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Month</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Day Of Week</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Is Holiday</text>
+          </g>
+
+          <!-- Guest DIM (center-bottom) -->
+          <g class="tbl dim" data-table="Guest" transform="translate(380,480)">
+            <rect class="tbl-bg" width="160" height="110" rx="6"/>
+            <rect class="tbl-header" width="160" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="160" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Guest</text>
+            <text x="128" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Guest Id</text>
+            <text x="132" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Email</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Company</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Guest Type</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Status</text>
+          </g>
+
+          <!-- Thing DIM (right, Reservation-style appearance) -->
+          <g class="tbl fact" data-table="Thing" transform="translate(700,80)">
+            <rect class="tbl-bg" width="160" height="140" rx="6"/>
+            <rect class="tbl-header" width="160" height="28" rx="6"/>
+            <rect class="tbl-header" y="14" width="160" height="14"/>
+            <text x="12" y="18" font-size="13" fill="#E5E9F0" font-weight="700">Thing</text>
+            <text x="128" y="18" font-size="9" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="46" font-size="10" fill="#38BDF8">Thing Id</text>
+            <text x="132" y="46" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="60" font-size="10" fill="#818CF8">Zone Id</text>
+            <text x="132" y="60" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="74" font-size="10" fill="#B5BCC8">Name</text>
+            <text x="12" y="88" font-size="10" fill="#B5BCC8">Capacity</text>
+            <text x="12" y="102" font-size="10" fill="#B5BCC8">Category</text>
+            <text x="12" y="116" font-size="10" fill="#B5BCC8">Status</text>
+            <text x="12" y="130" font-size="10" fill="#B5BCC8">Created At</text>
+          </g>
+
+          <!-- Row 2 -->
+          <!-- Items Offered DIM (left) -->
+          <g class="tbl dim" data-table="Items Offered" transform="translate(60,300)">
+            <rect class="tbl-bg" width="160" height="100" rx="6"/>
+            <rect class="tbl-header" width="160" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="160" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Items Offered</text>
+            <text x="128" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Item Id</text>
+            <text x="132" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Base Price</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Type</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Active</text>
+          </g>
+
+          <!-- Reservation FACT (center) -->
+          <g class="tbl fact" data-table="Reservation" transform="translate(380,260)">
+            <rect class="tbl-bg" width="160" height="140" rx="6"/>
+            <rect class="tbl-header" width="160" height="28" rx="6"/>
+            <rect class="tbl-header" y="14" width="160" height="14"/>
+            <text x="12" y="18" font-size="13" fill="#E5E9F0" font-weight="700">Reservation</text>
+            <text x="128" y="18" font-size="9" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="46" font-size="10" fill="#38BDF8">Reservation Id</text>
+            <text x="132" y="46" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="60" font-size="10" fill="#818CF8">Guest Id</text>
+            <text x="132" y="60" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="74" font-size="10" fill="#818CF8">Thing Id</text>
+            <text x="132" y="74" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="88" font-size="10" fill="#B5BCC8">Start Time</text>
+            <text x="12" y="102" font-size="10" fill="#818CF8">Start Date</text>
+            <text x="132" y="102" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="116" font-size="10" fill="#B5BCC8">Status</text>
+            <text x="12" y="130" font-size="10" fill="#B5BCC8">Duration</text>
+          </g>
+
+          <!-- Zone DIM (right) -->
+          <g class="tbl dim" data-table="Zone" transform="translate(700,300)">
+            <rect class="tbl-bg" width="160" height="100" rx="6"/>
+            <rect class="tbl-header" width="160" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="160" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Zone</text>
+            <text x="128" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Zone Id</text>
+            <text x="132" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#818CF8">Parent Zone Id</text>
+            <text x="132" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Name</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Level</text>
+          </g>
+
+          <!-- Row 3 -->
+          <!-- Equipment DIM (left) -->
+          <g class="tbl dim" data-table="Equipment" transform="translate(60,480)">
+            <rect class="tbl-bg" width="160" height="90" rx="6"/>
+            <rect class="tbl-header" width="160" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="160" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Equipment</text>
+            <text x="128" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Equipment Id</text>
+            <text x="132" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Category</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Model</text>
+          </g>
+
+          <!-- Cluster Authorizations DIM (center-top) -->
+          <g class="tbl dim" data-table="Cluster Authorizations" transform="translate(380,80)">
+            <rect class="tbl-bg" width="160" height="90" rx="6"/>
+            <rect class="tbl-header" width="160" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="160" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Cluster Auth</text>
+            <text x="128" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Cluster Id</text>
+            <text x="132" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Auth Level</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Permissions</text>
+          </g>
+
+          <!-- Opening Hours DIM (right) -->
+          <g class="tbl dim" data-table="Opening Hours" transform="translate(700,480)">
+            <rect class="tbl-bg" width="160" height="100" rx="6"/>
+            <rect class="tbl-header" width="160" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="160" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Opening Hours</text>
+            <text x="120" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Opening Id</text>
+            <text x="132" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#818CF8">Zone Id</text>
+            <text x="132" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Open Time</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Close Time</text>
+          </g>
+        </svg>
+      </div>
+      <aside class="schema-side" id="schemaSide">
+        <div class="ss-label">Inspector</div>
+        <div id="schemaInspector">
+          <div class="ss-empty">Hover or click any table to inspect its columns and relationships</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- 04 DAX -->
+<section id="dax">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>04</span> · DAX</div>
+      <div class="sh-title">
+        <h2>The logic, in code</h2>
+        <p style="max-width:none">45+ measures across utilization, saturation, occupancy, people, and guest access. Standout complexity: measures with multi-denominator utilization math and the Offered Time Independent pattern that strips date filter context while preserving all other filters</p>
+      </div>
+    </div>
+    <div class="dax-tabs" id="daxTabs">
+      <button class="dax-tab active" data-panel="util">Measures <span class="count">4</span></button>
+      <button class="dax-tab" data-panel="cols">Calculated Columns <span class="count">2</span></button>
+    </div>
+
+    <!-- Measures -->
+    <div class="dax-panel active" data-panel="util">
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Occupancy <span class="tag">measure</span></div>
+            <div class="desc">People currently inside the space at the selected hour: count of reservations with an active status whose hour range matches the Calendar slicer. Drives the real-time occupancy KPI card on the Today Monitoring page</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> SelectedHour <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Calendar'</span>[<span class="dx-col">Z_Hour</span>], <span class="dx-fn">BLANK</span>())
+<span class="ln"> 2</span><span class="dx-kw">RETURN</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">COUNTROWS</span>(<span class="dx-tbl">'Reservation Flat'</span>),
+<span class="ln"> 3</span>    <span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Reservation Status</span>] <span class="dx-kw">IN</span> {<span class="dx-str">"Booked"</span>, <span class="dx-str">"Closed"</span>},
+<span class="ln"> 4</span>    <span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Z - Hour Range</span>] <span class="dx-op">=</span> SelectedHour)</pre>
+      </article>
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Utilization Booked <span class="tag">measure</span></div>
+            <div class="desc">Booked resource-hours as a fraction of total offered resource-hours. Numerator excludes cancelled and no-show rows. Paired with Utilization Offered to surface the gap between offer and confirmed demand</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">RETURN</span> <span class="dx-fn">DIVIDE</span>(<span class="dx-fn">CALCULATE</span>(<span class="dx-fn">SUM</span>(<span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Duration [h]</span>]),
+<span class="ln"> 2</span>              <span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Reservation Status</span>] <span class="dx-kw">IN</span> {<span class="dx-str">"Booked"</span>, <span class="dx-str">"Closed"</span>}),
+<span class="ln"> 3</span>              [<span class="dx-col">Offered Time Independent</span>] <span class="dx-op">*</span> [<span class="dx-col">Hours Per Day</span>])
+</pre>
+      </article>
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">People Covering <span class="tag">measure</span></div>
+            <div class="desc">Unique active employees who made at least one non-cancelled reservation in the selected period, divided by total active headcount from Get Users. Workspace adoption rate KPI: used in the Recurring variant to filter bookers with 12+ reservations in the past 12 months</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">RETURN</span> <span class="dx-fn">DIVIDE</span>(<span class="dx-fn">CALCULATE</span>(<span class="dx-fn">DISTINCTCOUNT</span>(<span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Created By</span>]),<span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Reservation Status</span>] <span class="dx-op">&lt;&gt;</span> <span class="dx-str">"Cancelled"</span>),
+<span class="ln"> 2</span>              <span class="dx-fn">COUNTROWS</span>(<span class="dx-tbl">'Get Users'</span>))</pre>
+      </article>
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Exits <span class="tag">measure</span></div>
+            <div class="desc">Count of physical exit events recorded by access-service hardware in the selected period. Cross-referenced against digital check-out records on the Access Anomalies page to flag discrepancies where exits exceed or precede reservation check-outs</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">RETURN</span> </span><span class="dx-fn">CALCULATE</span>(<span class="dx-fn">COUNTROWS</span>(<span class="dx-tbl">'Access'</span>), <span class="dx-tbl">'Access'</span>[<span class="dx-col">Event Type</span>] <span class="dx-op">=</span> <span class="dx-str">"Exit"</span>)</pre>
+      </article>
+    </div>
+
+    <!-- Calculated Columns -->
+    <div class="dax-panel" data-panel="cols">
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Is User Recurrent? <span class="tag">column · Reservation Flat</span></div>
+            <div class="desc">Classifies a booker as "recurrent" if they have made at least 12 non-cancelled reservations in the past 12 months. Used to filter the Recurring Bookers and Recurring People Covering measures, removing infrequent users from adoption rate calculations to avoid inflating the metric</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Email <span class="dx-op">         =</span> <span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Created By</span>]
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> RecentBookings <span class="dx-op">= </span><span class="dx-fn">CALCULATE</span>(<span class="dx-fn">COUNTROWS</span>(<span class="dx-tbl">'Reservation Flat'</span>),
+<span class="ln"> 3</span>                               <span class="dx-fn">FILTER</span>(<span class="dx-tbl">'Reservation Flat'</span>,
+<span class="ln"> 4</span>                                      <span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Created By</span>] <span class="dx-op">=</span> Email
+<span class="ln"> 5</span>                                      <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Check In Time</span>] <span class="dx-op">&gt;=</span> <span class="dx-fn">TODAY</span>() <span class="dx-op">-</span> <span class="dx-num">365</span>
+<span class="ln"> 6</span>                                      <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'Reservation Flat'</span>[<span class="dx-col">Reservation Status</span>] <span class="dx-op">&lt;&gt;</span> <span class="dx-str">"Cancelled"</span>))
+<span class="ln"> 7</span><span class="dx-kw">RETURN</span> <span class="dx-fn">IF</span>(RecentBookings <span class="dx-op">&gt;=</span> <span class="dx-num">12</span>, <span class="dx-str">"Y"</span>, <span class="dx-str">"N"</span>)</pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Reservation Start Time <span class="tag">column · Reservation Flat</span></div>
+            <div class="desc">Calculate the actual start time of a reservation considering the timezone and status of the reservation </div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Timezone <span class="dx-op">      = <span class="dx-fn">RELATED</span> <span class="dx-tbl">('Thing Flat'</span>[<span class="dx-col">Timezone])</span>
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Intermediate <span class="dx-op">  = <span class="dx-fn">IF</span> <span class="dx-tbl">('Reservation Flat'</span>[<span class="dx-col">Reservation Status]</span> IN <span class="dx-col">[<span class="dx-str">"Closed"</span>, <span class="dx-str">"In Progress"</span>]</span>,
+<span class="ln"> 3</span>                        <span class="dx-tbl">('Reservation Flat'</span>[<span class="dx-col">Check In Time]</span>, <span class="dx-tbl">('Reservation Flat'</span>[<span class="dx-col">Check In Time]</span> + <span class="dx-num">1</span>/<span class="dx-num">24))</span>
+<span class="ln"> 4</span><span class="dx-kw">VAR</span> Difference <span class="dx-op">    = <span class="dx-fn">LOOKUPVALUE</span> <span class="dx-tbl">('UTC Offset'</span>[<span class="dx-col">UTC offset ±hh:mm])</span>, <span class="dx-tbl">('UTC Offset'</span>[<span class="dx-col">TZ database name]), Timezone)</span>
+
+<span class="ln"> 5</span><span class="dx-kw">RETURN</span> <span class="dx-tbl"> Intermediate + </span><span class="dx-num">Difference</span>/<span class="dx-num">24</span></pre>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- 05 PAGES -->
+<section id="pages">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>05</span> · Pages</div>
+      <div class="sh-title">
+        <h2>Six pages, full lifecycle</h2>
+        <p style="max-width:none">From home navigation to reservation ledger, real-time monitoring, saturation analysis, people breakdown, and access anomaly detection: each page answers a distinct operational question</p>
+      </div>
+    </div>
+    
+    <div class="pages-stack">
+
+      <!-- PAGE 02 -->
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">PAGE 02 / BOOKING</div>
+          <h3>Reservation ledger</h3>
+          <p>Status breakdown, cancellation rates, and user booking patterns over time.</p>
+          <div class="features"><span>Bar Chart</span><span>Line Chart</span><span>Table</span><span>KPI Cards</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <img src="../screenshots/BABooking.png" alt="Booking page">
+        </div>
+      </div>
+
+      <!-- PAGE 04 -->
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">PAGE 04 / SATURATION</div>
+          <h3>Capacity frequency analysis</h3>
+          <p>Saturation trend, frequency distribution across capacity bands, and daily heatmap.</p>
+          <div class="features"><span>Area Chart</span><span>Heatmap</span><span>Distribution</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <img src="../screenshots/BASaturation.png" alt="Saturation page">
+        </div>
+      </div>
+
+      <!-- PAGE 05 -->
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">PAGE 05 / PEOPLE</div>
+          <h3>Booker coverage &amp; guest volume</h3>
+          <p>People Covering ratio, active employees, and guest counts broken down by company, division, and generation.</p>
+          <div class="features"><span>KPI Cards</span><span>Treemap</span><span>Bar Chart</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <img src="../screenshots/BAPeople.png" alt="People page">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <span>© 2024 Simone Caruso</span>
+    <span><a href="index.html">← Back to portfolio</a></span>
+  </div>
+</footer>
+
+<script>
+const tableData = {
+  "Reservation": {
+    "kind": "Fact",
+    "desc": "Central table containing all booking transactions and informations",
+    "cols": [
+      { "n": "Reservation Id", "t": "String", "tag": "pk" },
+      { "n": "Guest Id", "t": "String", "tag": "fk" },
+      { "n": "Thing Id", "t": "String", "tag": "fk" },
+      { "n": "Start Time", "t": "DateTime" },
+      { "n": "End Time", "t": "DateTime" },
+      { "n": "Status", "t": "String" }
+    ]
+  },
+  "Guest": {
+    "kind": "Dimension",
+    "desc": "All guest information and visitor details with GDPR compliance",
+    "cols": [
+      { "n": "Guest Id", "t": "String", "tag": "pk" },
+      { "n": "Email", "t": "String (Encrypted)" },
+      { "n": "Company", "t": "String" }
+    ]
+  },
+  "Access": {
+    "kind": "Fact",
+    "desc": "All access logs for physical entry/exit events",
+    "cols": [
+      { "n": "Access Id", "t": "String", "tag": "pk" },
+      { "n": "Guest Id", "t": "String", "tag": "fk" },
+      { "n": "Timestamp", "t": "DateTime" },
+      { "n": "Event Type", "t": "String" }
+    ]
+  },
+  "Thing": {
+    "kind": "Dimension",
+    "desc": "Bookable physical resources (desks, rooms, parking)",
+    "cols": [
+      { "n": "Thing Id", "t": "String", "tag": "pk" },
+      { "n": "Zone Id", "t": "String", "tag": "fk" },
+      { "n": "Name", "t": "String" }
+    ]
+  },
+  "Zone": {
+    "kind": "Dimension",
+    "desc": "Spatial hierarchy (Building, Floor, Area, Entity)",
+    "cols": [
+      { "n": "Zone Id", "t": "String", "tag": "pk" },
+      { "n": "Parent Zone Id", "t": "String", "tag": "fk" },
+      { "n": "Name", "t": "String" }
+    ]
+  },
+  "Calendar": {
+    "kind": "Dimension",
+    "desc": "Temporal table for trend analysis and aggregations",
+    "cols": [
+      { "n": "Date Time", "t": "DateTime", "tag": "pk" },
+      { "n": "Year", "t": "Int" },
+      { "n": "Month", "t": "String" }
+    ]
+  },
+  "Items Offered": {
+    "kind": "Dimension",
+    "desc": "Services and resources offered for reservation, with pricing details",
+    "cols": [
+      { "n": "Item Id", "t": "String", "tag": "pk" },
+      { "n": "Price", "t": "Decimal" }
+    ]
+  },
+  "Feedback": {
+    "kind": "Fact",
+    "desc": "Post-booking reviews and ratings",
+    "cols": [
+      { "n": "Feedback Id", "t": "String", "tag": "pk" },
+      { "n": "Reservation Id", "t": "String", "tag": "fk" },
+      { "n": "Rating", "t": "Int" }
+    ]
+  },
+  "Equipment": {
+    "kind": "Dimension",
+    "desc": "Technical equipment associated with the resources",
+    "cols": [
+      { "n": "Equipment Id", "t": "String", "tag": "pk" },
+      { "n": "Model", "t": "String" }
+    ]
+  },
+  "Opening Hours": {
+    "kind": "Dimension",
+    "desc": "Operating hours for different zones",
+    "cols": [
+      { "n": "Opening Id", "t": "String", "tag": "pk" },
+      { "n": "Zone Id", "t": "String", "tag": "fk" }
+    ]
+  },
+  "Cluster Authorizations": {
+    "kind": "Dimension",
+    "desc": "Access and control rules and permissions for user groups",
+    "cols": [
+      { "n": "Cluster Id", "t": "String", "tag": "pk" },
+      { "n": "User Group", "t": "String" }
+    ]
+  },
+  "UTC Offset": {
+    "kind": "Dimension",
+    "desc": "Time zone management for multi-country installations",
+    "cols": [
+      { "n": "UTC Offset Id", "t": "String", "tag": "pk" },
+      { "n": "Offset Value", "t": "String" }
+    ]
+  }
+};
+
+const schema = document.getElementById('schema');
+const inspector = document.getElementById('schemaInspector');
+function renderInspector(name) {
+  if (!name) { inspector.innerHTML = '<div class="ss-empty">Hover or click any table to inspect its columns and relationships</div>'; return; }
+  const t = tableData[name]; if (!t) return;
+  const cols = t.cols.map(c => {
+    const cls = c.tag||''; const tag = c.tag ? `<span class="col-tag ${c.tag}">${c.tag}</span>` : '';
+    return `<div class="col"><div><span class="name ${cls}">${c.n}</span>${tag}</div><div class="type">${c.t}</div></div>`;
+  }).join('');
+  inspector.innerHTML = `<div class="ss-title">${name} <span class="kind">${t.kind}</span></div><div class="ss-desc">${t.desc}</div><div class="ss-cols">${cols}</div>`;
+}
+const tbls = schema.querySelectorAll('.tbl');
+const conns = schema.querySelectorAll('.conn');
+function activate(name) {
+  if (!name) { schema.removeAttribute('data-active'); tbls.forEach(t=>t.classList.remove('active')); conns.forEach(c=>c.classList.remove('active')); renderInspector(null); return; }
+  schema.setAttribute('data-active', name);
+  tbls.forEach(t => t.classList.toggle('active', t.dataset.table === name));
+  conns.forEach(c => {
+    const pair = (c.dataset.pair||'').split(',');
+    c.classList.toggle('active', pair.includes(name));
+    pair.forEach(p => { if (p !== name) { const o = schema.querySelector(`.tbl[data-table="${p}"]`); if (o) o.classList.add('active'); } });
+  });
+  renderInspector(name);
+}
+tbls.forEach(t => { t.addEventListener('mouseenter', () => activate(t.dataset.table)); t.addEventListener('click', () => activate(t.dataset.table)); });
+schema.addEventListener('mouseleave', () => activate(null));
+
+const tabs = document.querySelectorAll('.dax-tab');
+const panels = document.querySelectorAll('.dax-panel');
+tabs.forEach(t => { t.addEventListener('click', () => { tabs.forEach(x=>x.classList.remove('active')); panels.forEach(p=>p.classList.remove('active')); t.classList.add('active'); document.querySelector(`.dax-panel[data-panel="${t.dataset.panel}"]`).classList.add('active'); }); });
+
+document.querySelectorAll('[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const code = btn.closest('.measure').querySelector('pre.dax').innerText.split('\n').map(l=>l.replace(/^\s*\d+\s/,'')).join('\n').trim();
+    try { await navigator.clipboard.writeText(code); const o=btn.textContent; btn.textContent='✓ Copied'; btn.classList.add('copied'); setTimeout(()=>{btn.textContent=o;btn.classList.remove('copied');},1400); } catch(e){btn.textContent='× Failed';}
+  });
+});
+</script>
+</body>
+</html>

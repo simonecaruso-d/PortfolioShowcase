@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>People Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
+  --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
+  --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
+  --accent:#38BDF8; --accent-2:#818CF8; --accent-3:#34D399;
+  --warn:#FBBF24; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Inter Tight',ui-sans-serif,system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:56px 56px;background-position:-1px -1px;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#000}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+.wide{max-width:1440px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted)}
+.tb-status .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3)}
+.tb-status .nav{display:flex;gap:18px}
+.tb-status .nav a{color:var(--muted);transition:color .15s}
+.tb-status .nav a:hover{color:var(--text)}
+
+/* Hero */
+.hero{padding:128px 0 96px;position:relative}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:32px;display:flex;align-items:center;gap:12px}
+.hero h1{font-size:clamp(44px,7vw,90px);line-height:.98;letter-spacing:-.04em;font-weight:700;margin-bottom:32px}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:500;white-space:nowrap}
+.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:680px;margin-bottom:48px;font-weight:400}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--accent);padding:6px 14px;border:1px solid rgba(56,189,248,.25);border-radius:999px;background:rgba(56,189,248,.08);display:inline-flex;align-items:center;transition:background .18s,border-color .18s}
+.chip:hover{background:rgba(56,189,248,.18);border-color:rgba(56,189,248,.5)}
+
+/* Stats strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 32px;border-right:1px solid var(--border);position:relative}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.stat .label .tag{color:var(--dim)}
+.stat .num{font-size:64px;line-height:1;letter-spacing:-.04em;font-weight:600;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:24px;color:var(--muted);margin-left:6px;font-weight:500;letter-spacing:.06em}
+.stat .sub{margin-top:12px;font-size:13px;color:var(--text-dim)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}.stat:nth-child(-n+2){border-bottom:1px solid var(--border)}}
+
+/* Section header */
+.sh{margin-bottom:56px;display:grid;grid-template-columns:200px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.12em}
+.sh-no span{color:var(--accent)}
+.sh-title h2{font-size:48px;line-height:1.05;letter-spacing:-.03em;font-weight:600;margin-bottom:16px;max-width:32ch}
+.sh-title p{font-size:17px;color:var(--text-dim);max-width:80ch}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}.sh-title h2{font-size:36px}}
+
+/* Problem */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.problem-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
+.problem-col.before{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.35)}
+.problem-col.after{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.35)}
+.problem-col h3{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.problem-col h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--danger)}
+.problem-col.after h3::before{background:var(--accent-3)}
+.problem-col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.problem-col li{display:flex;gap:14px;font-size:15px;line-height:1.55;color:var(--text-dim)}
+.problem-col li::before{content:"|";color:var(--dim);font-family:var(--mono);flex-shrink:0}
+@media(max-width:760px){.problem-grid{grid-template-columns:1fr}}
+
+/* Domain grid (Solution) */
+.domain-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:1100px){.domain-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.domain-grid{grid-template-columns:1fr}}
+.domain-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;position:relative;overflow:hidden;transition:border-color .15s}
+.domain-card:hover{border-color:var(--border-bright)}
+.dc-glyph{font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:-.04em;color:var(--accent);margin-bottom:14px}
+.dc-name{font-size:16px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+.dc-key{font-family:var(--mono);font-size:11px;color:var(--accent-3);letter-spacing:.06em;margin-bottom:10px;text-transform:uppercase}
+.dc-detail{font-size:13px;color:var(--muted);line-height:1.55}
+
+/* Pipeline */
+.pipeline{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;margin-bottom:24px}
+.pipeline-title{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:24px}
+.pipeline-flow{display:grid;grid-template-columns:1fr 24px 1.6fr 24px 2fr;gap:0;align-items:stretch}
+.pl-stage{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.pl-stage .stg-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pl-stage .stg-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.pl-stage .stg-items{display:flex;flex-direction:column;gap:6px}
+.pl-stage .pn{font-family:var(--mono);font-size:12px;padding:6px 10px;background:var(--panel-3);border:1px solid var(--border);border-radius:4px;color:var(--text-dim)}
+.pl-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim);font-family:var(--mono)}
+@media(max-width:900px){.pipeline-flow{grid-template-columns:1fr}.pl-arrow{padding:8px;transform:rotate(90deg)}}
+
+/* Schema */
+.schema-shell{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0;overflow:hidden;display:grid;grid-template-columns:1fr 320px}
+.schema-canvas{background-image:radial-gradient(circle at 20% 20%,rgba(56,189,248,.04),transparent 50%),radial-gradient(circle at 80% 80%,rgba(129,140,248,.04),transparent 50%),linear-gradient(var(--panel-2) 1px,transparent 1px),linear-gradient(90deg,var(--panel-2) 1px,transparent 1px);background-size:100% 100%,100% 100%,32px 32px,32px 32px;position:relative;min-height:620px;padding:16px;border-right:1px solid var(--border)}
+.schema-canvas svg{display:block;width:100%;height:auto;max-height:600px}
+.tbl{cursor:pointer;transition:opacity .2s}
+.schema-canvas[data-active] .tbl:not(.active){opacity:.25}
+.schema-canvas[data-active] .conn:not(.active){opacity:.1}
+.tbl.active rect.tbl-bg{stroke:var(--accent);stroke-width:2}
+.tbl rect.tbl-bg{stroke:var(--border-bright);stroke-width:1.5;fill:var(--panel-2);transition:stroke .2s,stroke-width .2s}
+.tbl.hub rect.tbl-bg{stroke:var(--accent);stroke-width:2}
+.tbl.fact rect.tbl-bg{stroke:rgba(56,189,248,.5);stroke-width:1.5}
+.tbl rect.tbl-header{fill:var(--panel-3)}
+.tbl.hub rect.tbl-header{fill:rgba(56,189,248,.18)}
+.conn{transition:opacity .2s}
+.schema-side{padding:24px;background:var(--panel-2);overflow-y:auto;max-height:620px}
+.schema-side .ss-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
+.schema-side .ss-title{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.schema-side .ss-title .kind{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--accent);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);padding:2px 6px;border-radius:3px;text-transform:uppercase}
+.schema-side .ss-desc{font-size:13px;color:var(--text-dim);line-height:1.55;margin-bottom:20px}
+.schema-side .ss-cols{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border)}
+.schema-side .col{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px;align-items:center}
+.schema-side .col .name{color:var(--text)}
+.schema-side .col .type{color:var(--muted);font-size:11px}
+.schema-side .col .name.pk{color:var(--accent)}
+.schema-side .col .name.fk{color:var(--accent-2)}
+.schema-side .col-tag{font-size:9px;letter-spacing:.08em;font-weight:700;padding:2px 5px;border-radius:2px;margin-left:6px}
+.schema-side .col-tag.pk{background:rgba(56,189,248,.1);color:var(--accent)}
+.schema-side .col-tag.fk{background:rgba(129,140,248,.1);color:var(--accent-2)}
+.schema-side .ss-empty{font-family:var(--mono);font-size:12px;color:var(--muted);padding:24px 0;text-align:center;border:1px dashed var(--border);border-radius:6px}
+@media(max-width:900px){.schema-shell{grid-template-columns:1fr}.schema-canvas{border-right:none;border-bottom:1px solid var(--border)}}
+
+/* DAX */
+.dax-tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);overflow-x:auto}
+.dax-tab{font-family:var(--mono);font-size:12px;color:var(--muted);padding:12px 16px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;transition:color .15s,border-color .15s;white-space:nowrap}
+.dax-tab:hover{color:var(--text)}
+.dax-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.dax-tab .count{margin-left:6px;color:var(--dim);font-size:11px}
+.dax-tab.active .count{color:var(--accent)}
+.dax-panel{display:none;flex-direction:column;gap:24px}
+.dax-panel.active{display:flex}
+.measure{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.measure-head{padding:20px 24px;display:flex;align-items:flex-start;gap:24px;border-bottom:1px solid var(--border)}
+.measure-head .meta{flex:1;min-width:0}
+.measure-head .name{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px;display:flex;align-items:baseline;gap:10px}
+.measure-head .name .tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--accent);background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600}
+.measure-head .desc{font-size:14px;color:var(--text-dim);line-height:1.55}
+.measure-head .actions{display:flex;gap:8px;flex-shrink:0}
+.btn-icon{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--panel-2);border:1px solid var(--border);padding:6px 10px;border-radius:4px;cursor:pointer;letter-spacing:.06em;display:flex;align-items:center;gap:6px;transition:color .15s,border-color .15s}
+.btn-icon:hover{color:var(--text);border-color:var(--border-bright)}
+.btn-icon.copied{color:var(--accent-3);border-color:var(--accent-3)}
+.code-bar{background:var(--panel-2);padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.code-bar .lang{color:var(--accent)}
+.code-bar .lang::before{content:"●";margin-right:8px}
+.code-bar .lines{margin-left:auto;color:var(--dim);text-transform:none;letter-spacing:0}
+pre.dax{margin:0;padding:24px;background:#06080B;font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto;color:var(--text-dim)}
+.dx-kw{color:var(--accent-2);font-weight:500}
+.dx-fn{color:var(--accent)}
+.dx-str{color:var(--accent-3)}
+.dx-num{color:var(--warn)}
+.dx-com{color:var(--dim);font-style:italic}
+.dx-tbl{color:var(--text)}
+.dx-col{color:var(--text-dim)}
+.dx-op{color:var(--muted)}
+.ln{display:inline-block;width:32px;color:var(--dim);text-align:right;margin-right:16px;user-select:none;font-size:11px}
+
+/* Pages */
+.pages-stack{display:flex;flex-direction:column;gap:64px}
+.page-row{display:grid;grid-template-columns:380px 1fr;gap:48px;align-items:start}
+.page-meta .num{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;margin-bottom:16px}
+.page-meta h3{font-size:28px;letter-spacing:-.02em;font-weight:600;margin-bottom:16px}
+.page-meta p{font-size:15px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
+.page-meta .features{display:flex;flex-wrap:wrap;gap:6px}
+.page-meta .features span{font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:4px 8px;border-radius:4px}
+.page-frame{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;position:relative;width:560px}
+.page-frame .frame-bar{height:32px;background:var(--panel-2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.page-frame .frame-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.ph{aspect-ratio:16/9;background:repeating-linear-gradient(135deg,var(--panel) 0,var(--panel) 12px,var(--panel-2) 12px,var(--panel-2) 24px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
+@media(max-width:900px){.page-row{grid-template-columns:1fr;gap:24px}.page-frame{width:100%}}
+
+/* Footer */
+footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+.foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.foot-inner a{color:var(--text-dim);transition:color .15s}
+.foot-inner a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="wide topbar-inner">
+    <a href="index.html" class="tb-back">← Portfolio</a>
+    <span class="tb-path">
+      <span class="slash">/</span>Data Visualization<span class="slash">/</span><span class="here">People Analytics</span>
+    </span>
+    <div class="tb-status">
+      <span class="nav">
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#dax">DAX</a>
+        <a href="#pages">Pages</a>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero wrap">
+  <div class="meta">Data Visualization Project · Power BI · 2023</div>
+  <h1>People data,<br><span class="accent">hire to exit</span></h1>
+  <p class="lede">End-to-end HR intelligence platform: headcount, cost, turnover, gender gap, recruiting, learning, and much more across 160+ DAX measures, a 66-table model, and an ML regression for churn prediction embedded directly in DAX</p>
+  <div class="chips">
+    <span class="chip">Power BI</span>
+    <span class="chip">DAX</span>
+    <span class="chip">Power Query (M)</span>
+    <span class="chip">SharePoint</span>
+    <span class="chip">Oracle ERP</span>
+    <span class="chip">ML in DAX</span>
+  </div>
+</header>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="label"><span>DAX measures</span><span class="tag">model</span></div>
+    <div class="num">160+<span class="unit"></span></div>
+    <div class="sub">Turnover · Cost · Learning · Compliance </div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>Report pages</span><span class="tag">published</span></div>
+    <div class="num">17+</div>
+    <div class="sub">12+ domain pages & executive views</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>Tables in model</span><span class="tag">data model</span></div>
+    <div class="num">66</div>
+    <div class="sub">Including 9 parameter tables</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>ML predictors</span><span class="tag">regression</span></div>
+    <div class="num">6</div>
+    <div class="sub">From a reactive to a proactive approach</div>
+  </div>
+</div>
+
+<!-- 01 PROBLEM -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>01</span> · Problem</div>
+      <div class="sh-title">
+        <h2>HR data in hundreds of different Excel files</h2>
+        <p>Every domain (cost, recruiting, turnover, learning, and so on) lived in a separate workbook owned by a different person. No shared definitions, no common date spine, no way to cross-reference headcount against cost against exits</p>
+      </div>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-col before">
+        <h3>Before</h3>
+        <ul>
+          <li>Fragmented Excel files per domain: cost in one workbook, recruiting in another, exit data in a third: each with its own column naming and time logic</li>
+          <li>No single employee identifier across sources: joining Oracle ERP to SharePoint surveys required manual VLOOKUP on email, rebuilt every month</li>
+          <li>NY cost forecast was a copy-paste exercise: Finance received a snapshot, not a live model with scenario inputs</li>
+          <li>Zero visibility into turnover prediction: exits were reported after the fact, never anticipated</li>
+        </ul>
+      </div>
+      <div class="problem-col after">
+        <h3>After</h3>
+        <ul>
+          <li>Single Master Registry hub joins Oracle ERP, SharePoint cost, recruiting pipeline, exit surveys, and eNPS into one governed model on a shared email</li>
+          <li>Compliance is treated as a first-class citizen in the model and receives a dedicated tech/data approach</li>
+          <li>NY cost forecast is a live scenario model: planned hires, exits, raises, and contract transformations update the closing figure dynamically</li>
+          <li>6-variable ML regression in DAX produces per-employee churn probability with R² and MAPE diagnostics updated on each refresh</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 SOLUTION -->
+<section id="solution">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>02</span> · Solution</div>
+      <div class="sh-title">
+        <h2>Eight domains, one command centre</h2>
+        <p>Each domain has its own page cluster, its own measure group, and its own data source, but all share the same Registry, so every filter propagates across the full model</p>
+      </div>
+    </div>
+    <div class="domain-grid">
+      <div class="domain-card">
+        <div class="dc-glyph">HDC</div>
+        <div class="dc-name">Headcount</div>
+        <div class="dc-key">~300 employees · 8 countries</div>
+        <div class="dc-detail">Active employees, historic trend, organizational demographics by office, team, contract type, generation, and seniority</div>
+      </div>
+      <div class="domain-card">
+        <div class="dc-glyph">TRN</div>
+        <div class="dc-name">Turnover</div>
+        <div class="dc-key">Turnover · Retention</div>
+        <div class="dc-detail">Monthly churn waterfall: positive and negative turnover, net hire ratio, cumulative retention curve</div>
+      </div>
+      <div class="domain-card">
+        <div class="dc-glyph">DEI</div>
+        <div class="dc-name">Diversity, Equity & Inclusion</div>
+        <div class="dc-key">Pay gap · Diversity KPIs</div>
+        <div class="dc-detail">Female-to-total ratio, cost gap by seniority level, historic gender pay gap trend in terms of gender, disabilities and more. E&amp;I scatter and bar decomposition</div>
+      </div>
+      <div class="domain-card">
+        <div class="dc-glyph">RCT</div>
+        <div class="dc-name">Recruiting</div>
+        <div class="dc-key">Open positions · Time-to-fill</div>
+        <div class="dc-detail">SharePoint recruiting pipeline from 2022: open positions, last activity flags, conversion rate by team. Funnel and matrix views</div>
+      </div>
+      <div class="domain-card">
+        <div class="dc-glyph">LRN</div>
+        <div class="dc-name">Learning</div>
+        <div class="dc-key">Hours pro capite · Certifications</div>
+        <div class="dc-detail">Learning programme hours per active FTE, certifications, average cost per hour, anomaly detection on certification cost outliers by team</div>
+      </div>
+      <div class="domain-card">
+        <div class="dc-glyph">CST</div>
+        <div class="dc-name">Cost</div>
+        <div class="dc-key">Closing forecasts & models</div>
+        <div class="dc-detail">Full personnel cost breakdown: salary, benefits, compliance, ICT, safety. NY closing forecast chains five impact measures</div>
+      </div>
+      <div class="domain-card">
+        <div class="dc-glyph">PRD</div>
+        <div class="dc-name">Productivity</div>
+        <div class="dc-key">Chargeability · Output per FTE</div>
+        <div class="dc-detail">Chargeability rate, internal vs. billable hours ratio, output per active FTE, and absenteeism impact on effective capacity by team and circle</div>
+      </div>
+      <div class="domain-card">
+        <div class="dc-glyph">CPL</div>
+        <div class="dc-name">Compliance</div>
+        <div class="dc-key">Certificate tracking</div>
+        <div class="dc-detail">P/CAT disabled and orphan employee quotas (7% and 1% targets), compliance gap alerts, certificate expiry tracking, and deadline monitoring by office</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ARCHITECTURE -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>03</span> · Architecture</div>
+      <div class="sh-title">
+        <h2>Hub-and-spoke, anchored to Master Registry</h2>
+        <p>Master Registry is the central hub: every domain fact table joins on <code style="font-family:var(--mono);font-size:.9em;color:var(--accent)">email</code>. Calendar Table provides the shared date spine for time-intelligence across all tables</p>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-title">Power Query Pipeline</div>
+      <div class="pipeline-flow">
+        <div class="pl-stage">
+          <div class="stg-label">Sources</div>
+          <div class="stg-items">
+            <div class="pn">2x Oracle ERP</div>
+            <div class="pn">Multiple SharePoint Excel</div>
+            <div class="pn">Multiple Embedded JSON</div>
+          </div>
+        </div>
+        <div class="pl-arrow">→</div>
+        <div class="pl-stage">
+          <div class="stg-label">Power Query (M)</div>
+          <div class="stg-items">
+            <div class="pn">Master Registry (10-table JOIN)</div>
+            <div class="pn">Personnel Cost</div>
+            <div class="pn">Tracking Recruiting</div>
+            <div class="pn">Exit Interview</div>
+            <div class="pn">eNPS</div>
+            <div class="pn">Projects Detail</div>
+          </div>
+        </div>
+        <div class="pl-arrow">→</div>
+        <div class="pl-stage">
+          <div class="stg-label">Model + DAX Tables</div>
+          <div class="stg-items">
+            <div class="pn">Master Registry</div>
+            <div class="pn">Calendar Table</div>
+            <div class="pn">Exit Interview</div>
+            <div class="pn">Personnel Cost</div>
+            <div class="pn">Turnover Regression</div>
+            <div class="pn">Measure & Parameters Table</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="schema-shell">
+      <div class="schema-canvas" id="schema">
+        <svg viewBox="0 0 920 580" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--mono)">
+          <defs>
+            <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <polygon points="0,0 6,3 0,6" fill="#4B7FA8"/>
+            </marker>
+          </defs>
+
+          <!-- Connections -->
+          <g class="connections" stroke="#4B7FA8" stroke-width="1.25" fill="none">
+            <!-- Calendar Table → Viaggi (Date → Departure Date) -->
+            <path class="conn" data-pair="Calendar Table,Viaggi"
+              d="M 350,48 L 127,48 L 127,215"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Calendar Table → Timesheet (Date → Competency Date) -->
+            <path class="conn" data-pair="Calendar Table,Timesheet"
+              d="M 565,48 L 792,48 L 792,215"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Anagrafica → Exit Interview (Email) -->
+            <path class="conn" data-pair="Anagrafica,Exit Interview"
+              d="M 350,252 L 295,252 L 295,70 L 235,70"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Anagrafica → Viaggi (Employee → Traveler) -->
+            <path class="conn" data-pair="Anagrafica,Viaggi"
+              d="M 350,272 L 235,272"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Anagrafica → Timesheet (Email) -->
+            <path class="conn" data-pair="Anagrafica,Timesheet"
+              d="M 585,272 L 685,272"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Anagrafica ↔ Prices History (Employee, bidirectional) -->
+            <path class="conn" data-pair="Anagrafica,Prices History"
+              d="M 400,363 L 400,408 L 127,408 L 127,430"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Anagrafica → Personnel Cost (Email) -->
+            <path class="conn" data-pair="Anagrafica,Personnel Cost"
+              d="M 467,363 L 467,430"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Anagrafica → Onboarding Survey (Email) -->
+            <path class="conn" data-pair="Anagrafica,Onboarding Survey"
+              d="M 585,320 L 645,320 L 645,480 L 685,480"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+          </g>
+
+          <!-- Cardinality labels -->
+          <g font-family="var(--mono)" font-size="9" font-weight="700" fill="#9AA3B0">
+            <!-- Calendar → Viaggi -->
+            <text x="335" y="44">1</text><text x="131" y="210">N</text>
+            <!-- Calendar → Timesheet -->
+            <text x="580" y="44">1</text><text x="788" y="210">N</text>
+            <!-- Anagrafica → Exit Interview -->
+            <text x="314" y="248">1</text><text x="238" y="66">N</text>
+            <!-- Anagrafica → Viaggi -->
+            <text x="314" y="268">1</text><text x="238" y="268">N</text>
+            <!-- Anagrafica → Timesheet -->
+            <text x="599" y="268">1</text><text x="688" y="268">N</text>
+            <!-- Anagrafica → Prices History -->
+            <text x="403" y="382">1</text><text x="130" y="426">N</text>
+            <!-- Anagrafica → Personnel Cost -->
+            <text x="470" y="381">1</text><text x="470" y="426">N</text>
+            <!-- Anagrafica → Onboarding Survey -->
+            <text x="599" y="316">1</text><text x="688" y="476">N</text>
+          </g>
+
+          <!-- EXIT INTERVIEW (top-left) -->
+          <g class="tbl fact" data-table="Exit Interview" transform="translate(20,15)">
+            <rect class="tbl-bg" width="215" height="110" rx="6"/>
+            <rect class="tbl-header" width="215" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="215" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Exit Interview</text>
+            <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Id</text>
+            <text x="195" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#818CF8">Email</text>
+            <text x="197" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Start time</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Question</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Answer</text>
+          </g>
+
+          <!-- CALENDAR TABLE (top-center, DIM) -->
+          <g class="tbl dim" data-table="Calendar Table" transform="translate(350,15)">
+            <rect class="tbl-bg" width="215" height="66" rx="6"/>
+            <rect class="tbl-header" width="215" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="215" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Calendar Table</text>
+            <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Date</text>
+            <text x="195" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Year</text>
+          </g>
+
+          <!-- TRACKING RECRUITING (top-right) -->
+          <g class="tbl fact" data-table="Tracking Recruiting" transform="translate(685,15)">
+            <rect class="tbl-bg" width="215" height="110" rx="6"/>
+            <rect class="tbl-header" width="215" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="215" height="10"/>
+            <text x="12" y="16" font-size="10" fill="#E5E9F0" font-weight="600">Tracking Recruiting</text>
+            <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Position Id</text>
+            <text x="195" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Team</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Seniority</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Last Activity Date</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Status</text>
+          </g>
+
+          <!-- TRAVELS (middle-left) -->
+          <g class="tbl fact" data-table="Viaggi" transform="translate(20,215)">
+            <rect class="tbl-bg" width="215" height="110" rx="6"/>
+            <rect class="tbl-header" width="215" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="215" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Travels</text>
+            <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Travel Id</text>
+            <text x="195" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#818CF8">Traveler</text>
+            <text x="197" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#818CF8">Departure Date</text>
+            <text x="197" y="68" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Cost</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Destination</text>
+          </g>
+
+          <!-- ANAGRAFICA (center — HUB) -->
+          <g class="tbl hub" data-table="Anagrafica" transform="translate(350,215)">
+            <rect class="tbl-bg" width="235" height="148" rx="6"/>
+            <rect class="tbl-header" width="235" height="28" rx="6"/>
+            <rect class="tbl-header" y="14" width="235" height="14"/>
+            <text x="14" y="18" font-size="13" fill="#E5E9F0" font-weight="700">Master Registry</text>
+            <text x="198" y="18" font-size="9" fill="#38BDF8" font-weight="700">HUB</text>
+            <text x="14" y="46" font-size="10" fill="#38BDF8">Email</text>
+            <text x="213" y="46" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="14" y="60" font-size="10" fill="#38BDF8">Status</text>
+            <text x="14" y="74" font-size="10" fill="#B5BCC8">Team</text>
+            <text x="14" y="88" font-size="10" fill="#B5BCC8">Contract Type</text>
+            <text x="14" y="102" font-size="10" fill="#B5BCC8">Tenure</text>
+            <text x="14" y="116" font-size="10" fill="#B5BCC8">Generation</text>
+          </g>
+
+          <!-- TIMESHEET (middle-right) -->
+          <g class="tbl fact" data-table="Timesheet" transform="translate(685,215)">
+            <rect class="tbl-bg" width="215" height="110" rx="6"/>
+            <rect class="tbl-header" width="215" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="215" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Timesheet</text>
+            <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#818CF8">Email</text>
+            <text x="197" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#818CF8">Competency Date</text>
+            <text x="197" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Activity Code</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Hours</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Internal Price</text>
+          </g>
+
+          <!-- PRICES HISTORY (bottom-left) -->
+          <g class="tbl fact" data-table="Prices History" transform="translate(20,430)">
+            <rect class="tbl-bg" width="215" height="100" rx="6"/>
+            <rect class="tbl-header" width="215" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="215" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Prices History</text>
+            <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#818CF8">Employee</text>
+            <text x="197" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Price Date</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Internal Cost</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Notes</text>
+          </g>
+
+          <!-- PERSONNEL COST (bottom-center) -->
+          <g class="tbl fact" data-table="Personnel Cost" transform="translate(350,430)">
+            <rect class="tbl-bg" width="235" height="88" rx="6"/>
+            <rect class="tbl-header" width="235" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="235" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Personnel Cost</text>
+            <text x="203" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#818CF8">Email</text>
+            <text x="213" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#818CF8">Competency Date</text>
+            <text x="213" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Amount</text>
+          </g>
+
+          <!-- ONBOARDING SURVEY (bottom-right) -->
+          <g class="tbl fact" data-table="Onboarding Survey" transform="translate(685,430)">
+            <rect class="tbl-bg" width="215" height="110" rx="6"/>
+            <rect class="tbl-header" width="215" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="215" height="10"/>
+            <text x="12" y="16" font-size="10" fill="#E5E9F0" font-weight="600">Onboarding Survey</text>
+            <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#818CF8">Email</text>
+            <text x="197" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#818CF8">Date</text>
+            <text x="197" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Question</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Answer</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Area</text>
+          </g>
+        </svg>
+      </div>
+      <aside class="schema-side" id="schemaSide">
+        <div class="ss-label">Inspector</div>
+        <div id="schemaInspector">
+          <div class="ss-empty">Hover or click any table to inspect its columns and relationships</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- 04 DAX -->
+<section id="dax">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>04</span> · DAX</div>
+      <div class="sh-title">
+        <h2>The logic, in code</h2>
+        <p>160+ measures across 8+ domain groups. The standout: a full multiple linear regression embedded as a calculated column, with R² and MAPE diagnostics depending on per-row SSR/SST columns iterated with EARLIER</p>
+      </div>
+    </div>
+
+    <div class="dax-tabs" id="daxTabs">
+      <button class="dax-tab active" data-panel="measures">Measures <span class="count">5</span></button>
+      <button class="dax-tab" data-panel="cols">Calculated Columns <span class="count">1</span></button>
+    </div>
+
+    <!-- Measures -->
+    <div class="dax-panel active" data-panel="measures">
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Chargeability <span class="tag">measure</span></div>
+            <div class="desc">Ratio of hours logged on chargeable activities to total productive hours excluding Absence, capped to dates up to today so future forecast timesheets don't inflate the rate</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Chargeable   <span class="dx-op">=</span> {<span class="dx-str">"Market"</span>, <span class="dx-str">"Production - Other Team"</span>, <span class="dx-str">"Production - Same Team"</span>}
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Numerator    <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">SUM</span>(<span class="dx-tbl">'Timesheet (Minimal)'</span>[<span class="dx-col">Hours</span>]), <span class="dx-tbl">'Timesheet (Minimal)'</span>[<span class="dx-col">Competency Date</span>] <span class="dx-op">&lt;=</span> <span class="dx-fn">TODAY</span>() <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'Timesheet (Minimal)'</span>[<span class="dx-col">Category</span>] <span class="dx-fn">IN</span> Chargeable)
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> Denominator  <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">SUM</span>(<span class="dx-tbl">'Timesheet (Minimal)'</span>[<span class="dx-col">Hours</span>]), <span class="dx-tbl">'Timesheet (Minimal)'</span>[<span class="dx-col">Competency Date</span>] <span class="dx-op">&lt;=</span> <span class="dx-fn">TODAY</span>() <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'Timesheet (Minimal)'</span>[<span class="dx-col">Category</span>] <span class="dx-op">&lt;&gt;</span> <span class="dx-str">"Absence"</span>)
+<span class="ln"> 4</span><span class="dx-kw">RETURN</span> <span class="dx-op">=</span> <span class="dx-fn">IF</span>(Denominator <span class="dx-fn">IN</span> {<span class="dx-fn">BLANK</span>(), <span class="dx-num">0</span>}, <span class="dx-str">"Error"</span>, Numerator <span class="dx-op">/</span> Denominator)
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Average Salary Gap <span class="tag">measure</span></div>
+            <div class="desc">Pay gap between protected-category employees and the rest</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> AverageNotProtectedRAL <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">AVERAGE</span>(<span class="dx-tbl">'Timesheet (Minimal)'</span>[<span class="dx-col">Internal Price</span>]), <span class="dx-tbl">Anagrafica</span>[<span class="dx-col">CatP</span>] <span class="dx-fn">IN</span> {<span class="dx-str">"NO"</span>, <span class="dx-fn">BLANK</span>()})
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> AverageProtectedRAL <span class="dx-op">   =</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">AVERAGE</span>(<span class="dx-tbl">'Timesheet (Minimal)'</span>[<span class="dx-col">Internal Price</span>]), <span class="dx-tbl">Anagrafica</span>[<span class="dx-col">CatP</span>] <span class="dx-op">=</span> <span class="dx-str">"SI"</span>)
+<span class="ln"> 3</span><span class="dx-kw">RETURN</span> <span class="dx-fn">IF</span>(AverageNotProtectedRAL <span class="dx-fn">IN</span> {<span class="dx-num">0</span>, <span class="dx-fn">BLANK</span>()}, <span class="dx-fn">BLANK</span>(), (AverageProtectedRAL <span class="dx-op">-</span> AverageNotProtectedRAL) <span class="dx-op">/</span> AverageNotProtectedRAL)</pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Out <span class="tag">measure</span></div>
+            <div class="desc">Count of leavers for the selected period. Dual-granularity logic lets the same measure drive both annual summary cards and monthly trend charts without duplication</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Anno       <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Calendar Table'</span>[<span class="dx-col">Date</span>].[Year])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Mese       <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Calendar Table'</span>[<span class="dx-col">Date</span>].[MonthNo])
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> FiltroAnno <span class="dx-op">=</span> <span class="dx-fn">FILTER</span>(<span class="dx-tbl">Anagrafica</span>, <span class="dx-tbl">Anagrafica</span>[<span class="dx-col">Status</span>] <span class="dx-op">=</span> <span class="dx-str">"Non attivo"</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">Anagrafica</span>[<span class="dx-col">Contract End Date</span>].[Year] <span class="dx-op">=</span> Anno)
+<span class="ln"> 4</span><span class="dx-kw">VAR</span> FiltroMese <span class="dx-op">=</span> <span class="dx-fn">FILTER</span>(<span class="dx-tbl">Anagrafica</span>, <span class="dx-tbl">Anagrafica</span>[<span class="dx-col">Status</span>] <span class="dx-op">=</span> <span class="dx-str">"Non attivo"</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">Anagrafica</span>[<span class="dx-col">Contract End Date</span>].[Year] <span class="dx-op">=</span> Anno <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">Anagrafica</span>[<span class="dx-col">Contract End Date</span>].[MonthNo] <span class="dx-op">=</span> Mese)
+<span class="ln"> 5</span><span class="dx-kw">VAR</span> OutputAnno <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">DISTINCTCOUNT</span>(<span class="dx-tbl">Anagrafica</span>[<span class="dx-col">Employee</span>]), FiltroAnno)
+<span class="ln"> 6</span><span class="dx-kw">VAR</span> OutputMese <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">DISTINCTCOUNT</span>(<span class="dx-tbl">Anagrafica</span>[<span class="dx-col">Employee</span>]), FiltroMese)
+<span class="ln"> 7</span><span class="dx-kw">RETURN</span> <span class="dx-fn">IF</span>(Mese <span class="dx-op">=</span> <span class="dx-fn">BLANK</span>(), OutputAnno, OutputMese)</pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">RSquared <span class="tag">measure</span></div>
+            <div class="desc">Model fit for the turnover regression, basedo on the sums of per-row SSR (squared residuals vs prediction) and SST (squared deviations from mean actual)</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> SSR <span class="dx-op">=</span> <span class="dx-fn">SUMX</span>(<span class="dx-tbl">'Z - Regression on Negative Turnover'</span>, <span class="dx-tbl">'Z - Regression on Negative Turnover'</span>[<span class="dx-col">Z - SSR</span>])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> SST <span class="dx-op">=</span> <span class="dx-fn">SUMX</span>(<span class="dx-tbl">'Regression on Negative Turnover'</span>, <span class="dx-tbl">'Regression on Negative Turnover'</span>[<span class="dx-col">Z - SST</span>])
+<span class="ln"> 3</span><span class="dx-kw">RETURN</span> <span class="dx-num">1</span> <span class="dx-op">-</span> <span class="dx-fn">DIVIDE</span>(SSR, SST)</pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">NPS <span class="tag">measure</span></div>
+            <div class="desc">Net Promoter Score from exit interviews</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Detrattori <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">DISTINCTCOUNT</span>(<span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Name</span>]), <span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Z - NPS</span>] <span class="dx-op">&lt;</span> <span class="dx-num">7</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Z - NPS</span>] <span class="dx-op">&gt;</span> <span class="dx-num">0</span>)
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Difensori  <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">DISTINCTCOUNT</span>(<span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Name</span>]), <span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Z - NPS</span>] <span class="dx-op">&gt;</span> <span class="dx-num">8</span>)
+<span class="ln"> 3</span><span class="dx-kw">RETURN</span> Difensori <span class="dx-op">-</span> Detrattori</pre>
+      </article>
+
+    </div>
+
+    <!-- Calculated Columns -->
+    <div class="dax-panel" data-panel="cols">
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Is it the last price for this person? <span class="tag">column · Prices History</span></div>
+            <div class="desc">Flags the most recent price record per employee. Used as a filter anchor in salary gap, RAL estimation, and cost measures to avoid double-counting historical contract tiers</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Employee <span class="dx-op">=</span> <span class="dx-tbl">'Storico Tariffe'</span>[<span class="dx-col">Employee</span>]
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Filter   <span class="dx-op">=</span> <span class="dx-fn">FILTER</span>(<span class="dx-fn">ALL</span>(<span class="dx-tbl">'Storico Tariffe'</span>), <span class="dx-tbl">'Storico Tariffe'</span>[<span class="dx-col">Employee</span>] <span class="dx-op">=</span> Employee)
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> MaxDate  <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">MAX</span>(<span class="dx-tbl">'Storico Tariffe'</span>[<span class="dx-col">Price Date</span>]), Filter)
+<span class="ln"> 4</span><span class="dx-kw">VAR</span> Date     <span class="dx-op">=</span> <span class="dx-tbl">'Storico Tariffe'</span>[<span class="dx-col">Price Date</span>]
+<span class="ln"> 5</span><span class="dx-kw">RETURN</span> <span class="dx-fn">IF</span>(MaxDate <span class="dx-op">=</span> Date, <span class="dx-str">"Y"</span>, <span class="dx-str">"N"</span>)</pre>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- 05 PAGES -->
+<section id="pages">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>05</span> · Pages</div>
+      <div class="sh-title">
+        <h2>Pages showcase</h2>
+        <p>HR operations, people analytics, ML forecasting, and executive views</p>
+      </div>
+    </div>
+    <div class="pages-stack">
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">HOME</div>
+          <h3>HR command centre</h3>
+          <p>Entry point. Navigation hub to all domain sub-reports</p>
+          <div class="features"><span>Domain Navigation</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <img src="../screenshots/PAHome.png" alt="Home" style="width:100%;display:block">
+        </div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">OVERVIEW</div>
+          <h3>Organization demographics</h3>
+          <p>Headcount by office, circle, team, contract type, generation, seniority, and education level. Time series of active employee count with hire and exit overlaid</p>
+          <div class="features"><span>Bar Charts</span><span>Map</span><span>Line Chart</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <img src="../screenshots/PAOverview.png" alt="Overview" style="width:100%;display:block">
+        </div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">TIME ANALYSIS</div>
+          <h3>Timesheet In Depth</h3>
+          <p>Chargeability, absence rate, internal time ratio, and projected leave residuals from Oracle future absence query. Actuals vs theoretical hours by period and circle</p>
+          <div class="features"><span>Stacked Bar</span><span>Table</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <img src="../screenshots/PATime.png" alt="Time Analysis" style="width:100%;display:block">
+        </div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">RECRUITING</div>
+          <h3>Pipeline Status</h3>
+          <p>Open positions, last activity flags, time-to-fill, and conversion rate by circle and team</p>
+          <div class="features"><span>Funnel</span><span>KPI Cards</span><span>Matrix</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <img src="../screenshots/PARecruiting.png" alt="Recruiting" style="width:100%;display:block">
+        </div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">TURNOVER</div>
+          <h3>Churn Analysis</h3>
+          <p>Monthly positive and negative turnover, net hire ratio, cumulative retention, by employee segment</p>
+          <div class="features"><span>Line</span><span>Bar chart</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <img src="../screenshots/PATurnover.png" alt="Turnover" style="width:100%;display:block">
+        </div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">ML</div>
+          <h3>Forecasts & Regression</h3>
+          <p>Correlation matrix between HR metrics, monovariate forecasting over time, regression betas for all predictors, plus R² and MAPE diagnostics for the turnover prediction model</p>
+          <div class="features"><span>Forecast Line</span><span>Model Stats</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <img src="../screenshots/PAMl.png" alt="ML" style="width:100%;display:block">
+        </div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">COMPLIANCE KPI</div>
+          <h3>Compliance KPIs</h3>
+          <p>Series of KPIs tracked for a specific compliance audit in terms of suppliers</p>
+          <div class="features"><span>Matrix</span><span>Stacked Lines</span></div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <img src="../screenshots/PACompliance.png" alt="Compliance KPI" style="width:100%;display:block">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <span>© 2023 Simone Caruso</span>
+    <span><a href="index.html">← Back to portfolio</a></span>
+  </div>
+</footer>
+
+<script>
+const tableData = {
+  "Anagrafica": {
+    kind: "HUB",
+    desc: "Employee master: 100+ columns from a 10-table Oracle JOIN. Calculated columns add Status, Age, Tenure, Generation, Office groups, Education/Major buckets, and Living Address fallback logic. Central hub for all fact tables via Employee (PK) and Email (UK).",
+    cols: [
+      { n: "Employee", t: "str", tag: "pk" },
+      { n: "Email", t: "str", tag: "uk" },
+      { n: "Status", t: "str" },
+      { n: "Circle", t: "str" },
+      { n: "Team", t: "str" },
+      { n: "Contract Type", t: "str" },
+      { n: "Collaboration Start Date", t: "date" },
+      { n: "Office", t: "str" },
+      { n: "Gender", t: "str" },
+      { n: "Generation", t: "str" },
+      { n: "Tenure", t: "dbl" },
+      { n: "Main Profile", t: "str" },
+    ]
+  },
+  "Calendar Table": {
+    kind: "DIM",
+    desc: "DAX CALENDAR() table spanning from earliest Collaboration Start Date to today+365. Date spine for all time-intelligence: YTD, PY, Rolling 12M. Primary relationships to Timesheet (Competency Date) and Travels (Departure Date).",
+    cols: [
+      { n: "Date", t: "date", tag: "pk" },
+      { n: "Year", t: "int" },
+      { n: "MonthNo", t: "int" },
+      { n: "QuarterNo", t: "int" },
+      { n: "MonthName", t: "str" },
+    ]
+  },
+  "Viaggi": {
+    kind: "FACT",
+    desc: "Travel requests from Oracle ERP: one row per travel segment. Joined to Master Registry on Traveler→Employee (1:N) and to Calendar Table on Departure Date. Calculated columns compute alert flags for cost outliers, weekend travel, pipeline status, and team mismatch.",
+    cols: [
+      { n: "Travel Id", t: "str", tag: "pk" },
+      { n: "Traveler", t: "str", tag: "fk" },
+      { n: "Departure Date", t: "date", tag: "fk" },
+      { n: "Return Date", t: "date" },
+      { n: "Request Type", t: "str" },
+      { n: "Origin", t: "str" },
+      { n: "Destination", t: "str" },
+      { n: "Cost", t: "€" },
+      { n: "Activity Code", t: "str" },
+      { n: "Operator", t: "str" },
+    ]
+  },
+  "Timesheet": {
+    kind: "FACT",
+    desc: "Daily timesheet actuals from Oracle ERP: one row per employee per day per activity, last 5 years. Joined to Master Registry on Email and to Calendar Table on Competency Date. Source for chargeability, FTE, cross-country allocation, and internal cost reconciliation.",
+    cols: [
+      { n: "Email", t: "str", tag: "fk" },
+      { n: "Competency Date", t: "date", tag: "fk" },
+      { n: "Employee", t: "str" },
+      { n: "Activity Code", t: "str" },
+      { n: "Hours", t: "dbl" },
+      { n: "Internal Cost", t: "€" },
+      { n: "External Price", t: "dbl" },
+      { n: "Internal Price", t: "dbl" },
+    ]
+  },
+  "Exit Interview": {
+    kind: "FACT",
+    desc: "Exit survey responses unpivoted to long format: one row per respondent per question. Name column is parsed to reconstruct an email FK to Master Registry. Powers NPS scoring, open-text analysis, and exit-reason correlation with employee attributes.",
+    cols: [
+      { n: "Id", t: "str", tag: "pk" },
+      { n: "Email", t: "str", tag: "fk" },
+      { n: "Name", t: "str" },
+      { n: "Start time", t: "date" },
+      { n: "Completion time", t: "date" },
+      { n: "Question", t: "str" },
+      { n: "Answer", t: "str" },
+      { n: "Numeric Answer", t: "int" },
+      { n: "Text Answer", t: "str" },
+    ]
+  },
+  "Onboarding Survey": {
+    kind: "FACT",
+    desc: "Onboarding satisfaction survey from SharePoint Excel, unpivoted to long format. Joined to Master Registry on Email. Likert scale mapped to Numerical Answer; free-text responses stored in Textual Answer. Grouped into Areas for radar chart analysis.",
+    cols: [
+      { n: "Email", t: "str", tag: "fk" },
+      { n: "Date", t: "date", tag: "fk" },
+      { n: "Question", t: "str" },
+      { n: "Area", t: "str" },
+      { n: "Numerical Answer", t: "dbl" },
+      { n: "Textual Answer", t: "str" },
+    ]
+  },
+  "Prices History": {
+    kind: "FACT",
+    desc: "Full history of hourly rate changes per employee from Oracle Cost table. Joined bidirectionally to Master Registry on Employee. Calculated columns flag the latest rate, count total transformations, and compute cumulative cost growth %. Source for gender pay gap and raise cycle analysis.",
+    cols: [
+      { n: "Employee", t: "str", tag: "fk" },
+      { n: "Price Date", t: "date" },
+      { n: "Internal Cost", t: "€" },
+      { n: "External Cost", t: "dbl" },
+      { n: "Notes", t: "str" },
+    ]
+  },
+  "Personnel Cost": {
+    kind: "FACT",
+    desc: "Five years of monthly personnel cost data combined from five SharePoint Excel workbooks via Table.Combine. Joined to Master Registry on Email. Calculated columns cross-check against Timesheet internal cost and flag delta vs prior month.",
+    cols: [
+      { n: "Email", t: "str", tag: "fk" },
+      { n: "Competency Date", t: "date", tag: "fk" },
+      { n: "Amount", t: "€" },
+    ]
+  },
+  "Tracking Recruiting": {
+    kind: "FACT",
+    desc: "Recruiting pipeline from four SharePoint Excel workbooks. Tracks open positions, last activity, throughput time, applicant funnel, and refused offers per circle and team. No direct FK to Master Registry: standalone pipeline table.",
+    cols: [
+      { n: "Position Id", t: "str", tag: "pk" },
+      { n: "Circle", t: "str" },
+      { n: "Team", t: "str" },
+      { n: "Status", t: "str" },
+      { n: "Seniority", t: "str" },
+      { n: "Position Name", t: "str" },
+      { n: "Last Activity Date", t: "date" },
+      { n: "RAL", t: "€" },
+      { n: "Available Spots", t: "int" },
+      { n: "Throughput Time [Days]", t: "int" },
+      { n: "Refused Offers", t: "int" },
+      { n: "Contract Type", t: "str" },
+    ]
+  },
+};
+
+const schema = document.getElementById('schema');
+const inspector = document.getElementById('schemaInspector');
+
+function renderInspector(name) {
+  if (!name) {
+    inspector.innerHTML = '<div class="ss-empty">Hover or click any table to inspect its columns and relationships.</div>';
+    return;
+  }
+  const t = tableData[name];
+  if (!t) return;
+  const cols = t.cols.map(c => {
+    const cls = c.tag ? c.tag : '';
+    const tag = c.tag ? `<span class="col-tag ${c.tag}">${c.tag.toUpperCase()}</span>` : '';
+    return `<div class="col"><div><span class="name ${cls}">${c.n}</span>${tag}</div><div class="type">${c.t}</div></div>`;
+  }).join('');
+  inspector.innerHTML = `
+    <div class="ss-title">${name} <span class="kind">${t.kind}</span></div>
+    <div class="ss-desc">${t.desc}</div>
+    <div class="ss-cols">${cols}</div>
+  `;
+}
+
+const tbls = schema.querySelectorAll('.tbl');
+const conns = schema.querySelectorAll('.conn');
+
+function activate(name) {
+  if (!name) {
+    schema.removeAttribute('data-active');
+    tbls.forEach(t => t.classList.remove('active'));
+    conns.forEach(c => c.classList.remove('active'));
+    renderInspector(null);
+    return;
+  }
+  schema.setAttribute('data-active', name);
+  tbls.forEach(t => t.classList.toggle('active', t.dataset.table === name));
+  conns.forEach(c => {
+    const pair = (c.dataset.pair || '').split(',');
+    c.classList.toggle('active', pair.includes(name));
+    pair.forEach(p => {
+      if (p !== name) {
+        const other = schema.querySelector(`.tbl[data-table="${p}"]`);
+        if (other) other.classList.add('active');
+      }
+    });
+  });
+  renderInspector(name);
+}
+
+tbls.forEach(t => {
+  t.addEventListener('mouseenter', () => activate(t.dataset.table));
+  t.addEventListener('click', () => activate(t.dataset.table));
+});
+schema.addEventListener('mouseleave', () => activate(null));
+
+// DAX tabs
+const tabs = document.querySelectorAll('.dax-tab');
+const panels = document.querySelectorAll('.dax-panel');
+tabs.forEach(t => {
+  t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelector(`.dax-panel[data-panel="${t.dataset.panel}"]`).classList.add('active');
+  });
+});
+
+// Copy buttons
+document.querySelectorAll('[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const measure = btn.closest('.measure');
+    const code = measure.querySelector('pre.dax').innerText
+      .split('\n').map(l => l.replace(/^\s*\d+\s/, '')).join('\n').trim();
+    try {
+      await navigator.clipboard.writeText(code);
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1400);
+    } catch(e) { btn.textContent = '× Failed'; }
+  });
+});
+</script>
+</body>
+</html>

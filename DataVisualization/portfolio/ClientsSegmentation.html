@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clients Segmentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
+  --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
+  --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
+  --accent:#38BDF8;       /* electric cyan */
+  --accent-2:#818CF8;     /* periwinkle */
+  --accent-3:#34D399;     /* mint */
+  --warn:#FBBF24; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: -1px -1px;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#000}
+
+/* ───────── Layout ───────── */
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+.wide{max-width:1440px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+
+/* ───────── Top bar ───────── */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:0.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted)}
+.tb-status .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3)}
+.tb-status .nav{display:flex;gap:18px}
+.tb-status .nav a{color:var(--muted);transition:color .15s}
+.tb-status .nav a:hover{color:var(--text)}
+
+/* ───────── Hero ───────── */
+.hero{padding:128px 0 96px;position:relative}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:32px;display:flex;align-items:center;gap:12px}
+.hero .meta::before{content:"";width:32px;height:1px;background:var(--accent);display:none}
+.hero h1{font-size:clamp(44px,7vw,90px);line-height:0.98;letter-spacing:-0.04em;font-weight:700;margin-bottom:32px;max-width:none}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:500;white-space:nowrap}
+.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:100%;margin-bottom:48px;font-weight:400}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--accent);padding:6px 14px;border:1px solid rgba(56,189,248,0.25);border-radius:999px;background:rgba(56,189,248,0.08);display:inline-flex;align-items:center;transition:background 0.18s,border-color 0.18s}
+.chip:hover{background:rgba(56,189,248,0.18);border-color:rgba(56,189,248,0.5)}
+
+/* ───────── Stat strip ───────── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%, var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 32px;border-right:1px solid var(--border);position:relative}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.stat .label .tag{color:var(--dim)}
+.stat .num{font-size:64px;line-height:1;letter-spacing:-0.04em;font-weight:600;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:24px;color:var(--muted);margin-left:6px;font-weight:500;letter-spacing:0.06em}
+.stat .sub{margin-top:12px;font-size:13px;color:var(--text-dim)}
+.stat[data-placeholder]::after{content:"PLACEHOLDER";position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9px;color:var(--warn);letter-spacing:0.12em;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);padding:2px 6px;border-radius:3px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}.stat:nth-child(-n+2){border-bottom:1px solid var(--border)}}
+
+/* ───────── Section header ───────── */
+.sh{margin-bottom:56px;display:grid;grid-template-columns:200px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.12em}
+.sh-no span{color:var(--accent)}
+.sh-no .line{display:none}
+.sh-title h2{font-size:48px;line-height:1.05;letter-spacing:-0.03em;font-weight:600;margin-bottom:16px;max-width:18ch}
+.sh-title p{font-size:17px;color:var(--text-dim);max-width:60ch}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}.sh-title h2{font-size:36px}}
+
+/* ───────── Problem panel ───────── */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.problem-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
+.problem-col.before{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.35)}
+.problem-col.after{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.35)}
+.problem-col h3{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.problem-col h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--danger)}
+.problem-col.after h3::before{background:var(--accent-3)}
+.problem-col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.problem-col li{display:flex;gap:14px;font-size:15px;line-height:1.55;color:var(--text-dim)}
+.problem-col li::before{content:"|";color:var(--dim);font-family:var(--mono);flex-shrink:0}
+@media(max-width:760px){.problem-grid{grid-template-columns:1fr}}
+
+/* ───────── Segmentation Matrix ───────── */
+.matrix-wrap{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;overflow-x:auto}
+.matrix-legend{display:flex;flex-wrap:wrap;gap:24px;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase}
+.matrix-legend .item{display:flex;align-items:center;gap:8px}
+.matrix-legend .sw{width:14px;height:14px;border-radius:3px}
+.matrix{display:grid;grid-template-columns:140px repeat(6,1fr);min-width:880px}
+.mx-cell{padding:18px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-height:74px;display:flex;flex-direction:column;justify-content:center;font-size:13px}
+.mx-cell:nth-child(7n){border-right:none}
+.mx-head{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--panel-2)}
+.mx-head.corner{background:transparent;color:var(--dim)}
+.mx-row-head{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--panel-2);font-weight:600;display:flex;align-items:center;gap:10px}
+.mx-action{font-weight:600;letter-spacing:-0.01em;color:var(--text);position:relative;cursor:default;transition:background .15s}
+.mx-action[data-act="develop"]{background:rgba(52,211,153,.07)}
+.mx-action[data-act="develop"] .label{color:var(--accent-3)}
+.mx-action[data-act="accelerate"]{background:rgba(56,189,248,.07)}
+.mx-action[data-act="accelerate"] .label{color:var(--accent)}
+.mx-action[data-act="elevate"]{background:rgba(129,140,248,.07)}
+.mx-action[data-act="elevate"] .label{color:var(--accent-2)}
+.mx-action[data-act="reconnect"]{background:rgba(251,191,36,.07)}
+.mx-action[data-act="reconnect"] .label{color:var(--warn)}
+.mx-action[data-act="acquire"]{background:rgba(248,113,113,.07)}
+.mx-action[data-act="acquire"] .label{color:var(--danger)}
+.mx-action[data-act="none"]{color:var(--dim);background:transparent}
+.mx-action:hover{background:var(--panel-3)}
+.mx-action .label{font-size:13px;text-transform:uppercase;letter-spacing:0.04em;font-weight:700}
+.mx-action .desc{font-size:11px;color:var(--muted);font-weight:400;margin-top:4px;letter-spacing:0;text-transform:none}
+.matrix-foot{margin-top:24px;display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.06em}
+.matrix-foot .arrow{flex:1;height:1px;background:linear-gradient(90deg, var(--border-bright), transparent)}
+
+/* ───────── Pages / Screenshots ───────── */
+.pages-stack{display:flex;flex-direction:column;gap:64px}
+.page-row{display:grid;grid-template-columns:380px 1fr;gap:48px;align-items:start}
+.page-meta .num{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.12em;margin-bottom:16px}
+.page-meta h3{font-size:28px;letter-spacing:-0.02em;font-weight:600;margin-bottom:16px}
+.page-meta p{font-size:15px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
+.page-meta .features{display:flex;flex-wrap:wrap;gap:6px}
+.page-meta .features span{font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:4px 8px;border-radius:4px}
+.page-frame{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;position:relative}
+.page-frame .frame-bar{height:32px;background:var(--panel-2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.page-frame .frame-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.page-frame .frame-bar .filename{margin-left:8px;color:var(--text-dim)}
+.page-frame .frame-bar .badge{margin-left:auto;color:var(--accent);background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);padding:2px 8px;border-radius:3px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase}
+.page-frame .ph{aspect-ratio:16/9;background:
+  repeating-linear-gradient(135deg,var(--panel) 0,var(--panel) 12px,var(--panel-2) 12px,var(--panel-2) 24px);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:0.04em;position:relative}
+.page-frame .ph .filepath{color:var(--text-dim);font-size:13px}
+.page-frame .ph .hint{color:var(--dim);font-size:11px}
+.page-frame{width:fit-content}
+.page-frame img{display:block;width:auto;height:300px;max-width:100%}
+.page-frame.blurred::after{content:"REDACTED FOR PRIVACY";position:absolute;inset:32px 0 0;backdrop-filter:blur(8px);background:rgba(8,9,12,.4);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--text);letter-spacing:0.16em;font-weight:600}
+@media(max-width:900px){.page-row{grid-template-columns:1fr;gap:24px}}
+
+/* ───────── Power Query Pipeline ───────── */
+.pipeline{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;margin-bottom:24px}
+.pipeline-title{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px}
+.pipeline-flow{display:grid;grid-template-columns:1fr 24px 1.6fr 24px 2fr;gap:0;align-items:stretch}
+.pl-stage{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.pl-stage .stg-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pl-stage .stg-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.pl-stage .stg-items{display:flex;flex-direction:column;gap:6px}
+.pl-stage .pn{font-family:var(--mono);font-size:12px;padding:6px 10px;background:var(--panel-3);border:1px solid var(--border);border-radius:4px;color:var(--text-dim)}
+.pl-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim);font-family:var(--mono)}
+@media(max-width:900px){.pipeline-flow{grid-template-columns:1fr}.pl-arrow{padding:8px;transform:rotate(90deg)}}
+
+/* ───────── Schema (interactive) ───────── */
+.schema-shell{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0;overflow:hidden;display:grid;grid-template-columns:1fr 320px}
+.schema-canvas{background:
+  radial-gradient(circle at 20% 20%, rgba(56,189,248,.04), transparent 50%),
+  radial-gradient(circle at 80% 80%, rgba(129,140,248,.04), transparent 50%),
+  var(--panel);
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(56,189,248,.04), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(129,140,248,.04), transparent 50%),
+    linear-gradient(var(--panel-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--panel-2) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+  position:relative;min-height:620px;padding:16px;border-right:1px solid var(--border)
+}
+.schema-canvas svg{display:block;width:100%;height:auto;max-height:600px}
+.tbl{cursor:pointer;transition:opacity .2s}
+.schema-canvas[data-active] .tbl:not(.active){opacity:.25}
+.schema-canvas[data-active] .conn:not(.active){opacity:.1}
+.tbl.active rect.tbl-bg{stroke:var(--accent);stroke-width:2}
+.tbl rect.tbl-bg{stroke:var(--border-bright);stroke-width:1.5;fill:var(--panel-2);transition:stroke .2s, stroke-width .2s}
+.tbl.fact rect.tbl-bg{stroke:var(--accent);stroke-width:2}
+.tbl.param rect.tbl-bg{stroke:var(--accent-2);stroke-width:1.5;stroke-dasharray:5,3}
+.tbl rect.tbl-header{fill:var(--panel-3)}
+.tbl.fact rect.tbl-header{fill:rgba(56,189,248,.18)}
+.conn{transition:opacity .2s}
+.schema-side{padding:24px;background:var(--panel-2);overflow-y:auto;max-height:620px}
+.schema-side .ss-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px}
+.schema-side .ss-title{font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.schema-side .ss-title .kind{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--accent);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);padding:2px 6px;border-radius:3px;text-transform:uppercase}
+.schema-side .ss-desc{font-size:13px;color:var(--text-dim);line-height:1.55;margin-bottom:20px}
+.schema-side .ss-cols{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border)}
+.schema-side .col{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px;align-items:center}
+.schema-side .col .name{color:var(--text)}
+.schema-side .col .type{color:var(--muted);font-size:11px}
+.schema-side .col .name.pk{color:var(--accent)}
+.schema-side .col .name.fk{color:var(--accent-2)}
+.schema-side .col-tag{font-size:9px;letter-spacing:0.08em;font-weight:700;padding:2px 5px;border-radius:2px;margin-left:6px}
+.schema-side .col-tag.pk{background:rgba(56,189,248,.1);color:var(--accent)}
+.schema-side .col-tag.fk{background:rgba(129,140,248,.1);color:var(--accent-2)}
+.schema-side .ss-empty{font-family:var(--mono);font-size:12px;color:var(--muted);padding:24px 0;text-align:center;border:1px dashed var(--border);border-radius:6px}
+@media(max-width:900px){.schema-shell{grid-template-columns:1fr}.schema-canvas{border-right:none;border-bottom:1px solid var(--border)}}
+
+/* ───────── DAX Showcase ───────── */
+.dax-tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);overflow-x:auto}
+.dax-tab{font-family:var(--mono);font-size:12px;color:var(--muted);padding:12px 16px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;transition:color .15s, border-color .15s;white-space:nowrap}
+.dax-tab:hover{color:var(--text)}
+.dax-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.dax-tab .count{margin-left:6px;color:var(--dim);font-size:11px}
+.dax-tab.active .count{color:var(--accent)}
+.dax-panel{display:none;flex-direction:column;gap:24px}
+.dax-panel.active{display:flex}
+.measure{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.measure-head{padding:20px 24px;display:flex;align-items:flex-start;gap:24px;border-bottom:1px solid var(--border)}
+.measure-head .meta{flex:1;min-width:0}
+.measure-head .name{font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:4px;display:flex;align-items:baseline;gap:10px}
+.measure-head .name .tag{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--accent);background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600}
+.measure-head .desc{font-size:14px;color:var(--text-dim);line-height:1.55;max-width:75ch}
+#dax .measure-head .desc{max-width:none}
+.measure-head .actions{display:flex;gap:8px;flex-shrink:0}
+.btn-icon{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--panel-2);border:1px solid var(--border);padding:6px 10px;border-radius:4px;cursor:pointer;letter-spacing:0.06em;display:flex;align-items:center;gap:6px;transition:color .15s, border-color .15s}
+.btn-icon:hover{color:var(--text);border-color:var(--border-bright)}
+.btn-icon.copied{color:var(--accent-3);border-color:var(--accent-3)}
+.code-bar{background:var(--panel-2);padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
+.code-bar .lang{color:var(--accent)}
+.code-bar .lang::before{content:"●";margin-right:8px}
+.code-bar .lines{margin-left:auto;color:var(--dim);text-transform:none;letter-spacing:0}
+pre.dax{margin:0;padding:24px;background:#06080B;font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto;color:var(--text-dim);counter-reset:line}
+pre.dax code{counter-reset:line}
+pre.dax .ln{display:inline-block;width:32px;color:var(--dim);text-align:right;margin-right:16px;user-select:none;font-size:11px}
+.dx-kw{color:var(--accent-2);font-weight:500}
+.dx-fn{color:var(--accent)}
+.dx-str{color:var(--accent-3)}
+.dx-num{color:var(--warn)}
+.dx-com{color:var(--dim);font-style:italic}
+.dx-tbl{color:var(--text)}
+.dx-col{color:var(--text-dim)}
+.dx-op{color:var(--muted)}
+
+/* ───────── Tech stack ───────── */
+.stack-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.stack-item{background:var(--panel);padding:28px 20px;display:flex;flex-direction:column;gap:8px}
+.stack-item .sk-glyph{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.08em;margin-bottom:8px}
+.stack-item .sk-name{font-size:16px;font-weight:600;letter-spacing:-0.01em}
+.stack-item .sk-detail{font-family:var(--mono);font-size:11px;color:var(--muted)}
+@media(max-width:900px){.stack-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ───────── Footer ───────── */
+footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.04em}
+.foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.foot-inner a{color:var(--text-dim);transition:color .15s}
+.foot-inner a:hover{color:var(--accent)}
+
+/* PLACEHOLDER badge */
+.ph-tag{font-family:var(--mono);font-size:9px;color:var(--warn);letter-spacing:0.12em;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);padding:2px 6px;border-radius:3px;text-transform:uppercase;display:inline-block;vertical-align:middle;margin-left:8px}
+</style>
+</head>
+<body>
+
+<!-- ════════ TOP BAR ════════ -->
+<div class="topbar">
+  <div class="wide topbar-inner">
+    <a href="index.html" class="tb-back">← Portfolio</a>
+    <span class="tb-path">
+      <span class="slash">/</span>Data Visualization<span class="slash">/</span><span class="here">Clients Segmentation</span>
+    </span>
+    <div class="tb-status">
+      <span class="nav">
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#dax">DAX</a>
+        <a href="#pages">Pages</a>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ HERO ════════ -->
+<header class="hero wrap">
+  <div class="meta">Data Visualization Project · Power BI · 2026</div>
+  <h1>Multi-tier client classification,<br><span class="accent">at scale</span></h1>
+  <p class="lede">A governed segmentation engine for commercial teams across four European markets: replacing fragmented spreadsheets with one source of truth that benchmarks every customer on usage, lifecycle, and the next strategic action to&nbsp;take</p>
+  <div class="chips">
+    <span class="chip">Power BI</span>
+    <span class="chip">DAX</span>
+    <span class="chip">Power Query (M)</span>
+    <span class="chip">Azure Analysis Services</span>
+  </div>
+</header>
+
+<!-- ════════ STAT STRIP ════════ -->
+<div class="stats">
+  <div class="stat">
+    <div class="label"><span>Markets</span><span class="tag">EU</span></div>
+    <div class="num">4<span class="unit">countries</span></div>
+    <div class="sub">Italy, Greece, Spain, Portugal: a single governed model</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>DAX measures</span><span class="tag">model</span></div>
+    <div class="num">46+<span class="unit"></span></div>
+    <div class="sub">Plus 5 calculated columns across 3 tables</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>Customers segmented</span><span class="tag">live</span></div>
+    <div class="num">28k+</div>
+    <div class="sub">Total active customers across all markets</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>Hours saved / week</span><span class="tag">vs. excel</span></div>
+    <div class="num">40</div>
+    <div class="sub">Replaced manual export-and-classify workflow</div>
+  </div>
+</div>
+
+<!-- ════════ PROBLEM ════════ -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>01</span> · Problem<span class="line"></span></div>
+      <div class="sh-title">
+        <h2 style="white-space:nowrap;max-width:none">Each market was running its own spreadsheet</h2>
+        <p style="max-width:none">Territory managers had to export raw sales, apply local rules in Excel, and reconcile by hand : every cycle.<br>Inconsistent definitions, no shared time windows, no audit trail</p>
+      </div>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-col before">
+        <h3>Before</h3>
+        <ul>
+          <li>Four separate spreadsheets, one per market, each with its own rating logic</li>
+          <li>Time windows defined per analyst; YoY and PoP comparisons recomputed manually each cycle</li>
+          <li>No way to compare strategic action across territories: every output was a snapshot, not a system</li>
+          <li>Analysis performed on specific products only</li>
+        </ul>
+      </div>
+      <div class="problem-col after">
+        <h3>After</h3>
+        <ul>
+          <li>Single model sourced live from Azure Analysis Services: zero local data</li>
+          <li>Dynamic time intelligence windows with switchable YoY and PoP growth</li>
+          <li>Cascading classification (Usage → Lifecycle → Action) encoded in DAX, governed centrally</li>
+          <li>Market and Product-specific overrides handled by parameter tables, not by forking the report</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ SOLUTION / MATRIX ════════ -->
+<section id="solution">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>02</span> · Solution<span class="line"></span></div>
+      <div class="sh-title">
+        <h2 style="white-space:nowrap;max-width:none">Three classes, one decision matrix</h2>
+        <p style="max-width:none">Class 1 measures <em>usage level</em> against the market median. Class 2 places each customer on a <em>lifecycle</em> arc.<br>Class 3 reads them both and emits a single <em>strategic action</em>: the only thing the territory manager actually needs</p>
+      </div>
+    </div>
+
+    <div class="matrix-wrap">
+
+      <div class="matrix">
+        <!-- Header row -->
+        <div class="mx-cell mx-head corner">Class 1/2</div>
+        <div class="mx-cell mx-head">Loyal</div>
+        <div class="mx-cell mx-head">Potentially Loyal</div>
+        <div class="mx-cell mx-head">Back</div>
+        <div class="mx-cell mx-head">New</div>
+        <div class="mx-cell mx-head">Lost</div>
+        <div class="mx-cell mx-head">Never Buying</div>
+
+        <!-- High User row -->
+        <div class="mx-cell mx-row-head" data-c1="high">High User</div>
+        <div class="mx-cell mx-action" data-act="develop"><span class="label">Develop</span><span class="desc">Deepen account</span></div>
+        <div class="mx-cell mx-action" data-act="develop"><span class="label">Develop</span><span class="desc">Deepen account</span></div>
+        <div class="mx-cell mx-action" data-act="develop"><span class="label">Develop</span><span class="desc">Deepen account</span></div>
+        <div class="mx-cell mx-action" data-act="develop"><span class="label">Develop</span><span class="desc">Deepen account</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">N/A</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">N/A</span></div>
+
+        <!-- Low User row -->
+        <div class="mx-cell mx-row-head" data-c1="low">Low User</div>
+        <div class="mx-cell mx-action" data-act="accelerate"><span class="label">Accelerate</span><span class="desc">Push toward high</span></div>
+        <div class="mx-cell mx-action" data-act="elevate"><span class="label">Elevate</span><span class="desc">Convert to loyal</span></div>
+        <div class="mx-cell mx-action" data-act="elevate"><span class="label">Elevate</span><span class="desc">Convert to loyal</span></div>
+        <div class="mx-cell mx-action" data-act="elevate"><span class="label">Elevate</span><span class="desc">Convert to loyal</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">N/A</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">N/A</span></div>
+
+        <!-- No User row -->
+        <div class="mx-cell mx-row-head" data-c1="no">No User</div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">N/A</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">N/A</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">N/A</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">N/A</span></div>
+        <div class="mx-cell mx-action" data-act="reconnect"><span class="label">Reconnect</span><span class="desc">Win back</span></div>
+        <div class="mx-cell mx-action" data-act="acquire"><span class="label">Acquire</span><span class="desc">First sale</span></div>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ ARCHITECTURE ════════ -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>03</span> · Architecture<span class="line"></span></div>
+      <div class="sh-title">
+        <h2>Star schema, fed live</h2>
+        <p>One fact table (<code style="font-family:var(--mono);font-size:0.9em;color:var(--accent)">DDP Data</code>) surrounded by four dimensions, a lookup table, and a parameter layer. Sourced directly from Azure Analysis Services: no local data</p>
+      </div>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="pipeline">
+      <div class="pipeline-title">Power Query Pipeline</div>
+      <div class="pipeline-flow">
+        <div class="pl-stage">
+          <div class="stg-label">Source</div>
+          <div class="stg-items">
+            <div class="pn">Azure Analysis Services<br><span style="color:var(--muted)">FFE cube</span></div>
+          </div>
+        </div>
+        <div class="pl-arrow">→</div>
+        <div class="pl-stage">
+          <div class="stg-label">Power Query (M)</div>
+          <div class="stg-items">
+            <div class="pn">Customer</div>
+            <div class="pn">Product</div>
+            <div class="pn">Sales</div>
+            <div class="pn">SalesForce</div>
+            <div class="pn">Territory</div>
+          </div>
+        </div>
+        <div class="pl-arrow">→</div>
+        <div class="pl-stage">
+          <div class="stg-label">Model Tables</div>
+          <div class="stg-items" style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div class="pn">Customer</div>
+            <div class="pn">DDP Data</div>
+            <div class="pn">Date</div>
+            <div class="pn">Product</div>
+            <div class="pn">Territory</div>
+            <div class="pn">Classes Levels</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schema -->
+    <div class="schema-shell">
+      <div class="schema-canvas" id="schema">
+        <svg viewBox="0 0 920 600" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--mono)">
+          <defs>
+            <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <polygon points="0,0 6,3 0,6" fill="#4B7FA8"/>
+            </marker>
+          </defs>
+
+          <!-- Connections (drawn first so they sit behind tables) -->
+          <g class="connections" stroke="#4B7FA8" stroke-width="1.25" fill="none">
+            <!-- DdpData → Customer -->
+            <path class="conn" data-pair="Ddp Data,Customer" d="M 330,300 L 255,300 L 255,198" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- DdpData → Territory -->
+            <path class="conn" data-pair="Ddp Data,Territory" d="M 590,300 L 705,300 L 705,198" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- DdpData → Product -->
+            <path class="conn" data-pair="Ddp Data,Product" d="M 460,380 L 460,440" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- DdpData → DateTable -->
+            <path class="conn" data-pair="Ddp Data,DateTable" d="M 330,350 L 165,350 L 165,440" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- DdpData → ClassesLevels (via measures, dotted lookup) -->
+            <path class="conn" data-pair="Ddp Data,ClassesLevels" d="M 590,350 L 770,350 L 770,440" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+          </g>
+
+          <!-- Cardinality labels -->
+          <g font-family="var(--mono)" font-size="9" font-weight="700" fill="#9AA3B0">
+            <text x="286" y="296">N</text><text x="259" y="208">1</text>
+            <text x="618" y="296">N</text><text x="708" y="208">1</text>
+            <text x="464" y="394">N</text><text x="464" y="436">1</text>
+            <text x="286" y="346">N</text><text x="168" y="452">1</text>
+            <text x="618" y="346">N</text><text x="773" y="452">1</text>
+          </g>
+
+          <!-- Tables -->
+          <!-- Parameters cluster (top center) -->
+          <g class="tbl param" data-table="Parameters" transform="translate(300,100)">
+            <rect class="tbl-bg" width="316" height="98" rx="6"/>
+            <rect class="tbl-header" width="316" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="316" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Parameters</text>
+            <text x="272" y="16" font-size="8" fill="#818CF8" font-weight="700">PARAM</text>
+            <text x="12" y="40" font-size="9" fill="#9AA3B0">Classes</text>
+            <text x="168" y="40" font-size="9" fill="#9AA3B0">Time Comparison</text>
+            <text x="12" y="56" font-size="9" fill="#9AA3B0">Dimension</text>
+            <text x="168" y="56" font-size="9" fill="#9AA3B0">Time</text>
+            <text x="12" y="80" font-size="8" fill="#5A6471" font-style="italic">Slicer parameters · read-only · no FK relationships</text>
+          </g>
+
+          <!-- Customer (left) -->
+          <g class="tbl dim" data-table="Customer" transform="translate(60,100)">
+            <rect class="tbl-bg" width="190" height="98" rx="6"/>
+            <rect class="tbl-header" width="190" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="190" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Customer</text>
+            <text x="170" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Market Customer Key</text>
+            <text x="160" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Customer Long Name</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Customer Type</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Rating</text>
+          </g>
+
+          <!-- Territory (right) -->
+          <g class="tbl dim" data-table="Territory" transform="translate(700,100)">
+            <rect class="tbl-bg" width="170" height="98" rx="6"/>
+            <rect class="tbl-header" width="170" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="170" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Territory</text>
+            <text x="148" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Territory Key</text>
+            <text x="140" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Territory ID</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Area Manager</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Area Business Manager</text>
+          </g>
+
+          <!-- DdpData FACT (center) -->
+          <g class="tbl fact" data-table="DDP Data" transform="translate(330,240)">
+            <rect class="tbl-bg" width="260" height="140" rx="6"/>
+            <rect class="tbl-header" width="260" height="28" rx="6"/>
+            <rect class="tbl-header" y="14" width="260" height="14"/>
+            <text x="14" y="18" font-size="13" fill="#E5E9F0" font-weight="700">DDP Data</text>
+            <text x="226" y="18" font-size="9" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="14" y="46" font-size="10" fill="#818CF8">Market Customer Key</text>
+            <text x="232" y="46" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="14" y="60" font-size="10" fill="#818CF8">Product ID</text>
+            <text x="232" y="60" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="14" y="74" font-size="10" fill="#818CF8">Territory Key</text>
+            <text x="232" y="74" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="14" y="88" font-size="10" fill="#818CF8">Date</text>
+            <text x="232" y="88" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="14" y="102" font-size="10" fill="#B5BCC8">Sales Quantity</text>
+            <text x="14" y="116" font-size="10" fill="#B5BCC8">Sales Amount</text>
+            <text x="14" y="130" font-size="10" fill="#B5BCC8">Sales Type</text>
+          </g>
+
+          <!-- DateTable (bottom left) -->
+          <g class="tbl dim" data-table="Date Table" transform="translate(80,440)">
+            <rect class="tbl-bg" width="170" height="76" rx="6"/>
+            <rect class="tbl-header" width="170" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="170" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Date Table</text>
+            <text x="148" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Date</text>
+            <text x="140" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Is Last Day Of Month</text>
+          </g>
+
+          <!-- Product (bottom center) -->
+          <g class="tbl dim" data-table="Product" transform="translate(370,440)">
+            <rect class="tbl-bg" width="180" height="76" rx="6"/>
+            <rect class="tbl-header" width="180" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="180" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Product</text>
+            <text x="160" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Product ID</text>
+            <text x="152" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Market Code</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Brand</text>
+          </g>
+
+          <!-- ClassesLevels (bottom right) -->
+          <g class="tbl lookup" data-table="Classes Levels" transform="translate(670,440)">
+            <rect class="tbl-bg" width="200" height="76" rx="6"/>
+            <rect class="tbl-header" width="200" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="200" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Classes Levels</text>
+            <text x="156" y="16" font-size="8" fill="#34D399" font-weight="700">LOOKUP</text>
+            <text x="12" y="40" font-size="10" fill="#B5BCC8">Class 1</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Class 2</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Class 3</text>
+          </g>
+        </svg>
+      </div>
+      <aside class="schema-side" id="schemaSide">
+        <div class="ss-label">Inspector</div>
+        <div id="schemaInspector">
+          <div class="ss-empty">Hover or click any table to inspect its columns and relationships</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ DAX ════════ -->
+<section id="dax">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>04</span> · DAX<span class="line"></span></div>
+      <div class="sh-title">
+        <h2>The logic, in code</h2>
+        <p style="max-width:none">46+ measures across segmentation, time intelligence, growth analytics, and dynamic formatting.<br>The standout is the cascading classification: Class 3 reads Class 2 reads Class 1,<br>each evaluated at row context with market-specific overrides</p>
+      </div>
+    </div>
+
+    <div class="dax-tabs" id="daxTabs">
+      <button class="dax-tab active" data-panel="seg">Segmentation <span class="count">3</span></button>
+      <button class="dax-tab" data-panel="cols">Calculated Columns <span class="count">2</span></button>
+      <button class="dax-tab" data-panel="time">Time Intelligence <span class="count">2</span></button>
+      <button class="dax-tab" data-panel="growth">Growth <span class="count">3</span></button>
+      <button class="dax-tab" data-panel="fmt">Dynamic Formatting <span class="count">1</span></button>
+    </div>
+
+    <!-- Segmentation -->
+    <div class="dax-panel active" data-panel="seg">
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Class 1 - Usage Level <span class="tag">measure</span></div>
+            <div class="desc">Benchmarks each customer against the average sales for their rating group in the selected period. Returns High User (at or above average), Low User (below average but with historical sales), No User (zero sales in period), or No Data (no historical sales, or Greece C-rating exclusion applies)</div>
+          </div>
+          <div class="actions">
+            <button class="btn-icon" data-copy>Copy</button>
+          </div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Country      <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Market Code</span>])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Rating       <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">Customer</span>[<span class="dx-col">Customer Rating</span>])
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> TouchpointId <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">Customer</span>[<span class="dx-col">Customer ID</span>])
+<span class="ln"> 4</span>
+<span class="ln"> 5</span><span class="dx-kw">VAR</span> Output <span class="dx-op">=</span> <span class="dx-fn">IF</span>([<span class="dx-col">Historical Sales</span>] <span class="dx-kw">IN</span> {<span class="dx-num">0</span>, <span class="dx-fn">BLANK</span>()},
+<span class="ln"> 6</span>                <span class="dx-str">"No Data"</span>,
+<span class="ln"> 7</span>                <span class="dx-fn">IF</span>([<span class="dx-col">Period Sales</span>] <span class="dx-kw">IN</span> {<span class="dx-num">0</span>, <span class="dx-fn">BLANK</span>()},
+<span class="ln"> 8</span>                    <span class="dx-str">"No User"</span>,
+<span class="ln"> 9</span>                    <span class="dx-fn">IF</span>([<span class="dx-col">Period Sales</span>] <span class="dx-op">&gt;=</span> [<span class="dx-col">Period Sales | Average by Rating</span>], <span class="dx-str">"High User"</span>, <span class="dx-str">"Low User"</span>)))
+<span class="ln">10</span>
+<span class="ln">11</span><span class="dx-kw">RETURN</span> <span class="dx-fn">SWITCH</span>(<span class="dx-fn">TRUE</span>(),
+<span class="ln">12</span>    Country <span class="dx-op">=</span> <span class="dx-str">"GRC"</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-fn">LEFT</span>(Rating, <span class="dx-num">1</span>) <span class="dx-op">=</span> <span class="dx-str">"C"</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-kw">NOT</span> TouchpointId <span class="dx-kw">IN</span> <span class="dx-fn">VALUES</span>(<span class="dx-tbl">'Greece CA Customers To Keep'</span>[<span class="dx-col">Customer Id</span>]), <span class="dx-str">"No Data"</span>,
+<span class="ln">13</span>    Output)</code></pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Class 2 - Lifecycle Stage <span class="tag">measure</span></div>
+            <div class="desc">Places each customer on a lifecycle arc by comparing sales across three consecutive time windows and two sub-period halves. The 11-branch Switch resolves to: Loyal · Potentially Loyal · Back · New · Lost · Not Buying · Never Using · No Data</div>
+          </div>
+          <div class="actions">
+            <button class="btn-icon" data-copy>Copy</button>
+          </div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Country      <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Market Code</span>])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Rating       <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">Customer</span>[<span class="dx-col">Customer Rating</span>])
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> TouchpointId <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">Customer</span>[<span class="dx-col">Customer ID</span>])
+<span class="ln"> 4</span>
+<span class="ln"> 5</span><span class="dx-kw">VAR</span> ThisPeriod         <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">+</span> [<span class="dx-col">Period Sales</span>]
+<span class="ln"> 6</span><span class="dx-kw">VAR</span> LastPeriod         <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">+</span> [<span class="dx-col">Last Period Sales</span>]
+<span class="ln"> 7</span><span class="dx-kw">VAR</span> SecondToLastPeriod <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">+</span> [<span class="dx-col">Second To Last Period Sales</span>]
+<span class="ln"> 8</span><span class="dx-kw">VAR</span> CurrentSubPeriod   <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">+</span> [<span class="dx-col">Current SubPeriod Sales</span>]
+<span class="ln"> 9</span><span class="dx-kw">VAR</span> LastSubPeriod      <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">+</span> [<span class="dx-col">Last SubPeriod Sales</span>]
+<span class="ln">10</span>
+<span class="ln">11</span><span class="dx-kw">VAR</span> Output <span class="dx-op">=</span> <span class="dx-fn">SWITCH</span>(<span class="dx-fn">TRUE</span>(),
+<span class="ln">12</span>    [<span class="dx-col">Historical Sales</span>] <span class="dx-kw">IN</span> {<span class="dx-num">0</span>, <span class="dx-fn">BLANK</span>()}, <span class="dx-str">"No Data"</span>,
+<span class="ln">13</span>    SecondToLastPeriod <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> LastPeriod <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> ThisPeriod <span class="dx-op">=</span> <span class="dx-num">0</span>, <span class="dx-str">"Never Using"</span>,
+<span class="ln">14</span>    SecondToLastPeriod <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> LastPeriod <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> ThisPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span>, <span class="dx-str">"New"</span>,
+<span class="ln">15</span>    LastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> ThisPeriod <span class="dx-op">=</span> <span class="dx-num">0</span>, <span class="dx-str">"Not Buying"</span>,
+<span class="ln">16</span>    SecondToLastPeriod <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> LastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> ThisPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span>, <span class="dx-str">"Potentially Loyal"</span>,
+<span class="ln">17</span>    SecondToLastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> LastPeriod <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> ThisPeriod <span class="dx-op">=</span> <span class="dx-num">0</span>, <span class="dx-str">"Lost"</span>,
+<span class="ln">18</span>    SecondToLastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> LastPeriod <span class="dx-op">=</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> ThisPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span>, <span class="dx-str">"Back"</span>,
+<span class="ln">19</span>    SecondToLastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> LastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> ThisPeriod <span class="dx-op">=</span> <span class="dx-num">0</span>, <span class="dx-str">"Not Buying"</span>,
+<span class="ln">20</span>    LastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> CurrentSubPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> LastSubPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span>, <span class="dx-str">"Loyal"</span>,
+<span class="ln">21</span>    LastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-fn">OR</span>(CurrentSubPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span>, LastSubPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span>), <span class="dx-str">"Potentially Loyal"</span>,
+<span class="ln">22</span>    SecondToLastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> LastPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span> <span class="dx-op">&amp;&amp;</span> ThisPeriod <span class="dx-op">&lt;&gt;</span> <span class="dx-num">0</span>, <span class="dx-str">"Potentially Loyal"</span>)
+<span class="ln">23</span>
+<span class="ln">24</span><span class="dx-kw">RETURN</span> <span class="dx-fn">SWITCH</span>(<span class="dx-fn">TRUE</span>(),
+<span class="ln">25</span>    Country <span class="dx-op">=</span> <span class="dx-str">"GRC"</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-fn">LEFT</span>(Rating, <span class="dx-num">1</span>) <span class="dx-op">=</span> <span class="dx-str">"C"</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-kw">NOT</span> TouchpointId <span class="dx-kw">IN</span> <span class="dx-fn">VALUES</span>(<span class="dx-tbl">'Greece CA Customers To Keep'</span>[<span class="dx-col">Customer Id</span>]), <span class="dx-str">"No Data"</span>,
+<span class="ln">26</span>    Output)</code></pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Class 3 - Strategic Action <span class="tag">measure</span></div>
+            <div class="desc">Reads Class 1 and Class 2 and emits one of five actions: Develop · Accelerate · Elevate · Reconnect · Acquire. Low User + Not Buying also maps to Reconnect (win-back). Falls back to the Class 1 label when no matrix condition matches, preserving full context for edge cases</div>
+          </div>
+          <div class="actions">
+            <button class="btn-icon" data-copy>Copy</button>
+          </div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> ClassOne <span class="dx-op">=</span> [<span class="dx-col">Class 1</span>]
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> ClassTwo <span class="dx-op">=</span> [<span class="dx-col">Class 2</span>]
+<span class="ln"> 3</span>
+<span class="ln"> 4</span><span class="dx-kw">RETURN</span> <span class="dx-fn">SWITCH</span>(<span class="dx-fn">TRUE</span>(),
+<span class="ln"> 5</span>    ClassOne <span class="dx-op">=</span> <span class="dx-str">"No Data"</span>, <span class="dx-str">"No Data"</span>,
+<span class="ln"> 6</span>
+<span class="ln"> 7</span>    ClassOne <span class="dx-op">=</span> <span class="dx-str">"No User"</span> <span class="dx-op">&amp;&amp;</span> ClassTwo <span class="dx-op">=</span> <span class="dx-str">"Never Using"</span>, <span class="dx-str">"Acquire"</span>,
+<span class="ln"> 8</span>    ClassOne <span class="dx-op">=</span> <span class="dx-str">"No User"</span> <span class="dx-op">&amp;&amp;</span> ClassTwo <span class="dx-kw">IN</span> {<span class="dx-str">"Not Buying"</span>, <span class="dx-str">"Lost"</span>}, <span class="dx-str">"Reconnect"</span>,
+<span class="ln"> 9</span>
+<span class="ln">10</span>    ClassOne <span class="dx-op">=</span> <span class="dx-str">"Low User"</span> <span class="dx-op">&amp;&amp;</span> ClassTwo <span class="dx-op">=</span> <span class="dx-str">"Not Buying"</span>, <span class="dx-str">"Reconnect"</span>,
+<span class="ln">11</span>    ClassOne <span class="dx-op">=</span> <span class="dx-str">"Low User"</span> <span class="dx-op">&amp;&amp;</span> ClassTwo <span class="dx-kw">IN</span> {<span class="dx-str">"Potentially Loyal"</span>, <span class="dx-str">"Back"</span>, <span class="dx-str">"New"</span>}, <span class="dx-str">"Elevate"</span>,
+<span class="ln">12</span>    ClassOne <span class="dx-op">=</span> <span class="dx-str">"Low User"</span> <span class="dx-op">&amp;&amp;</span> ClassTwo <span class="dx-kw">IN</span> {<span class="dx-str">"Loyal"</span>}, <span class="dx-str">"Accelerate"</span>,
+<span class="ln">13</span>
+<span class="ln">14</span>    ClassOne <span class="dx-op">=</span> <span class="dx-str">"High User"</span> <span class="dx-op">&amp;&amp;</span> ClassTwo <span class="dx-kw">IN</span> {<span class="dx-str">"Loyal"</span>, <span class="dx-str">"Potentially Loyal"</span>, <span class="dx-str">"Back"</span>, <span class="dx-str">"New"</span>}, <span class="dx-str">"Develop"</span>,
+<span class="ln">15</span>
+<span class="ln">16</span>    ClassOne)</code></pre>
+      </article>
+
+    </div>
+
+    <!-- Calculated Columns -->
+    <div class="dax-panel" data-panel="cols">
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Greece CA To Exclude <span class="tag">column · Customer</span></div>
+            <div class="desc">Flags Greek customers with a C-rating who are absent from the approved whitelist. Returns 1 (exclude from C-rating analytics) or 0 (include). All non-GRC rows return 0. Computed at load time in the Customer table; referenced in Class 1 and Class 2 for the market-override gate</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> MarketCode <span class="dx-op">=</span> <span class="dx-tbl">Customer</span>[<span class="dx-col">Market Code</span>]
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Rating     <span class="dx-op">=</span> <span class="dx-fn">LEFT</span>(<span class="dx-tbl">Customer</span>[<span class="dx-col">Customer Rating</span>], <span class="dx-num">1</span>)
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> CustomerId <span class="dx-op">=</span> <span class="dx-tbl">Customer</span>[<span class="dx-col">Customer ID</span>]
+<span class="ln"> 4</span><span class="dx-kw">VAR</span> ToKeep     <span class="dx-op">=</span> <span class="dx-fn">VALUES</span>(<span class="dx-tbl">'Greece CA Customers To Keep'</span>[<span class="dx-col">Customer Id</span>])
+<span class="ln"> 5</span>
+<span class="ln"> 6</span><span class="dx-kw">RETURN</span> <span class="dx-fn">SWITCH</span>(<span class="dx-fn">TRUE</span>(), MarketCode <span class="dx-op">=</span> <span class="dx-str">"GRC"</span> <span class="dx-op">&amp;&amp;</span> Rating <span class="dx-op">=</span> <span class="dx-str">"C"</span>, <span class="dx-fn">IF</span>(CustomerId <span class="dx-kw">IN</span> ToKeep, <span class="dx-num">0</span>, <span class="dx-num">1</span>), <span class="dx-num">0</span>)</code></pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Portugal ABM To Exclude <span class="tag">column · DDP Data</span></div>
+            <div class="desc">Flags Portuguese rows where the Area Business Manager is blank: a data-quality signal from the SalesForce join indicating unassigned territory. Rows returning 1 are excluded from territory-level analytics. Computed at load time in the DDP Data fact table</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> MarketCode <span class="dx-op">=</span> <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Market Code</span>]
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> ABM        <span class="dx-op">=</span> <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Area Business Manager</span>]
+<span class="ln"> 3</span>
+<span class="ln"> 4</span><span class="dx-kw">RETURN</span> <span class="dx-fn">SWITCH</span>(<span class="dx-fn">TRUE</span>(), MarketCode <span class="dx-op">=</span> <span class="dx-str">"POR"</span> <span class="dx-op">&amp;&amp;</span> ABM <span class="dx-op">=</span> <span class="dx-fn">BLANK</span>(), <span class="dx-num">1</span>, <span class="dx-num">0</span>)</code></pre>
+      </article>
+    </div>
+
+    <!-- Time Intelligence -->
+    <div class="dax-panel" data-panel="time">
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Period Sales <span class="tag">measure</span></div>
+            <div class="desc">Core parametric measure: sums Sales Amount or Quantity for a sliding window anchored to the date slicer. Window width is driven by the Time Parameter (1 M · 3 M · 6 M · 12 M · YTD); measurement unit by the Dimension Parameter (Value · Quantity). Every downstream classification chains off this single measure</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> ThresholdDate        <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Date Table'</span>[<span class="dx-col">Date</span>])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> MeasurementParameter <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Dimension Parameter'</span>[<span class="dx-col">Text</span>])
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> TimeParameter        <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Time Parameter'</span>[<span class="dx-col">Text</span>])
+<span class="ln"> 4</span>
+<span class="ln"> 5</span><span class="dx-kw">VAR</span> StartDate <span class="dx-op">=</span> <span class="dx-fn">SWITCH</span>(TimeParameter,
+<span class="ln"> 6</span>                    <span class="dx-str">"12 Months"</span>,   ThresholdDate <span class="dx-op">-</span> <span class="dx-num">367</span>,
+<span class="ln"> 7</span>                    <span class="dx-str">"6 Months"</span>,    ThresholdDate <span class="dx-op">-</span> <span class="dx-num">182</span>,
+<span class="ln"> 8</span>                    <span class="dx-str">"3 Months"</span>,    ThresholdDate <span class="dx-op">-</span> <span class="dx-num">92</span>,
+<span class="ln"> 9</span>                    <span class="dx-str">"1 Month"</span>,     ThresholdDate <span class="dx-op">-</span> <span class="dx-num">32</span>,
+<span class="ln">10</span>                    <span class="dx-str">"Year To Date"</span>, <span class="dx-fn">DATE</span>(<span class="dx-fn">YEAR</span>(ThresholdDate), <span class="dx-num">1</span>, <span class="dx-num">1</span>))
+<span class="ln">11</span>
+<span class="ln">12</span><span class="dx-kw">VAR</span> ValueOutput    <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">SUM</span>(<span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Sales Amount</span>]),   <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Date</span>] <span class="dx-op">&lt;=</span> ThresholdDate <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Date</span>] <span class="dx-op">&gt;=</span> StartDate)
+<span class="ln">13</span><span class="dx-kw">VAR</span> QuantityOutput <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">SUM</span>(<span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Sales Quantity</span>]), <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Date</span>] <span class="dx-op">&lt;=</span> ThresholdDate <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Date</span>] <span class="dx-op">&gt;=</span> StartDate)
+<span class="ln">14</span>
+<span class="ln">15</span><span class="dx-kw">RETURN</span> <span class="dx-fn">SWITCH</span>(MeasurementParameter, <span class="dx-str">"Quantity"</span>, QuantityOutput, <span class="dx-str">"Value"</span>, ValueOutput)</code></pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Historical Sales <span class="tag">measure</span></div>
+            <div class="desc">Anchored baseline: sums sales from a fixed start date (Dec 2023) through the threshold date, with Brand filter removed. Used by Class 1 to decide whether a customer has any history at all: the gate that separates No Data from active classification. Brand filters are stripped so the check is customer-level, not SKU-level</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> ThresholdDate        <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Date Table'</span>[<span class="dx-col">Date</span>])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> MeasurementParameter <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Dimension Parameter'</span>[<span class="dx-col">Text</span>])
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> HistoricalDateStart  <span class="dx-op">=</span> <span class="dx-fn">DATE</span>(<span class="dx-num">2023</span>, <span class="dx-num">12</span>, <span class="dx-num">1</span>)
+<span class="ln"> 4</span>
+<span class="ln"> 5</span><span class="dx-kw">VAR</span> ValueOutput    <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">SUM</span>(<span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Sales Amount</span>]),
+<span class="ln"> 6</span>                        <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Date</span>] <span class="dx-op">&lt;=</span> ThresholdDate <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Date</span>] <span class="dx-op">&gt;=</span> HistoricalDateStart,
+<span class="ln"> 7</span>                        <span class="dx-fn">REMOVEFILTERS</span>(<span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Brand</span>]))
+<span class="ln"> 8</span><span class="dx-kw">VAR</span> QuantityOutput <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">SUM</span>(<span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Sales Quantity</span>]),
+<span class="ln"> 9</span>                        <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Date</span>] <span class="dx-op">&lt;=</span> ThresholdDate <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Date</span>] <span class="dx-op">&gt;=</span> HistoricalDateStart,
+<span class="ln">10</span>                        <span class="dx-fn">REMOVEFILTERS</span>(<span class="dx-tbl">'DDP Data'</span>[<span class="dx-col">Brand</span>]))
+<span class="ln">11</span>
+<span class="ln">12</span><span class="dx-kw">RETURN</span> <span class="dx-fn">SWITCH</span>(MeasurementParameter, <span class="dx-str">"Quantity"</span>, QuantityOutput, <span class="dx-str">"Value"</span>, ValueOutput)</code></pre>
+      </article>
+    </div>
+
+    <!-- Growth -->
+    <div class="dax-panel" data-panel="growth">
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Current vs Last Year Sales <span class="tag">measure</span></div>
+            <div class="desc">Percentage change between Period Sales and Same Period Last Year Sales. Returns Blank when the prior-year value is zero or blank, avoiding division noise. Formatted as a percentage; powers the YoY growth KPI card and the Positive/Negative growth customer counts</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> CPS       <span class="dx-op">=</span> [<span class="dx-col">Period Sales</span>]
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> SPLY      <span class="dx-op">=</span> [<span class="dx-col">Same Period Last Year Sales</span>]
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> PreOutput <span class="dx-op">=</span> (CPS <span class="dx-op">-</span> SPLY) <span class="dx-op">/</span> SPLY
+<span class="ln"> 4</span>
+<span class="ln"> 5</span><span class="dx-kw">RETURN</span> <span class="dx-fn">IF</span>(<span class="dx-kw">NOT</span> SPLY <span class="dx-kw">IN</span> {<span class="dx-num">0</span>, <span class="dx-fn">BLANK</span>()}, PreOutput)</code></pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Current vs Last Period Sales <span class="tag">measure</span></div>
+            <div class="desc">Percentage change between Period Sales and Last Period Sales (period-over-period). Same guard against zero denominators. Together with the YoY variant, these two form the inputs to the Overall Growth switcher</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> CPS       <span class="dx-op">=</span> [<span class="dx-col">Period Sales</span>]
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> LPS       <span class="dx-op">=</span> [<span class="dx-col">Last Period Sales</span>]
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> PreOutput <span class="dx-op">=</span> (CPS <span class="dx-op">-</span> LPS) <span class="dx-op">/</span> LPS
+<span class="ln"> 4</span>
+<span class="ln"> 5</span><span class="dx-kw">RETURN</span> <span class="dx-fn">IF</span>(<span class="dx-kw">NOT</span> LPS <span class="dx-kw">IN</span> {<span class="dx-num">0</span>, <span class="dx-fn">BLANK</span>()}, PreOutput)</code></pre>
+      </article>
+
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Overall Growth <span class="tag">measure</span></div>
+            <div class="desc">Single switchable growth percentage driven by the Time Comparison Parameter slicer: routes to period-over-period or same-period-prior-year in one measure. This is the only growth figure exposed in KPI cards: no separate YoY / PoP measures required on the canvas</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> CompareParameter <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Time Comparison Parameter'</span>[<span class="dx-col">Compare With</span>])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> SPPY             <span class="dx-op">=</span> [<span class="dx-col">Current vs Last Year Sales | Numerical</span>]
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> PPSY             <span class="dx-op">=</span> [<span class="dx-col">Current vs Last Period Sales | Numerical</span>]
+<span class="ln"> 4</span>
+<span class="ln"> 5</span><span class="dx-kw">RETURN</span> <span class="dx-fn">SWITCH</span>(CompareParameter, <span class="dx-str">"Previous Period Same Year"</span>, PPSY, <span class="dx-str">"Same Period Previous Year"</span>, SPPY)</code></pre>
+      </article>
+
+    </div>
+
+    <!-- Dynamic Formatting -->
+    <div class="dax-panel" data-panel="fmt">
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Format String Definition <span class="tag">format string</span></div>
+            <div class="desc">Applied as a dynamic format string expression on every sales measure. Reads the Dimension Parameter slicer and returns the correct number format at render time: integer thousands-separator for Quantity, Euro currency with two decimals for Value. One expression governs all KPI cards: no per-visual overrides needed</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+        <div class="code-bar"><span class="lang">DAX</span></div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Threshold   <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Date Table'</span>[<span class="dx-col">Date</span>])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Measurement <span class="dx-op">=</span> <span class="dx-fn">SELECTEDVALUE</span>(<span class="dx-tbl">'Dimension Parameter'</span>[<span class="dx-col">Text</span>])
+<span class="ln"> 3</span>
+<span class="ln"> 4</span><span class="dx-kw">RETURN</span> <span class="dx-fn">SWITCH</span>(Measurement, <span class="dx-str">"Quantity"</span>, <span class="dx-str">"#,##0"</span>, <span class="dx-str">"€ #,##0.00"</span>)</code></pre>
+      </article>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════ PAGES ════════ -->
+<section id="pages">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>05</span> · Pages<span class="line"></span></div>
+      <div class="sh-title">
+        <h2>Three pages, one story</h2>
+        <p style="max-width:none">The report is intentionally narrow: enter from a home that orients the user, work the whole question on a single overview page, and export the segmented list when you need to act offline</p>
+      </div>
+    </div>
+
+    <div class="pages-stack">
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">PAGE 01 / HOME</div>
+          <h3>Orientation</h3>
+          <p>Web-app-style entry point with usage guidance, a market dropdown, and direct links into each section. Replaces the typical "wall of slicers" landing page with a calmer, instructional surface</p>
+          <div class="features">
+            <span>Section Navigation</span><span>Usage Guide</span>
+          </div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <img src="../screenshots/CSHome.png" alt="Home page">
+        </div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">PAGE 02 / OVERVIEW</div>
+          <h3>The whole story, one canvas</h3>
+          <p>KPI strip, scatter plot of Class 1 & Class 2, customer-count matrix by country and rating, and a pivot drill-down: all driven by a single time-window slicer. This is where 95 % of the work happens</p>
+          <div class="features">
+            <span>KPI Strip</span><span>Country & Rating Matrix</span><span>Time-Window Slicer</span>
+          </div>
+        </div>
+        <div class="page-frame">
+          <div class="frame-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <img src="../screenshots/CSOverview.png" alt="Overview page">
+        </div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">PAGE 03 / DOWNLOADS</div>
+          <h3>Export to act offline</h3>
+          <p>Full segmentation table downloadable per territory: for managers who still review in Excel before the next sales meeting. Filtered by the same slicers as the overview, so the export always matches the on-screen state</p>
+          <div class="features">
+            <span>Per Territory Export</span><span>State Aware Filters</span><span>Governance Trail</span>
+          </div>
+        </div>
+        <div class="page-frame blurred">
+          <div class="frame-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <img src="../screenshots/CSDownload.png" alt="Downloads page">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <span>© 2026 Simone Caruso</span>
+    <span><a href="index.html">← Back to portfolio</a></span>
+  </div>
+</footer>
+
+<!-- ════════ JS ════════ -->
+<script>
+// ─── Schema interactivity ───────────────────────────────
+const tableData = {
+  DdpData: {
+    kind: 'FACT', desc: 'Single facts table : every sales transaction across all four markets, filtered to interested geographies and sales types.',
+    cols: [
+      { n: 'Market Code', t: 'str' },
+      { n: 'Market Customer Key', t: 'str', tag: 'fk' },
+      { n: 'Product Id', t: 'str', tag: 'fk' },
+      { n: 'Territory Key', t: 'str', tag: 'fk' },
+      { n: 'Date', t: 'date', tag: 'fk' },
+      { n: 'Sales Quantity', t: 'dbl' },
+      { n: 'Sales Amount', t: 'dbl' },
+      { n: 'Sales Type', t: 'str' },
+    ]
+  },
+  Customer: {
+    kind: 'DIM', desc: 'Customer dimension. Sourced from the FFE cube and enriched with rating and flags.',
+    cols: [
+      { n: 'Market Customer Key', t: 'str', tag: 'pk' },
+      { n: 'Customer Long Name', t: 'str' },
+      { n: 'Customer Type', t: 'str' },
+      { n: 'Customer Rating', t: 'str' },
+      { n: 'Greece Ca To Exclude', t: 'str' },
+    ]
+  },
+  Territory: {
+    kind: 'DIM', desc: 'Territory dimension joined to SalesForce hierarchy at load time: each row carries Area Manager and Area Business Manager.',
+    cols: [
+      { n: 'Territory Key', t: 'str', tag: 'pk' },
+      { n: 'Territory Id', t: 'str' },
+      { n: 'Area Manager', t: 'str' },
+      { n: 'Area Business Manager', t: 'str' },
+    ]
+  },
+  DateTable: {
+    kind: 'DIM', desc: 'Standard date dimension. Marked as date table: powers all time-intelligence measures.',
+    cols: [
+      { n: 'Date', t: 'date', tag: 'pk' },
+      { n: 'Is Last Day Of Month', t: 'bool' },
+    ]
+  },
+  Product: {
+    kind: 'DIM', desc: 'Product dimension. Combined Market + Product Id composite key for international SKU disambiguation.',
+    cols: [
+      { n: 'Product Id', t: 'str', tag: 'pk' },
+      { n: 'Market Code', t: 'str' },
+      { n: 'Brand', t: 'str' },
+    ]
+  },
+  ClassesLevels: {
+    kind: 'LOOKUP', desc: 'Static lookup for ordering classes in slicers and visuals. Pure presentation: no relationships, no filter direction.',
+    cols: [
+      { n: 'Class 1', t: 'str' },
+      { n: 'Class 2', t: 'str' },
+      { n: 'Class 3', t: 'str' },
+    ]
+  },
+  Parameters: {
+    kind: 'PARAM', desc: 'Collapsed group of four parameter tables used as slicer inputs by all measures. No FK relationships: consumed at measure evaluation time only.',
+    cols: [
+      { n: 'Classes Parameters', t: 'str' },
+      { n: 'Time Comparison Parameter', t: 'str' },
+      { n: 'Dimension Parameter', t: 'str' },
+      { n: 'Time Parameter', t: 'str' },
+    ]
+  },
+};
+
+const schema = document.getElementById('schema');
+const inspector = document.getElementById('schemaInspector');
+
+function renderInspector(name) {
+  if (!name) {
+    inspector.innerHTML = '<div class="ss-empty">Hover or click any table to inspect its columns and relationships.</div>';
+    return;
+  }
+  const t = tableData[name];
+  if (!t) return;
+  const cols = t.cols.map(c => {
+    const cls = c.tag ? c.tag : '';
+    const tag = c.tag ? `<span class="col-tag ${c.tag}">${c.tag}</span>` : '';
+    return `<div class="col"><div><span class="name ${cls}">${c.n}</span>${tag}</div><div class="type">${c.t}</div></div>`;
+  }).join('');
+  inspector.innerHTML = `
+    <div class="ss-title">${name} <span class="kind">${t.kind}</span></div>
+    <div class="ss-desc">${t.desc}</div>
+    <div class="ss-cols">${cols}</div>
+  `;
+}
+
+const tbls = schema.querySelectorAll('.tbl');
+const conns = schema.querySelectorAll('.conn');
+
+function activate(name) {
+  if (!name) {
+    schema.removeAttribute('data-active');
+    tbls.forEach(t => t.classList.remove('active'));
+    conns.forEach(c => c.classList.remove('active'));
+    renderInspector(null);
+    return;
+  }
+  schema.setAttribute('data-active', name);
+  tbls.forEach(t => t.classList.toggle('active', t.dataset.table === name));
+  conns.forEach(c => {
+    const pair = (c.dataset.pair || '').split(',');
+    c.classList.toggle('active', pair.includes(name));
+    // also light up the related table
+    pair.forEach(p => {
+      if (p !== name) {
+        const other = schema.querySelector(`.tbl[data-table="${p}"]`);
+        if (other) other.classList.add('active');
+      }
+    });
+  });
+  renderInspector(name);
+}
+
+tbls.forEach(t => {
+  t.addEventListener('mouseenter', () => activate(t.dataset.table));
+  t.addEventListener('click', () => activate(t.dataset.table));
+});
+schema.addEventListener('mouseleave', () => activate(null));
+
+// ─── DAX tabs ───────────────────────────────────────────
+const tabs = document.querySelectorAll('.dax-tab');
+const panels = document.querySelectorAll('.dax-panel');
+tabs.forEach(t => {
+  t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelector(`.dax-panel[data-panel="${t.dataset.panel}"]`).classList.add('active');
+  });
+});
+
+// ─── Copy buttons ───────────────────────────────────────
+document.querySelectorAll('[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const measure = btn.closest('.measure');
+    const code = measure.querySelector('pre.dax').innerText
+      // strip line-number prefix
+      .split('\n').map(l => l.replace(/^\s*\d+\s/, '')).join('\n').trim();
+    try {
+      await navigator.clipboard.writeText(code);
+      const orig = btn.textContent;
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1400);
+    } catch (e) { btn.textContent = '× Failed'; }
+  });
+});
+</script>
+
+</body>
+</html>

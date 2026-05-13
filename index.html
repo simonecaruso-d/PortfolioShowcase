@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Simone Caruso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
+  --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
+  --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
+  --accent:#38BDF8;
+  --accent-2:#818CF8;
+  --accent-3:#34D399;
+  --warn:#FBBF24; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:56px 56px;
+  background-position:-1px -1px;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#000}
+
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+section{padding:80px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+
+/* ── Topbar ── */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.tb-logo{color:var(--text-dim);font-weight:600}
+.tb-logo span{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted)}
+.tb-status .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3)}
+
+/* ── Hero ── */
+.hero{padding:120px 0 80px}
+.hero-label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+.hero h1{font-size:clamp(40px,5vw,72px);font-weight:800;line-height:1.08;letter-spacing:-.03em;color:var(--text);margin-bottom:24px}
+.hero h1 .dim{color:var(--muted)}
+.hero-desc{font-size:18px;color:var(--muted);max-width:560px;line-height:1.65;margin-bottom:40px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-bright);color:var(--muted);background:var(--panel)}
+
+/* ── Section header ── */
+.sec-header{display:flex;align-items:baseline;gap:16px;margin-bottom:48px}
+.sec-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.sec-title{font-size:clamp(22px,3vw,32px);font-weight:700;letter-spacing:-.02em}
+.sec-count{font-family:var(--mono);font-size:13px;color:var(--dim)}
+
+/* ── Project grid ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1px;background:var(--border)}
+.card{background:var(--bg);padding:32px;display:flex;flex-direction:column;gap:16px;transition:background .15s}
+.card:hover{background:var(--panel)}
+.card-meta{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--dim)}
+.card-meta .cat{color:var(--accent-2);font-weight:600}
+.card-title{font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--text-dim);transition:color .15s}
+.card:hover .card-title{color:var(--text)}
+.card-desc{font-size:14px;color:var(--muted);line-height:1.6;flex:1}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.card-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--panel-2);color:var(--muted);border:1px solid var(--border)}
+.card-arrow{color:var(--dim);font-size:18px;transition:color .15s,transform .15s}
+.card:hover .card-arrow{color:var(--accent);transform:translateX(3px)}
+
+/* ── Footer ── */
+.footer{padding:40px 0;border-top:1px solid var(--border)}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.footer-inner a:hover{color:var(--text)}
+
+@media(max-width:600px){
+  .wrap{padding:0 16px}
+  .hero{padding:72px 0 48px}
+  .grid{grid-template-columns:1fr}
+  .footer-inner{flex-direction:column;gap:12px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <span class="tb-logo">simone<span>.</span>caruso</span>
+    <div class="tb-status">
+      <span class="dot"></span>
+      <span>portfolio</span>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-label">// portfolio</div>
+    <h1>Simone Caruso<br><span class="dim">Data & Full-Stack</span></h1>
+    <p class="hero-desc">Projects spanning Power BI analytics, data modelling, and full-stack web development. Built with real data, shipped to production.</p>
+    <div class="hero-tags">
+      <span class="tag">Power BI</span>
+      <span class="tag">DAX</span>
+      <span class="tag">SQL</span>
+      <span class="tag">HTML / CSS / JS</span>
+      <span class="tag">Python</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-header">
+      <span class="sec-label">01</span>
+      <span class="sec-title">Data Visualisation</span>
+      <span class="sec-count">4 projects</span>
+    </div>
+    <div class="grid">
+
+      <a class="card" href="DataVisualization/portfolio/ClientsSegmentation.html">
+        <div class="card-meta"><span class="cat">Power BI</span><span>·</span><span>Analytics</span></div>
+        <div class="card-title">Clients Segmentation</div>
+        <div class="card-desc">Customer segmentation by country, rating, usage behaviour, and purchase patterns. RFM-style breakdown with dynamic slicer drill-through.</div>
+        <div class="card-footer">
+          <div class="card-chips"><span class="chip">DAX</span><span class="chip">Power Query</span><span class="chip">RFM</span></div>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+
+      <a class="card" href="DataVisualization/portfolio/BookingAnalytics.html">
+        <div class="card-meta"><span class="cat">Power BI</span><span>·</span><span>Operations</span></div>
+        <div class="card-title">Booking Analytics</div>
+        <div class="card-desc">Reservation trends, occupancy rates, and revenue metrics for a coworking space. Time-intelligence comparisons and anomaly flagging.</div>
+        <div class="card-footer">
+          <div class="card-chips"><span class="chip">DAX</span><span class="chip">Time Intelligence</span></div>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+
+      <a class="card" href="DataVisualization/portfolio/PeopleAnalytics.html">
+        <div class="card-meta"><span class="cat">Power BI</span><span>·</span><span>HR</span></div>
+        <div class="card-title">People Analytics</div>
+        <div class="card-desc">Workforce composition, headcount evolution, and role distribution. Supports HR planning and organisational design decisions.</div>
+        <div class="card-footer">
+          <div class="card-chips"><span class="chip">DAX</span><span class="chip">HR Data</span></div>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+
+      <a class="card" href="DataVisualization/portfolio/AnalyticsByRoleAndFocus.html">
+        <div class="card-meta"><span class="cat">Power BI</span><span>·</span><span>Usage</span></div>
+        <div class="card-title">Analytics by Role & Focus</div>
+        <div class="card-desc">Space utilisation and member engagement broken down by role and focus area. Supports product and pricing strategy.</div>
+        <div class="card-footer">
+          <div class="card-chips"><span class="chip">DAX</span><span class="chip">Segmentation</span></div>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-header">
+      <span class="sec-label">02</span>
+      <span class="sec-title">Full-Stack</span>
+      <span class="sec-count">2 projects</span>
+    </div>
+    <div class="grid">
+
+      <a class="card" href="FullStack/DomaniDono.html">
+        <div class="card-meta"><span class="cat">Web App</span><span>·</span><span>Civic</span></div>
+        <div class="card-title">Domani Dono</div>
+        <div class="card-desc">Civic platform connecting donors with local initiatives. Event-driven donation flows, user matching, and impact tracking.</div>
+        <div class="card-footer">
+          <div class="card-chips"><span class="chip">HTML</span><span class="chip">CSS</span><span class="chip">JS</span></div>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+
+      <a class="card" href="FullStack/DomaniPiove.html">
+        <div class="card-meta"><span class="cat">Web App</span><span>·</span><span>Utility</span></div>
+        <div class="card-title">Domani Piove</div>
+        <div class="card-desc">Hyperlocal weather forecast interface with daily planner integration. Fast lookup, clean data display, zero friction.</div>
+        <div class="card-footer">
+          <div class="card-chips"><span class="chip">HTML</span><span class="chip">CSS</span><span class="chip">JS</span></div>
+          <span class="card-arrow">→</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>Simone Caruso — simocaruso1997@libero.it</span>
+    <span>© 2025 · Built with HTML/CSS · Hosted on GitHub Pages</span>
+  </div>
+</footer>
+
+</body>
+</html>

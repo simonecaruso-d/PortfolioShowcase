@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics By Role &amp; Focus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
+  --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
+  --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
+  --accent:#38BDF8; --accent-2:#818CF8; --accent-3:#34D399;
+  --warn:#FBBF24; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:'Inter Tight',ui-sans-serif,system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:56px 56px;background-position:-1px -1px}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#000}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+.wide{max-width:1440px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:0.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted)}
+.tb-status .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3)}
+.tb-status .nav{display:flex;gap:18px}
+.tb-status .nav a{color:var(--muted);transition:color .15s}
+.tb-status .nav a:hover{color:var(--text)}
+.hero{padding:128px 0 96px;position:relative}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:32px;display:flex;align-items:center;gap:12px}
+.hero h1{font-size:clamp(44px,7vw,90px);line-height:0.98;letter-spacing:-0.04em;font-weight:700;margin-bottom:32px}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:500;white-space:nowrap}
+.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:100%;margin-bottom:48px;font-weight:400}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--accent);padding:6px 14px;border:1px solid rgba(56,189,248,0.25);border-radius:999px;background:rgba(56,189,248,0.08);display:inline-flex;align-items:center;transition:background .18s,border-color .18s}
+.chip:hover{background:rgba(56,189,248,0.18);border-color:rgba(56,189,248,0.5)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 32px;border-right:1px solid var(--border);position:relative}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.stat .label .tag{color:var(--dim)}
+.stat .num{font-size:64px;line-height:1;letter-spacing:-0.04em;font-weight:600;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:24px;color:var(--muted);margin-left:6px;font-weight:500;letter-spacing:0.06em}
+.stat .sub{margin-top:12px;font-size:13px;color:var(--text-dim)}
+.sh{margin-bottom:56px;display:grid;grid-template-columns:200px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.12em}
+.sh-no span{color:var(--accent)}
+.sh-title h2{font-size:48px;line-height:1.05;letter-spacing:-0.03em;font-weight:600;margin-bottom:16px;max-width:18ch}
+.sh-title p{font-size:17px;color:var(--text-dim);max-width:60ch}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}.sh-title h2{font-size:36px}}
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.problem-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
+.problem-col.before{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.35)}
+.problem-col.after{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.35)}
+.problem-col h3{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.problem-col h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--danger)}
+.problem-col.after h3::before{background:var(--accent-3)}
+.problem-col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.problem-col li{display:flex;gap:14px;font-size:15px;line-height:1.55;color:var(--text-dim)}
+.problem-col li::before{content:"|";color:var(--dim);font-family:var(--mono);flex-shrink:0}
+@media(max-width:760px){.problem-grid{grid-template-columns:1fr}}
+/* Role matrix */
+.role-matrix-wrap{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;overflow-x:auto}
+.role-matrix{display:grid;grid-template-columns:150px repeat(5,1fr);min-width:780px}
+.mx-cell{padding:18px 14px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-height:74px;display:flex;flex-direction:column;justify-content:center;font-size:13px}
+.mx-head{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--panel-2)}
+.mx-head.corner{background:transparent;color:var(--dim)}
+.mx-row-head{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--panel-2);font-weight:600;display:flex;align-items:center;gap:10px}
+.mx-action{font-weight:600;letter-spacing:-0.01em;color:var(--text);cursor:default;transition:background .15s}
+.mx-action[data-act="cash"]{background:rgba(251,191,36,.07)}
+.mx-action[data-act="cash"] .label{color:var(--warn)}
+.mx-action[data-act="delivery"]{background:rgba(56,189,248,.07)}
+.mx-action[data-act="delivery"] .label{color:var(--accent)}
+.mx-action[data-act="market"]{background:rgba(129,140,248,.07)}
+.mx-action[data-act="market"] .label{color:var(--accent-2)}
+.mx-action[data-act="engagement"]{background:rgba(52,211,153,.07)}
+.mx-action[data-act="engagement"] .label{color:var(--accent-3)}
+.mx-action[data-act="platform"]{background:rgba(248,113,113,.07)}
+.mx-action[data-act="platform"] .label{color:var(--danger)}
+.mx-action[data-act="none"]{color:var(--dim);background:transparent}
+.mx-action:hover{background:var(--panel-3)}
+.mx-action .label{font-size:13px;text-transform:uppercase;letter-spacing:0.04em;font-weight:700}
+.mx-action .desc{font-size:11px;color:var(--muted);font-weight:400;margin-top:4px;letter-spacing:0;text-transform:none}
+.role-matrix .mx-cell:nth-child(6n){border-right:none}
+.pipeline{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;margin-bottom:24px}
+.pipeline-title{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px}
+.pipeline-flow{display:grid;grid-template-columns:1fr 24px 1.6fr 24px 2fr;gap:0;align-items:stretch}
+.pl-stage{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.pl-stage .stg-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pl-stage .stg-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.pl-stage .stg-items{display:flex;flex-direction:column;gap:6px}
+.pl-stage .pn{font-family:var(--mono);font-size:12px;padding:6px 10px;background:var(--panel-3);border:1px solid var(--border);border-radius:4px;color:var(--text-dim)}
+.pl-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim);font-family:var(--mono)}
+@media(max-width:900px){.pipeline-flow{grid-template-columns:1fr}.pl-arrow{padding:8px;transform:rotate(90deg)}}
+.schema-shell{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0;overflow:hidden;display:grid;grid-template-columns:1fr 320px}
+.schema-canvas{background:radial-gradient(circle at 20% 20%,rgba(56,189,248,.04),transparent 50%),radial-gradient(circle at 80% 80%,rgba(129,140,248,.04),transparent 50%),var(--panel);background-image:radial-gradient(circle at 20% 20%,rgba(56,189,248,.04),transparent 50%),radial-gradient(circle at 80% 80%,rgba(129,140,248,.04),transparent 50%),linear-gradient(var(--panel-2) 1px,transparent 1px),linear-gradient(90deg,var(--panel-2) 1px,transparent 1px);background-size:100% 100%,100% 100%,32px 32px,32px 32px;position:relative;min-height:580px;padding:16px;border-right:1px solid var(--border)}
+.schema-canvas svg{display:block;width:100%;height:auto;max-height:580px}
+.tbl{cursor:pointer;transition:opacity .2s}
+.schema-canvas[data-active] .tbl:not(.active){opacity:.25}
+.schema-canvas[data-active] .conn:not(.active){opacity:.1}
+.tbl.active rect.tbl-bg{stroke:var(--accent);stroke-width:2}
+.tbl rect.tbl-bg{stroke:var(--border-bright);stroke-width:1.5;fill:var(--panel-2);transition:stroke .2s,stroke-width .2s}
+.tbl.fact rect.tbl-bg{stroke:var(--accent);stroke-width:2}
+.tbl rect.tbl-header{fill:var(--panel-3)}
+.tbl.fact rect.tbl-header{fill:rgba(56,189,248,.18)}
+.conn{transition:opacity .2s}
+.schema-side{padding:24px;background:var(--panel-2);overflow-y:auto;max-height:580px}
+.schema-side .ss-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px}
+.schema-side .ss-title{font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.schema-side .ss-title .kind{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;color:var(--accent);background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);padding:2px 6px;border-radius:3px;text-transform:uppercase}
+.schema-side .ss-desc{font-size:13px;color:var(--text-dim);line-height:1.55;margin-bottom:20px}
+.schema-side .ss-cols{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border)}
+.schema-side .col{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px;align-items:center}
+.schema-side .col .name{color:var(--text)}
+.schema-side .col .type{color:var(--muted);font-size:11px}
+.schema-side .col .name.pk{color:var(--accent)}
+.schema-side .col .name.fk{color:var(--accent-2)}
+.schema-side .col-tag{font-size:9px;letter-spacing:0.08em;font-weight:700;padding:2px 5px;border-radius:2px;margin-left:6px}
+.schema-side .col-tag.pk{background:rgba(56,189,248,.1);color:var(--accent)}
+.schema-side .col-tag.fk{background:rgba(129,140,248,.1);color:var(--accent-2)}
+.schema-side .ss-empty{font-family:var(--mono);font-size:12px;color:var(--muted);padding:24px 0;text-align:center;border:1px dashed var(--border);border-radius:6px}
+@media(max-width:900px){.schema-shell{grid-template-columns:1fr}.schema-canvas{border-right:none;border-bottom:1px solid var(--border)}}
+.dax-tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);overflow-x:auto}
+.dax-tab{font-family:var(--mono);font-size:12px;color:var(--muted);padding:12px 16px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;transition:color .15s,border-color .15s;white-space:nowrap}
+.dax-tab:hover{color:var(--text)}
+.dax-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.dax-tab .count{margin-left:6px;color:var(--dim);font-size:11px}
+.dax-tab.active .count{color:var(--accent)}
+.dax-panel{display:none;flex-direction:column;gap:24px}
+.dax-panel.active{display:flex}
+.measure{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.measure-head{padding:20px 24px;display:flex;align-items:flex-start;gap:24px;border-bottom:1px solid var(--border)}
+.measure-head .meta{flex:1;min-width:0}
+.measure-head .name{font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:4px;display:flex;align-items:baseline;gap:10px}
+.measure-head .name .tag{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:var(--accent);background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);padding:2px 6px;border-radius:3px;text-transform:uppercase;font-weight:600}
+.measure-head .desc{font-size:14px;color:var(--text-dim);line-height:1.55;max-width:none}
+.measure-head .actions{display:flex;gap:8px;flex-shrink:0}
+.btn-icon{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--panel-2);border:1px solid var(--border);padding:6px 10px;border-radius:4px;cursor:pointer;letter-spacing:0.06em;display:flex;align-items:center;gap:6px;transition:color .15s,border-color .15s}
+.btn-icon:hover{color:var(--text);border-color:var(--border-bright)}
+.btn-icon.copied{color:var(--accent-3);border-color:var(--accent-3)}
+.code-bar{background:var(--panel-2);padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
+.code-bar .lang{color:var(--accent)}
+.code-bar .lang::before{content:"●";margin-right:8px}
+.code-bar .lines{margin-left:auto;color:var(--dim);text-transform:none;letter-spacing:0}
+pre.dax{margin:0;padding:24px;background:#06080B;font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto;color:var(--text-dim)}
+pre.dax .ln{display:inline-block;width:32px;color:var(--dim);text-align:right;margin-right:16px;user-select:none;font-size:11px}
+.dx-kw{color:var(--accent-2);font-weight:500}
+.dx-fn{color:var(--accent)}
+.dx-str{color:var(--accent-3)}
+.dx-num{color:var(--warn)}
+.dx-com{color:var(--dim);font-style:italic}
+.dx-tbl{color:var(--text)}
+.dx-col{color:var(--text-dim)}
+.dx-op{color:var(--muted)}
+.pages-stack{display:flex;flex-direction:column;gap:64px}
+.page-row{display:grid;grid-template-columns:380px 1fr;gap:48px;align-items:start}
+.page-meta .num{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:0.12em;margin-bottom:16px}
+.page-meta h3{font-size:28px;letter-spacing:-0.02em;font-weight:600;margin-bottom:16px}
+.page-meta p{font-size:15px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
+.page-meta .features{display:flex;flex-wrap:wrap;gap:6px}
+.page-meta .features span{font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--panel);border:1px solid var(--border);padding:4px 8px;border-radius:4px}
+.page-frame{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;position:relative;width:560px}
+.page-frame .frame-bar{height:32px;background:var(--panel-2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.page-frame .frame-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.page-frame .frame-bar .filename{margin-left:8px;color:var(--text-dim)}
+.page-frame .ph{aspect-ratio:16/9;background:repeating-linear-gradient(135deg,var(--panel) 0,var(--panel) 12px,var(--panel-2) 12px,var(--panel-2) 24px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:0.04em}
+.page-frame .ph .hint{color:var(--dim);font-size:11px}
+@media(max-width:900px){.page-row{grid-template-columns:1fr;gap:24px}.page-frame{width:100%}}
+footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.04em}
+.foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.foot-inner a{color:var(--text-dim);transition:color .15s}
+.foot-inner a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="wide topbar-inner">
+    <a href="index.html" class="tb-back">← Portfolio</a>
+    <span class="tb-path">
+      <span class="slash">/</span>Data Visualization<span class="slash">/</span><span class="here">Analytics By Role &amp; Focus</span>
+    </span>
+    <div class="tb-status">
+      <span class="nav">
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#dax">DAX</a>
+        <a href="#pages">Pages</a>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero wrap">
+  <div class="meta">Data Visualization Project · Power BI · 2024</div>
+  <h1>Financial intelligence,<br><span class="accent">by role</span></h1>
+  <p class="lede">A unified command centre connecting Oracle ERP, HubSpot, SharePoint and more into a live financial platform, where Treasury, Delivery, Sales, and People performance are each visible to the right role, without rebuilding a report per domain</p>
+  <div class="chips">
+    <span class="chip">Power BI</span>
+    <span class="chip">DAX</span>
+    <span class="chip">Power Query (M)</span>
+    <span class="chip">Power Automate for Data Warehousing</span>
+    <span class="chip">HubSpot REST API</span>
+    <span class="chip">Oracle ERP</span>
+    <span class="chip">PostgreSQL Database</span>
+    <span class="chip">SharePoint Online</span>
+  </div>
+</header>
+
+<!-- STAT STRIP -->
+<div class="stats">
+  <div class="stat">
+    <div class="label"><span>DAX measures</span><span class="tag">model</span></div>
+    <div class="num">200+</div>
+    <div class="sub">Organised in display folders by role and sub-domain</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>Report pages</span><span class="tag">pages</span></div>
+    <div class="num">15</div>
+    <div class="sub">Across Turn-Over, Client Account, Project Management and many more views</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>Live data sources</span><span class="tag">connections</span></div>
+    <div class="num">4</div>
+    <div class="sub">Oracle ERP · PostgreSQL DB · HubSpot API · Excel and JSON</div>
+  </div>
+  <div class="stat">
+    <div class="label"><span>KPI domains</span><span class="tag">scope</span></div>
+    <div class="num">5</div>
+    <div class="sub">Cash · Delivery · Market · Engagement · Platform</div>
+  </div>
+</div>
+
+<!-- 01 PROBLEM -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>01</span> · Problem</div>
+      <div class="sh-title">
+        <h2 style="max-width:none">Fragmented sources, no shared view</h2>
+        <p style="max-width:none">Revenue lived in Oracle, pipeline in HubSpot, headcount in SharePoint. Finance, Sales, and Delivery each extracted their own slice and reconciled by hand: no single session ever showed the full picture with no focus on what each role actually needed</p>
+      </div>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-col before">
+        <h3>Before</h3>
+        <ul>
+          <li>Oracle ERP, PostgreSQL DB, HubSpot, and SharePoint data extracted separately; no live connection between them</li>
+          <li>Treasury KPIs recalculated manually in Excel each cycle by the finance team</li>
+          <li>Sales pipeline and project delivery siloed: no end-to-end view from HubSpot opportunity to invoiced margin</li>
+          <li>Team performance visible only at month-end close, not continuously: no intra-period course correction</li>
+        </ul>
+      </div>
+      <div class="problem-col after">
+        <h3>After</h3>
+        <ul>
+          <li>Single Power BI model fed live from 5 sources: Oracle ERP, PostgreSQL DB, HubSpot REST API, SharePoint Excel, embedded JSON</li>
+          <li>Treasury KPIs encoded in DAX with cascading dependencies: no manual exports, always in sync</li>
+          <li>End-to-end visibility: from HubSpot deal stage through project execution to invoice collection and cash</li>
+          <li>Role-based views (Team Officer · Client Account · Project Manager) segmented by domain: each role sees exactly what it needs</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 SOLUTION -->
+<section id="solution">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>02</span> · Solution</div>
+      <div class="sh-title">
+        <h2 style="max-width:none">Three roles, five domains</h2>
+        <p style="max-width:none">Every report page belongs to exactly one role and one domain. Team Officers monitor performance across all five dimensions. Client Account owns the market view. Project Managers track margin and cash per project</p>
+      </div>
+    </div>
+    <div class="role-matrix-wrap">
+      <div class="role-matrix">
+        <!-- Header -->
+        <div class="mx-cell mx-head corner">Role / Domain</div>
+        <div class="mx-cell mx-head">Cash</div>
+        <div class="mx-cell mx-head">Delivery</div>
+        <div class="mx-cell mx-head">Market</div>
+        <div class="mx-cell mx-head">Engagement</div>
+        <div class="mx-cell mx-head">Platform</div>
+        <!-- Team Officer -->
+        <div class="mx-cell mx-row-head">Team Officer</div>
+        <div class="mx-cell mx-action" data-act="cash"><span class="label">Circulation</span><span class="desc">Working capital &amp; treasury KPIs</span></div>
+        <div class="mx-cell mx-action" data-act="delivery"><span class="label">Delivery</span><span class="desc">Revenue, margin &amp; chargeability</span></div>
+        <div class="mx-cell mx-action" data-act="market"><span class="label">Marketing</span><span class="desc">HubSpot pipeline &amp; deal funnel</span></div>
+        <div class="mx-cell mx-action" data-act="engagement"><span class="label">Engagement</span><span class="desc">eNPS, turnover &amp; chargeability</span></div>
+        <div class="mx-cell mx-action" data-act="platform"><span class="label">Platform</span><span class="desc">Revenue model mix</span></div>
+        <!-- Client Account -->
+        <div class="mx-cell mx-row-head">Client Account</div>
+        <div class="mx-cell mx-action" data-act="cash"><span class="label">Cash</span><span class="desc">Invoiced amounts and payments</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">—</span></div>
+        <div class="mx-cell mx-action" data-act="market"><span class="label">Market &amp; Deal</span><span class="desc">Revenue vs. target per client</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">—</span></div>
+        <div class="mx-cell mx-action" data-act="platform"><span class="label">Platform</span><span class="desc">Alignment with business objectives</span></div>
+        <!-- Project Manager -->
+        <div class="mx-cell mx-row-head">Project Manager</div>
+        <div class="mx-cell mx-action" data-act="cash"><span class="label">Cash</span><span class="desc">Project costs</span></div>
+        <div class="mx-cell mx-action" data-act="delivery"><span class="label">Projects</span><span class="desc">Planned vs actual margin &amp; cash</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">—</span></div>
+        <div class="mx-cell mx-action" data-act="engagement"><span class="label">Engagement</span><span class="desc">Team member satisfaction</span></div>
+        <div class="mx-cell mx-action" data-act="none"><span class="label">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Power Automate data warehousing callout -->
+  <div class="wrap" style="margin-top:56px">
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+      <div style="background:rgba(56,189,248,.06);border-bottom:1px solid rgba(56,189,248,.18);padding:20px 28px;display:flex;align-items:center;gap:16px">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);padding:4px 10px;border-radius:4px;flex-shrink:0">Power Automate</span>
+        <span style="font-size:16px;font-weight:600;letter-spacing:-0.01em">Historic Capital Working Days - Data Warehousing pipeline</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+        <div style="padding:28px 32px;border-right:1px solid var(--border)">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">The problem</div>
+          <p style="font-size:14px;color:var(--text-dim);line-height:1.65">Capital Working Days is a <em>point-in-time</em> metric: every day the ERP overwrites the underlying receivables and ARNI balances, so each refresh gives a current value but history is permanently lost. There was no way to plot trends, set alerts on drift, or do period-over-period comparison beyond what the fact tables natively preserved</p>
+        </div>
+        <div style="padding:28px 32px">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px">The solution</div>
+          <p style="font-size:14px;color:var(--text-dim);line-height:1.65">A scheduled Power Automate flow runs once a day, reads the current CWD value exposed by the refreshed report, and appends a timestamped row to a SharePoint list, building a lightweight data warehouse one row per day. Power BI then loads this history table as a dedicated query, enabling true time-series analysis of working-capital drift without touching the source ERP</p>
+        </div>
+      </div>
+      <!-- flow diagram -->
+      <div style="border-top:1px solid var(--border);padding:24px 32px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:18px">Daily flow</div>
+        <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap">
+          <!-- step 1 -->
+          <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">① Trigger</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Scheduled - 07:30</div>
+            <div style="font-size:12px;color:var(--muted)">Fires after daily Power BI refresh completes</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 10px;color:var(--dim);font-family:var(--mono);font-size:14px">→</div>
+          <!-- step 2 -->
+          <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">② Read</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">HTTP → Power BI REST API</div>
+            <div style="font-size:12px;color:var(--muted)">Fetch current CWD value from Oracle</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 10px;color:var(--dim);font-family:var(--mono);font-size:14px">→</div>
+          <!-- step 3 -->
+          <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">③ Append</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">SharePoint list - new row</div>
+            <div style="font-size:12px;color:var(--muted)">Date · Team · CWD value · Timestamp</div>
+          </div>
+          <div style="display:flex;align-items:center;padding:0 10px;color:var(--dim);font-family:var(--mono);font-size:14px">→</div>
+          <!-- step 4 -->
+          <div style="background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.25);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--accent-3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">④ Loaded by Power BI</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">CWD Table</div>
+            <div style="font-size:12px;color:var(--muted)">Full history analysis</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 ARCHITECTURE -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>03</span> · Architecture</div>
+      <div class="sh-title">
+        <h2 style="max-width:none">Constellation schema</h2>
+        <p style="max-width:none">Four fact tables sharing two dimensions: Registry and Date Table. No single mega-fact: each domain owns its source table, so Oracle revenue, HubSpot pipeline, invoices, and timesheets stay independent and composable</p>
+      </div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-title">Power Query Pipeline</div>
+      <div class="pipeline-flow">
+        <div class="pl-stage">
+          <div class="stg-label">Sources</div>
+          <div class="stg-items">
+            <div class="pn">Oracle ERP</div>
+            <div class="pn">PostgreSQL DB</div>
+            <div class="pn">HubSpot REST API</div>
+            <div class="pn">SharePoint Excel</div>
+            <div class="pn">Embedded JSON</div>
+          </div>
+        </div>
+        <div class="pl-arrow">→</div>
+        <div class="pl-stage">
+          <div class="stg-label">Power Query (M)</div>
+          <div class="stg-items">
+            <div class="pn">Activity Detail</div>
+            <div class="pn">Invoices</div>
+            <div class="pn">Master Registry</div>
+            <div class="pn">Timesheet</div>
+            <div class="pn">eNPS Relevation</div>
+            <div class="pn">HubSpot Services</div>
+          </div>
+        </div>
+        <div class="pl-arrow">→</div>
+        <div class="pl-stage">
+          <div class="stg-label">Model Tables</div>
+          <div class="stg-items" style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div class="pn">Activity Detail</div>
+            <div class="pn">Offers</div>
+            <div class="pn">Invoices</div>
+            <div class="pn">HubSpot Services</div>
+            <div class="pn">eNPS Relevation</div>
+            <div class="pn">Master Registry</div>
+            <div class="pn">Plannings</div>
+            <div class="pn">Timesheet</div>
+            <div class="pn">Parameters</div>
+            <div class="pn">Date Table</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="schema-shell">
+      <div class="schema-canvas" id="schema">
+        <svg viewBox="0 0 920 560" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--mono)">
+          <defs>
+            <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <polygon points="0,0 6,3 0,6" fill="#4B7FA8"/>
+            </marker>
+          </defs>
+
+          <!-- Connections -->
+          <g class="connections" stroke="#4B7FA8" stroke-width="1.25" fill="none">
+            <!-- Employee Master Registry → Timesheet (Email 1:N) -->
+            <path class="conn" data-pair="Employee Master Registry,Timesheet"
+              d="M 137,122 L 137,400"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Activity Detail → Timesheet (Activity Code 1:N via Z-AC bridge) -->
+            <path class="conn" data-pair="Activity Detail,Timesheet"
+              d="M 340,335 L 340,450 L 300,450 L 260,450"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Activity Detail → Offers (Activity Code 1:N via Z-AC bridge) -->
+            <path class="conn" data-pair="Activity Detail,Offers"
+              d="M 490,175 L 490,100 L 610,100 L 655,100"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Activity Detail → Invoices (Activity Code 1:N via Z-AC bridge) -->
+            <path class="conn" data-pair="Activity Detail,Invoices"
+              d="M 490,335 L 490,450 L 600,450 L 655,450"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- Activity Detail ↔ HubSpot - Deals (Project Code — logical join) -->
+            <path class="conn" data-pair="Activity Detail,HubSpot - Deals"
+              d="M 560,265 L 655,265"
+              stroke-dasharray="4,3" marker-end="url(#arr)"/>
+          </g>
+
+          <!-- Cardinality labels -->
+          <g font-family="var(--mono)" font-size="9" font-weight="700" fill="#9AA3B0">
+            <!-- Employee Master Registry → Timesheet -->
+            <text x="125" y="170">1</text><text x="125" y="390">N</text>
+            <!-- Activity Detail → Timesheet -->
+            <text x="343" y="350">1</text><text x="270" y="440">N</text>
+            <!-- Activity Detail → Offers -->
+            <text x="475" y="165">1</text><text x="635" y="75">N</text>
+            <!-- Activity Detail → Invoices -->
+            <text x="475" y="350">1</text><text x="635" y="440">N</text>
+            <!-- Activity Detail ↔ HubSpot - Deals -->
+            <text x="570" y="260">N</text><text x="635" y="260">N</text>
+          </g>
+
+          <!-- EMPLOYEE MASTER REGISTRY (DIM, left) -->
+          <g class="tbl dim" data-table="Employee Master Registry" transform="translate(20,25)">
+            <rect class="tbl-bg" width="235" height="122" rx="6"/>
+            <rect class="tbl-header" width="235" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="235" height="10"/>
+            <text x="12" y="16" font-size="10" fill="#E5E9F0" font-weight="600">Employee Registry</text>
+            <text x="203" y="16" font-size="8" fill="#38BDF8" font-weight="700">DIM</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Email</text>
+            <text x="207" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="54" font-size="10" fill="#B5BCC8">Name</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Collaboration Start Date</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Contract Type</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Status</text>
+            <text x="12" y="110" font-size="10" fill="#B5BCC8">Team</text>
+          </g>
+
+          <!-- ACTIVITY DETAIL (FACT, central hub) -->
+          <g class="tbl fact" data-table="Activity Detail" transform="translate(285,175)">
+            <rect class="tbl-bg" width="275" height="160" rx="6"/>
+            <rect class="tbl-header" width="275" height="28" rx="6"/>
+            <rect class="tbl-header" y="14" width="275" height="14"/>
+            <text x="14" y="18" font-size="13" fill="#E5E9F0" font-weight="700">Activity Detail</text>
+            <text x="238" y="18" font-size="9" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="14" y="46" font-size="10" fill="#818CF8">Activity Code</text>
+            <text x="247" y="46" font-size="8" fill="#818CF8" font-weight="700">PK</text>
+            <text x="14" y="60" font-size="10" fill="#818CF8">Project Code</text>
+            <text x="247" y="60" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="14" y="74" font-size="10" fill="#B5BCC8">Business Model</text>
+            <text x="14" y="88" font-size="10" fill="#B5BCC8">Client Name</text>
+            <text x="14" y="102" font-size="10" fill="#B5BCC8">Execution Date</text>
+            <text x="14" y="116" font-size="10" fill="#B5BCC8">Actual Revenue</text>
+            <text x="14" y="130" font-size="10" fill="#B5BCC8">Actual Cost</text>
+            <text x="14" y="144" font-size="10" fill="#B5BCC8">Actual First Margin</text>
+          </g>
+
+          <!-- TIMESHEET (FACT, bottom-left) -->
+          <g class="tbl fact" data-table="Timesheet" transform="translate(20,400)">
+            <rect class="tbl-bg" width="240" height="136" rx="6"/>
+            <rect class="tbl-header" width="240" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="240" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Timesheet</text>
+            <text x="208" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#818CF8">Email</text>
+            <text x="212" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#818CF8">Activity Code</text>
+            <text x="212" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#818CF8">Competency Date</text>
+            <text x="212" y="68" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Chargeability</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">External Price</text>
+            <text x="12" y="110" font-size="10" fill="#B5BCC8">Internal Price</text>
+            <text x="12" y="124" font-size="10" fill="#B5BCC8">Hours</text>
+          </g>
+
+          <!-- OFFERS — ALL BIDS BY TEAM (FACT, top-right) -->
+          <g class="tbl fact" data-table="Offers" transform="translate(655,25)">
+            <rect class="tbl-bg" width="250" height="136" rx="6"/>
+            <rect class="tbl-header" width="250" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="250" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Offers</text>
+            <text x="218" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#818CF8">Activity Code</text>
+            <text x="222" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#38BDF8">Bid Code</text>
+            <text x="222" y="54" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Bid Status</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Client Name</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Pipeline Status</text>
+            <text x="12" y="110" font-size="10" fill="#B5BCC8">Proposal Date</text>
+            <text x="12" y="124" font-size="10" fill="#B5BCC8">Proposal Status</text>
+          </g>
+
+          <!-- HUBSPOT - DEALS (FACT, right) -->
+          <g class="tbl fact" data-table="HubSpot - Deals" transform="translate(655,200)">
+            <rect class="tbl-bg" width="250" height="136" rx="6"/>
+            <rect class="tbl-header" width="250" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="250" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">HubSpot Deals</text>
+            <text x="218" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#818CF8">Project Code</text>
+            <text x="222" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#38BDF8">Deal Id</text>
+            <text x="222" y="54" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Creation Date</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Deal Name</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Deal Stage</text>
+            <text x="12" y="110" font-size="10" fill="#B5BCC8">Owner</text>
+            <text x="12" y="124" font-size="10" fill="#B5BCC8">Amount</text>
+          </g>
+
+          <!-- INVOICES — APERTI + INCPAG (FACT, bottom-right) -->
+          <g class="tbl fact" data-table="Invoices" transform="translate(655,400)">
+            <rect class="tbl-bg" width="250" height="136" rx="6"/>
+            <rect class="tbl-header" width="250" height="24" rx="6"/>
+            <rect class="tbl-header" y="14" width="250" height="10"/>
+            <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Invoices</text>
+            <text x="218" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
+            <text x="12" y="40" font-size="10" fill="#818CF8">Activity Code</text>
+            <text x="222" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#38BDF8">Invoice Id</text>
+            <text x="222" y="54" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="12" y="68" font-size="10" fill="#B5BCC8">Invoice Type</text>
+            <text x="12" y="82" font-size="10" fill="#B5BCC8">Invoice Date</text>
+            <text x="12" y="96" font-size="10" fill="#B5BCC8">Payment Date</text>
+            <text x="12" y="110" font-size="10" fill="#B5BCC8">Status</text>
+            <text x="12" y="124" font-size="10" fill="#B5BCC8">Net Amount</text>
+          </g>
+        </svg>
+      </div>
+      <aside class="schema-side" id="schemaSide">
+        <div class="ss-label">Inspector</div>
+        <div id="schemaInspector">
+          <div class="ss-empty">Hover or click any table to inspect its columns and relationships</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- 04 DAX -->
+<section id="dax">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>04</span> · DAX</div>
+      <div class="sh-title">
+        <h2>The logic, in code</h2>
+        <p style="max-width:none">200+ measures across working capital, revenue, pipeline, engagement, project tracking, and more</p>
+      </div>
+    </div>
+    <div class="dax-tabs" id="daxTabs">
+      <button class="dax-tab active" data-panel="measures">Measures <span class="count">3</span></button>
+      <button class="dax-tab" data-panel="cols">Calculated Columns <span class="count">1</span></button>
+    </div>
+
+    <!-- Measures -->
+    <div class="dax-panel active" data-panel="measures">
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Margin % Production PY <span class="tag">measure</span></div>
+            <div class="desc">Production margin % for the prior calendar year. The ratio stays frozen on the closed year regardless of the current period slicer</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> PreviousYear <span class="dx-op"> =</span> <span class="dx-fn">YEAR</span>(<span class="dx-fn">TODAY</span>()) <span class="dx-op">-</span> <span class="dx-num">1</span>
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Revenue <span class="dx-op">      =</span> <span class="dx-fn">CALCULATE</span>([<span class="dx-col">Revenue Actual Production</span>], <span class="dx-fn">YEAR</span>(<span class="dx-tbl">'Date Table'</span>[<span class="dx-col">Date</span>]) <span class="dx-op">=</span> PreviousYear)
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> Cost <span class="dx-op">         =</span> <span class="dx-fn">CALCULATE</span>([<span class="dx-col">Cost Actual Production</span>], <span class="dx-fn">YEAR</span>(<span class="dx-tbl">'Date Table'</span>[<span class="dx-col">Date</span>]) <span class="dx-op">=</span> PreviousYear)
+<span class="ln"> 4</span><span class="dx-kw">VAR</span> Margin <span class="dx-op">       =</span> Revenue <span class="dx-op">-</span> Cost
+<span class="ln"> 5</span><span class="dx-kw">RETURN</span> <span class="dx-fn">IF</span>(Revenue <span class="dx-kw">IN</span> {<span class="dx-num">0</span>, <span class="dx-fn">BLANK</span>()},
+<span class="ln"> 6</span>        <span class="dx-fn">IF</span>(Margin <span class="dx-kw">IN</span> {<span class="dx-num">0</span>, <span class="dx-fn">BLANK</span>()}, <span class="dx-num">0</span>, <span class="dx-fn">IF</span>(Margin <span class="dx-op">&gt;</span> <span class="dx-num">0</span>, <span class="dx-num">1</span>, <span class="dx-op">-</span><span class="dx-num">1</span>)),
+<span class="ln"> 7</span>        Margin <span class="dx-op">/</span> Revenue)</pre>
+      </article>
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">eNPS Storytelling <span class="tag">measure</span></div>
+            <div class="desc">Text icon comparing the two most recent eNPS survey results: returns "✓" if the score held or improved, "⊘" if it declined, blank if no data. Displayed as a directional signal alongside the raw eNPS score in the Engagement view</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> LatestDate <span class="dx-op">      =</span> <span class="dx-fn">MAX</span>(<span class="dx-tbl">'eNPS'</span>[<span class="dx-col">Date</span>])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> SecondToLastDate <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">MAX</span>(<span class="dx-tbl">'eNPS'</span>[<span class="dx-col">Date</span>]), <span class="dx-tbl">'eNPS'</span>[<span class="dx-col">Date</span>] <span class="dx-op">&lt;</span> LatestDate)
+<span class="ln"> 3</span><span class="dx-kw">VAR</span> After  <span class="dx-op">          =</span> <span class="dx-fn">CALCULATE</span>([<span class="dx-col">eNPS</span>], <span class="dx-tbl">'eNPS'</span>[<span class="dx-col">Date</span>] <span class="dx-op">=</span> LatestDate)
+<span class="ln"> 4</span><span class="dx-kw">VAR</span> Before  <span class="dx-op">         =</span> <span class="dx-fn">CALCULATE</span>([<span class="dx-col">eNPS</span>], <span class="dx-tbl">'eNPS'</span>[<span class="dx-col">Date</span>] <span class="dx-op">=</span> SecondToLastDate)
+<span class="ln"> 5</span><span class="dx-kw">RETURN</span> <span class="dx-fn">IF</span>(After <span class="dx-op">=</span> <span class="dx-fn">BLANK</span>(), <span class="dx-str">" "</span>, <span class="dx-fn">IF</span>(After <span class="dx-op">&lt;</span> Before, <span class="dx-str">"⊘"</span>, <span class="dx-str">"✓"</span>))</pre>
+      </article>
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">Cashed <span class="tag">measure</span></div>
+            <div class="desc">Total cash collected per project: sum of VAT-included amounts for invoices with Paid or Closed status, limited to FTA, NCA, and SA invoice types. Direct cash-in KPI used in the PM Portfolio journey view at the Cashing stage</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-fn">CALCULATE</span>(<span class="dx-fn">SUM</span>(<span class="dx-tbl">'Aperti+IncPag'</span>[<span class="dx-col">VAT Included Amount</span>]),
+<span class="ln"> 2</span>    <span class="dx-tbl">'Aperti+IncPag'</span>[<span class="dx-col">Invoice Expiration Status</span>] <span class="dx-kw">IN</span> {<span class="dx-str">"Paid"</span>, <span class="dx-str">"Closed"</span>} <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'Aperti+IncPag'</span>[<span class="dx-col">Invoice Type</span>] <span class="dx-kw">IN</span> {<span class="dx-str">"FTA"</span>, <span class="dx-str">"NCA"</span>, <span class="dx-str">"SA"</span>})</pre>
+      </article>
+    </div>
+
+    <!-- Calculated Columns -->
+    <div class="dax-panel" data-panel="cols">
+      <article class="measure">
+        <div class="measure-head">
+          <div class="meta">
+            <div class="name">ARNI Cluster <span class="tag">column · Activity Detail</span></div>
+            <div class="desc">Classifies unbilled work into four ageing buckets combining recency and invoice overdue status</div>
+          </div>
+          <div class="actions"><button class="btn-icon" data-copy>Copy</button></div>
+        </div>
+<pre class="dax">
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Maturazione <span class="dx-op">=</span> <span class="dx-fn">DATEDIFF</span>(<span class="dx-tbl">'Activity Detail'</span>[<span class="dx-col">Execution Planned Date</span>], <span class="dx-fn">TODAY</span>(), <span class="dx-fn">DAY</span>)
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Scadenza    <span class="dx-op">=</span> <span class="dx-fn">DATEDIFF</span>(<span class="dx-tbl">'Activity Detail'</span>[<span class="dx-col">Invoice Planned Date</span>], <span class="dx-fn">TODAY</span>(), <span class="dx-fn">DAY</span>)
+<span class="ln"> 3</span><span class="dx-kw">RETURN</span>
+<span class="ln"> 4</span>    <span class="dx-fn">IF</span>(Maturazione <span class="dx-op">&lt;=</span> <span class="dx-num">60</span>,
+<span class="ln"> 5</span>        <span class="dx-fn">IF</span>(Scadenza <span class="dx-op">&gt;</span> <span class="dx-num">0</span>, <span class="dx-str">"Corrente-Scaduto"</span>,    <span class="dx-str">"Corrente-Non scaduto"</span>),
+<span class="ln"> 6</span>        <span class="dx-fn">IF</span>(Scadenza <span class="dx-op">&gt;</span> <span class="dx-num">0</span>, <span class="dx-str">"Non corrente-Scaduto"</span>, <span class="dx-str">"Non corrente-Non scaduto"</span>))</pre>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 05 PAGES -->
+<section id="pages">
+  <div class="wrap">
+    <div class="sh">
+      <div class="sh-no"><span>05</span> · Pages</div>
+      <div class="sh-title">
+        <h2>15 pages, three lenses</h2>
+        <p style="max-width:none">Team Officers monitor performance across all five domains. Client Accounts drill into client-level revenue and deal flow. Project Managers track individual project margins, journey stage, and cash collection</p>
+      </div>
+    </div>
+    <div class="pages-stack">
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">HOME</div>
+          <h3>Home</h3>
+          <p>Landing page and navigation hub. Single-screen entry point routing each role to their relevant domain views</p>
+          <div class="features"><span>Navigation</span><span>Role Routing</span></div>
+        </div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">Home</span></div><img src="../screenshots/ARFHome.png" alt="Home" style="width:100%;display:block"></div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">TO - REDIRECTORY</div>
+          <h3>Team Officer Redirectory</h3>
+          <p>Overview scorecard for Team Officers: navigation to each domain deep-dive</p>
+          <div class="features"><span>Navigation</span><span>Domain Routing</span></div>
+        </div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">TO - Redirectory</span></div><img src="../screenshots/ARFTo.png" alt="Team Officer Redirectory" style="width:100%;display:block"></div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">TO - DELIVERY</div>
+          <h3>Revenue actuals vs. targets</h3>
+          <p>First-margin %, chargeability rate, and FTE-normalised revenue per capita by circle and team. Actual vs plan with YoY comparison</p>
+          <div class="features"><span>Bar vs Target</span><span>Line Chart</span></div>
+        </div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">TO - Delivery</span></div><img src="../screenshots/ARFToDelivery.png" alt="TO - Delivery" style="width:100%;display:block"></div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">TO - MARKET</div>
+          <h3>HubSpot pipeline by stage</h3>
+          <p>Proposal amounts vs same-period prior year, deal success ratio, and funnel conversion from Opportunity through to Order</p>
+          <div class="features"><span>Funnel</span><span>Combo Chart</span><span>Pie Chart</span></div>
+        </div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">TO - Market</span></div><img src="../screenshots/ARFToMarket.png" alt="TO - Market" style="width:100%;display:block"></div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">CA - CASH</div>
+          <h3>Cash collection and invoicing</h3>
+          <p>Invoiced amounts, payment status, ARNI ageing buckets, and NCA ratio per client account. Full visibility on receivables health</p>
+          <div class="features"><span>Ageing Table</span><span>KPI Cards</span></div>
+        </div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">CA - Cash</span></div><img src="../screenshots/ARFCACash.png" alt="CA - Cash" style="width:100%;display:block"></div>
+      </div>
+
+      <div class="page-row">
+        <div class="page-meta">
+          <div class="num">PM - PORTFOLIO</div>
+          <h3>Portfolio and project view</h3>
+          <p>Journey stage tracking, planned vs actual margins, and cash collection status per project</p>
+          <div class="features"><span>Journey Steps</span><span>Margin %</span><span>Cashed KPI</span></div>
+        </div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">PM - Portfolio</span></div><img src="../screenshots/ARFPmPortfolio.png" alt="PM - Portfolio" style="width:100%;display:block"></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <span>© 2024 Simone Caruso</span>
+    <span><a href="index.html">← Back to portfolio</a></span>
+  </div>
+</footer>
+
+<script>
+const tableData = {
+  "Activity Detail": {
+    kind:'FACT',
+    desc:'Core project and activity table from Oracle ERP, one row per work package activity. Central hub of the constellation: Activity Code links to Timesheet, Offers, and Invoices',
+    cols:[
+      {n:'Activity Code',t:'str',tag:'pk'},
+      {n:'Project Code',t:'str',tag:'fk'},
+      {n:'Activity Description',t:'str'},
+      {n:'Activity Type',t:'str'},
+      {n:'Team',t:'str'},
+      {n:'Client Name',t:'str'},
+      {n:'Project Manager',t:'str'},
+      {n:'Business Model',t:'str'},
+      {n:'Status Pipeline',t:'str'},
+    ]
+  },
+  "Employee Master Registry": {
+    kind:'DIM',
+    desc:'Employee dimension sourced live from Oracle ERP. One row per employee. Primary key Email links to Timesheet. Calculated columns add Status, Age, Tenure, and Generation. Source for headcount, chargeability denominators, and cost rate lookups',
+    cols:[
+      {n:'Email',t:'str',tag:'pk'},
+      {n:'Employee',t:'str'},
+      {n:'Office',t:'str'},
+      {n:'Team',t:'str'},
+      {n:'Team Role',t:'str'},
+      {n:'Main Profile',t:'str'},
+      {n:'Status',t:'str'},
+      {n:'Contract Type',t:'str'},
+    ]
+  },
+  "Timesheet": {
+    kind:'FACT',
+    desc:'Daily timesheet actuals from Oracle ERP: one row per employee per day per activity. Source for chargeability, FTE, cross-team allocation, and internal cost reconciliation',
+    cols:[
+      {n:'Email',t:'str',tag:'fk'},
+      {n:'Activity Code',t:'str',tag:'fk'},
+      {n:'Competency Date',t:'date',tag:'fk'},
+      {n:'Employee',t:'str'},
+      {n:'Hours',t:'dbl'},
+      {n:'Internal Cost',t:'€'},
+      {n:'Category',t:'str'},
+      {n:'Chargeability',t:'str'},
+      {n:'Cross Team',t:'str'},
+    ]
+  },
+  "Offers": {
+    kind:'FACT',
+    desc:'All bids submitted by team from Oracle ERP: one row per bid per activity. Tracks pipeline status, bid lifecycle, approval flow, and proposal amounts by circle and team',
+    cols:[
+      {n:'Activity Code',t:'str',tag:'fk'},
+      {n:'Bid Code',t:'str',tag:'pk'},
+      {n:'Client Name',t:'str'},
+      {n:'Client Account',t:'str'},
+      {n:'Business Model',t:'str'},
+      {n:'Approval Status',t:'str'},
+      {n:'Bid Status',t:'str'},
+      {n:'Bid Ageing',t:'str'},
+      {n:'Proposal Date Registered',t:'date'},
+    ]
+  },
+  "HubSpot - Deals": {
+    kind:'FACT',
+    desc:'Live sales pipeline from HubSpot REST API: one row per deal across all stages. Powers pipeline value, conversion rate, deal duration, and forecast-category measures',
+    cols:[
+      {n:'Deal Id',t:'str',tag:'pk'},
+      {n:'Project Code',t:'str',tag:'fk'},
+      {n:'Deal Name',t:'str'},
+      {n:'Deal Stage',t:'str'},
+      {n:'Pipeline',t:'str'},
+      {n:'Amount',t:'€'},
+      {n:'Owner',t:'str'},
+      {n:'Contact',t:'str'},
+      {n:'Last Activity Date',t:'date'},
+    ]
+  },
+  "Invoices": {
+    kind:'FACT',
+    desc:'Outstanding and paid invoices from Oracle: one row per invoice line. Powers receivables, ARNI ageing buckets, NCA ratio, payment-on-time KPIs, and working capital measures',
+    cols:[
+      {n:'Activity Code',t:'str',tag:'fk'},
+      {n:'Invoice Id',t:'str',tag:'pk'},
+      {n:'Invoice Type',t:'str'},
+      {n:'Invoice Description',t:'str'},
+      {n:'Invoice Date',t:'date'},
+      {n:'Expiration Date',t:'date'},
+      {n:'Expiration Status',t:'str'},
+      {n:'Payment Terms',t:'str'},
+      {n:'Invoice Total Amount',t:'€'},
+    ]
+  },
+};
+
+const schema = document.getElementById('schema');
+const inspector = document.getElementById('schemaInspector');
+function renderInspector(name) {
+  if (!name) { inspector.innerHTML = '<div class="ss-empty">Hover or click any table to inspect its columns and relationships</div>'; return; }
+  const t = tableData[name]; if (!t) return;
+  const cols = t.cols.map(c => {
+    const cls = c.tag||''; const tag = c.tag ? `<span class="col-tag ${c.tag}">${c.tag}</span>` : '';
+    return `<div class="col"><div><span class="name ${cls}">${c.n}</span>${tag}</div><div class="type">${c.t}</div></div>`;
+  }).join('');
+  inspector.innerHTML = `<div class="ss-title">${name} <span class="kind">${t.kind}</span></div><div class="ss-desc">${t.desc}</div><div class="ss-cols">${cols}</div>`;
+}
+const tbls = schema.querySelectorAll('.tbl');
+const conns = schema.querySelectorAll('.conn');
+function activate(name) {
+  if (!name) { schema.removeAttribute('data-active'); tbls.forEach(t=>t.classList.remove('active')); conns.forEach(c=>c.classList.remove('active')); renderInspector(null); return; }
+  schema.setAttribute('data-active', name);
+  tbls.forEach(t => t.classList.toggle('active', t.dataset.table === name));
+  conns.forEach(c => {
+    const pair = (c.dataset.pair||'').split(',');
+    c.classList.toggle('active', pair.includes(name));
+    pair.forEach(p => { if (p !== name) { const o = schema.querySelector(`.tbl[data-table="${p}"]`); if (o) o.classList.add('active'); } });
+  });
+  renderInspector(name);
+}
+tbls.forEach(t => { t.addEventListener('mouseenter', () => activate(t.dataset.table)); t.addEventListener('click', () => activate(t.dataset.table)); });
+schema.addEventListener('mouseleave', () => activate(null));
+
+const tabs = document.querySelectorAll('.dax-tab');
+const panels = document.querySelectorAll('.dax-panel');
+tabs.forEach(t => { t.addEventListener('click', () => { tabs.forEach(x=>x.classList.remove('active')); panels.forEach(p=>p.classList.remove('active')); t.classList.add('active'); document.querySelector(`.dax-panel[data-panel="${t.dataset.panel}"]`).classList.add('active'); }); });
+
+document.querySelectorAll('[data-copy]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const code = btn.closest('.measure').querySelector('pre.dax').innerText.split('\n').map(l=>l.replace(/^\s*\d+\s/,'')).join('\n').trim();
+    try { await navigator.clipboard.writeText(code); const o=btn.textContent; btn.textContent='✓ Copied'; btn.classList.add('copied'); setTimeout(()=>{btn.textContent=o;btn.classList.remove('copied');},1400); } catch(e){btn.textContent='× Failed';}
+  });
+});
+</script>
+</body>
+</html>
