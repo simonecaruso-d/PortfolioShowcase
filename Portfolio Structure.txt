@@ -1,0 +1,25 @@
+NELLA HOME SCRIVERE CHE TUTTO QUELLO CHE MOSTRO E' UNA VERSIONE SEMPLIFICATA, FOR DISPLAY PURPOSES
+
+DATA VIZ
+- Clients Segmentation ✅
+- Analytics By Role & Focus ✅
+- People Analytics ✅
+- Booking ✅
+
+DATA ENGINEERING
+- Wholesaler Upload Demo
+- Huspot Data Retrieval
+
+AI & MACHINE LEARNING (2 + 2)
+- Cash Flow Forecasts
+- Times & Amount Predictions
+- WLDM
+
+- Newsie
+- Archie
+- Assie
+- Devvie
+
+FULL STACK
+- Domani Piove ✅
+- Domani Dono ✅
