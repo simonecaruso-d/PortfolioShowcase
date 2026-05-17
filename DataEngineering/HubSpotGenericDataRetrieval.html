@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HubSpot Generic Retrieval</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#060A08; --panel:#0A1210; --panel-2:#0F1A17; --panel-3:#14231E;
+  --border:#1A2E28; --border-bright:#254038; --grid:#0A1210;
+  --text:#F2F4F7; --text-dim:#C4CAD6; --muted:#7A8494; --dim:#3D4654;
+  --accent:#10B981;
+  --accent-2:#38BDF8;
+  --accent-3:#F59E0B;
+  --warn:#FB923C; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:56px 56px;background-position:-1px -1px}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#fff}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(6,10,8,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:20px;color:var(--muted)}
+.tb-nav{display:flex;gap:20px}
+.tb-nav a{color:var(--muted);transition:color .15s}
+.tb-nav a:hover{color:var(--text)}
+
+/* Hero */
+.hero{padding:136px 0 96px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(16,185,129,.07) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(56,189,248,.04) 0%,transparent 65%);pointer-events:none}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
+.hero h1{font-size:clamp(44px,7vw,88px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:600}
+.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:none;margin-bottom:20px;font-weight:400}
+.hero .sublede{font-size:16px;color:var(--muted);max-width:none;margin-bottom:48px;line-height:1.6}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
+.chip.accent{color:var(--accent);border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.07)}
+.chip.purple{color:var(--accent-2);border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.07)}
+
+/* Stats strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 24px;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.stat .num{font-size:48px;line-height:1;letter-spacing:-.04em;font-weight:700;font-feature-settings:'tnum'}
+.stat .sub{margin-top:10px;font-size:12px;color:var(--text-dim)}
+.stat .num.teal{color:var(--accent)}
+.stat .num.purple{color:var(--accent-2)}
+.stat .num.green{color:var(--accent-3)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}}
+
+/* Section header */
+.sh{margin-bottom:64px;display:grid;grid-template-columns:180px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.12em;padding-top:10px}
+.sh-no span{color:var(--accent)}
+.sh-title h2{font-size:clamp(38px,5vw,58px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin-bottom:18px}
+.sh-title p{font-size:18px;color:var(--text-dim);max-width:none;line-height:1.6}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}}
+
+/* Insight bar */
+.insight{background:var(--panel);border:1px solid var(--border-bright);border-left:3px solid var(--accent);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start}
+.insight svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.insight p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.insight p strong{color:var(--text)}
+
+/* Code block */
+.code-block{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.code-bar{height:36px;background:var(--panel-3);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.code-bar .cb-dots{display:flex;gap:6px}
+.code-bar .cbd{width:10px;height:10px;border-radius:50%;background:var(--border-bright)}
+.code-bar .filename{margin-left:6px;color:var(--text-dim)}
+.code-bar .lang{margin-left:auto;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--text-dim)}
+.kw{color:#c084fc}.fn{color:var(--accent)}.str{color:var(--accent-3)}.cm{color:var(--dim);font-style:italic}.num{color:var(--warn)}.cls{color:#fb923c}
+
+/* Entity grid */
+.entity-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.entity-card{background:var(--panel);border:1px solid rgba(56,189,248,.35);border-radius:var(--radius-lg);padding:24px;transition:border-color .2s,box-shadow .2s;position:relative;overflow:hidden;background:rgba(56,189,248,.05)}
+.entity-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent-2)}
+.entity-card:hover{border-color:rgba(56,189,248,.7);box-shadow:0 8px 32px rgba(56,189,248,.1)}
+.entity-card .ec-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;color:var(--accent-2)}
+.entity-card h3{font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin-bottom:8px}
+.entity-card .ec-url{font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:12px;word-break:break-all}
+.entity-card p{font-size:13px;color:var(--muted);line-height:1.6}
+.entity-card .ec-fields{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
+.entity-card .ef{font-family:var(--mono);font-size:10px;color:var(--text-dim);padding:3px 8px;border:1px solid var(--border);border-radius:3px;background:var(--panel-2)}
+@media(max-width:1100px){.entity-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.entity-grid{grid-template-columns:1fr}}
+
+/* Pipeline strip */
+.pipeline-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.pl-step{background:var(--panel);padding:24px 20px}
+.pl-step .ps-num{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;margin-bottom:12px}
+.pl-step .ps-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.pl-step .ps-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px}
+.pl-step ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.pl-step li{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.pl-step li::before{content:"›";color:var(--dim);flex-shrink:0}
+@media(max-width:600px){.pipeline-row{grid-template-columns:1fr}}
+
+/* Tech grid */
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tech-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s}
+.tech-card:hover{border-color:var(--border-bright)}
+.tech-card .tc-cat{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+.tech-card .tc-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+.tech-card .tc-why{font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:760px){.tech-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:48px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
+.footer-brand span{color:var(--accent)}
+.footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.footer-links a{transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-note{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+#entities .sh-no span{color:var(--accent-2)}
+
+/* Scroll animation */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <a class="tb-back" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portfolio
+    </a>
+    <div class="tb-path">
+      <span class="slash">/</span>Data Engineering<span class="slash">/</span><span class="here">HubSpot Generic Retrieval</span>
+    </div>
+    <div class="tb-status">
+      <nav class="tb-nav">
+        <a href="#problem">Problem</a>
+        <a href="#wrapper">Wrapper</a>
+        <a href="#entities">Entities</a>
+        <a href="#code">Code</a>
+        <a href="#stack">Stack</a>
+      </nav>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="meta">
+      Data Engineering &nbsp;·&nbsp; HubSpot API Utility &nbsp;·&nbsp; 2022
+    </div>
+    <h1>HubSpot Generic Retrieval</h1>
+    <p class="lede">A reusable paginated wrapper for extracting any HubSpot object into clean Pandas DataFrames with one function call</p>
+    <p class="sublede">Built as a companion tool to the Deals pipeline: where the deals script is purpose-built for a complex schema, this is the general-purpose layer for any HubSpot endpoint that follows the standard paginated response pattern</p>
+    <div class="chips">
+      <span class="chip accent">HubSpot API</span>
+      <span class="chip accent">Paginated REST</span>
+      <span class="chip accent">Pandas</span>
+      <span class="chip accent">Process Automation</span>
+    </div>
+  </div>
+</div>
+
+<!-- Problem -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>01</span> - Problem</div>
+      <div class="sh-title">
+        <h2>Every HubSpot object needed its own export</h2>
+        <p>Owners, products, meetings, line items required manual exports. The paginated response pattern is identical across all of them. The solution was one wrapper, not five scripts.</p>
+      </div>
+    </div>
+    <div class="insight reveal">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Pattern recognition:</strong> HubSpot's v3 API returns a consistent envelope across all object types: <code>results</code> array, <code>paging.next.after</code> cursor, and a top-level length field. Once you write pagination correctly once, every endpoint becomes a one-liner. The generic wrapper captures this invariant</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:32px" class="reveal">
+      <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.35);border-radius:var(--radius-lg);padding:28px">
+        <div style="font-family:var(--mono);font-size:10px;color:#fff;letter-spacing:.14em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px"><span style="width:8px;height:8px;border-radius:2px;background:var(--accent-3);display:inline-block"></span>Without wrapper</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--dim);font-family:var(--mono)">|</span>Manual exports from HubSpot website</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--dim);font-family:var(--mono)">|</span>Separate pagination logic duplicated per script</li>
+        </ul>
+      </div>
+      <div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.35);border-radius:var(--radius-lg);padding:28px">
+        <div style="font-family:var(--mono);font-size:10px;color:#fff;letter-spacing:.14em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block"></span>With wrapper</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--accent);font-family:var(--mono)">→</span>One HubSpotRequest function handles all paginated endpoints</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--accent);font-family:var(--mono)">→</span>New object = one new URL + property string</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--accent);font-family:var(--mono)">→</span>Pagination fixed once, works everywhere</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--accent);font-family:var(--mono)">→</span>All outputs follow the same DataFrame → Excel pattern</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Wrapper -->
+<section id="wrapper">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>02</span> - The Wrapper</div>
+      <div class="sh-title">
+        <h2>One function, any HubSpot object</h2>
+        <p>HubSpotRequest takes a URL, headers, and a payload and returns a fully paginated DataFrame. The pagination loop handles cursor extraction and concatenation automatically</p>
+      </div>
+    </div>
+    <div class="pipeline-row reveal">
+      <div class="pl-step">
+        <div class="ps-num">01</div>
+        <div class="ps-label">Initial Request</div>
+        <div class="ps-title">First page fetch</div>
+        <ul>
+          <li>GET to provided URL</li>
+          <li>Parse results array</li>
+          <li>Extract paging cursor</li>
+          <li>Read total length signal</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">02</div>
+        <div class="ps-label">Pagination Loop</div>
+        <div class="ps-title">While length &gt; 1</div>
+        <ul>
+          <li>Append cursor to URL</li>
+          <li>Fetch next page</li>
+          <li>Concat to running DataFrame</li>
+          <li>Update cursor if more pages</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">03</div>
+        <div class="ps-label">Output</div>
+        <div class="ps-title">Flat DataFrame</div>
+        <ul>
+          <li>json_normalize flattens nested JSON</li>
+          <li>All pages concatenated</li>
+          <li>ignore_index resets row numbers</li>
+          <li>Ready for export or downstream use</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight reveal">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Termination condition:</strong> the loop uses <code>len(dataJson) &gt; 1</code> as the "more pages" signal: when HubSpot has no further results, the response envelope shrinks to just the results key with no paging object. This avoids a KeyError on <code>paging.next.after</code> when exhausted.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Entities -->
+<section id="entities">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>03</span> - Retrieval</div>
+      <div class="sh-title">
+        <h2>Five object types, one call each</h2>
+        <p>Each entity is a single HubSpotRequest call with its endpoint URL and desired property list</p>
+      </div>
+    </div>
+    <div class="entity-grid reveal">
+      <div class="entity-card e-teal">
+        <div class="ec-tag">CRM</div>
+        <h3>Owners</h3>
+        <div class="ec-url">/owners/v2/owners</div>
+        <p>All HubSpot users configured as deal/contact owners. Used for ID → name resolution in reporting pipelines.</p>
+        <div class="ec-fields">
+          <span class="ef">id</span>
+          <span class="ef">firstName</span>
+          <span class="ef">lastName</span>
+          <span class="ef">email</span>
+        </div>
+      </div>
+      <div class="entity-card e-purple">
+        <div class="ec-tag">Sales</div>
+        <h3>Line Items</h3>
+        <div class="ec-url">/crm/v4/objects/line_items</div>
+        <p>Products and quantities associated with deals. Includes margin, total contract value, and deal associations.</p>
+        <div class="ec-fields">
+          <span class="ef">name</span>
+          <span class="ef">hs_product_id</span>
+          <span class="ef">quantity</span>
+          <span class="ef">hs_tcv</span>
+          <span class="ef">hs_margin_tcv</span>
+          <span class="ef">price</span>
+        </div>
+      </div>
+      <div class="entity-card e-green">
+        <div class="ec-tag">Activity</div>
+        <h3>Meetings</h3>
+        <div class="ec-url">/crm/v3/objects/meetings</div>
+        <p>All logged meetings with title, owner, timing, outcome, and associations to companies, contacts, and deals.</p>
+        <div class="ec-fields">
+          <span class="ef">hs_meeting_title</span>
+          <span class="ef">hubspot_owner_id</span>
+          <span class="ef">hs_meeting_start_time</span>
+          <span class="ef">hs_meeting_outcome</span>
+        </div>
+      </div>
+      <div class="entity-card e-blue">
+        <div class="ec-tag">Catalog</div>
+        <h3>Products</h3>
+        <div class="ec-url">/crm/v4/objects/products</div>
+        <p>Product catalog with owner IDs, team IDs, type, description, and pricing. Used for line item enrichment and reporting.</p>
+        <div class="ec-fields">
+          <span class="ef">name</span>
+          <span class="ef">price</span>
+          <span class="ef">hs_product_type</span>
+          <span class="ef">description</span>
+          <span class="ef">amount</span>
+        </div>
+      </div>
+      <div class="entity-card e-pink">
+        <div class="ec-tag">CMS</div>
+        <h3>CMS Domains</h3>
+        <div class="ec-url">/cms/v3/domains</div>
+        <p>All domains connected to the HubSpot CMS account. Useful for auditing connected portals and website configuration.</p>
+        <div class="ec-fields">
+          <span class="ef">domain</span>
+          <span class="ef">primaryDomain</span>
+          <span class="ef">isResolvable</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Code -->
+<section id="code">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>04</span> - Core Pattern</div>
+      <div class="sh-title">
+        <h2>The full wrapper in 18 lines</h2>
+        <p>The entire reusable logic: pagination, concatenation, and normalization</p>
+      </div>
+    </div>
+    <div class="code-block reveal">
+      <div class="code-bar">
+        <div class="cb-dots"><div class="cbd"></div><div class="cbd"></div><div class="cbd"></div></div>
+        <span class="filename">HubSpotGenericDataRetrieval.py</span>
+        <span class="lang">Python</span>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">HubSpotRequest</span>(url, headers, payload):
+    response = requests.request(<span class="str">'GET'</span>, url, headers=headers, data=payload)
+    dataJson = response.json()
+    results  = dataJson[<span class="str">'results'</span>]
+    after    = dataJson[<span class="str">'paging'</span>][<span class="str">'next'</span>][<span class="str">'after'</span>]
+    lenght   = <span class="fn">len</span>(dataJson)
+    df       = pd.DataFrame.from_dict(pd.json_normalize(results), orient=<span class="str">'columns'</span>)
+
+    <span class="kw">while</span> lenght &gt; <span class="num">1</span>:
+        responseTwo = requests.request(<span class="str">'GET'</span>, <span class="fn">f</span><span class="str">'{url}&after={after}'</span>, headers=headers, data=payload)
+        dataJsonTwo = responseTwo.json()
+        resultsTwo  = dataJsonTwo[<span class="str">'results'</span>]
+        lenght      = <span class="fn">len</span>(dataJsonTwo)
+        dfTwo       = pd.DataFrame.from_dict(pd.json_normalize(resultsTwo), orient=<span class="str">'columns'</span>)
+        df          = pd.concat([df, dfTwo], ignore_index=<span class="kw">True</span>)
+        <span class="kw">if</span> lenght &gt; <span class="num">1</span>: after = dataJsonTwo[<span class="str">'paging'</span>][<span class="str">'next'</span>][<span class="str">'after'</span>]
+
+    <span class="kw">return</span> df
+
+<span class="cm"># One call per entity type</span>
+OwnersDf    = <span class="fn">HubSpotRequest</span>(<span class="str">'https://api.hubapi.com/owners/v2/owners'</span>, headers, payload)
+LineItemsDf = <span class="fn">HubSpotRequest</span>(<span class="str">'https://api.hubapi.com/crm/v4/objects/line_items/?properties=name&...'</span>, headers, payload)
+MeetingsDf  = <span class="fn">HubSpotRequest</span>(<span class="str">'https://api.hubapi.com/crm/v3/objects/meetings?...'</span>, headers, payload)
+ProductsDf  = <span class="fn">HubSpotRequest</span>(<span class="str">'https://api.hubapi.com/crm/v4/objects/products/?...'</span>, headers, payload)
+</section>
+
+<!-- Stack -->
+<section id="stack">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>05</span> - Stack</div>
+      <div class="sh-title">
+        <h2>Minimal stack, maximum portability</h2>
+        <p>Three dependencies. Runs anywhere Python runs.</p>
+      </div>
+    </div>
+    <div class="tech-grid reveal">
+      <div class="tech-card">
+        <div class="tc-cat">Language</div>
+        <div class="tc-name">Python 3.8+</div>
+        <div class="tc-why">No version-specific features needed. Runs in any modern Python environment</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">HTTP</div>
+        <div class="tc-name">requests</div>
+        <div class="tc-why">GET with Bearer auth header. Simple, well-understood, no async complexity needed at this scale</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Data</div>
+        <div class="tc-name">Pandas</div>
+        <div class="tc-why">json_normalize flattens nested HubSpot JSON. concat assembles pages. to_excel for output</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">API</div>
+        <div class="tc-name">HubSpot REST</div>
+        <div class="tc-why">Standard paginated GET pattern. v2 for owners, v3/v4 for CRM objects, v3 for CMS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Simone Caruso</div>
+      <div class="footer-links">
+        <a href="../index.html">Portfolio</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('.entity-grid, .tech-grid').forEach(parent => {
+  [...parent.children].forEach((child, i) => { child.style.transitionDelay = `${i * 60}ms`; });
+});
+</script>
+</body>
+</html>

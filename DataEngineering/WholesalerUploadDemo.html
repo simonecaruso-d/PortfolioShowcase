@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wholesaler Upload</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#060A08; --panel:#0A1210; --panel-2:#0F1A17; --panel-3:#14231E;
+  --border:#1A2E28; --border-bright:#254038; --grid:#0A1210;
+  --text:#F2F4F7; --text-dim:#C4CAD6; --muted:#7A8494; --dim:#3D4654;
+  --accent:#10B981;
+  --accent-2:#38BDF8;
+  --accent-3:#F59E0B;
+  --warn:#FB923C; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:56px 56px;background-position:-1px -1px}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#fff}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(6,10,8,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:20px;color:var(--muted)}
+.tb-nav{display:flex;gap:20px}
+.tb-nav a{color:var(--muted);transition:color .15s}
+.tb-nav a:hover{color:var(--text)}
+
+/* Hero */
+.hero{padding:136px 0 96px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(16,185,129,.07) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(56,189,248,.04) 0%,transparent 65%);pointer-events:none}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
+.hero h1{font-size:clamp(44px,7vw,88px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:600}
+.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:none;margin-bottom:20px;font-weight:400}
+.hero .sublede{font-size:16px;color:var(--muted);max-width:none;margin-bottom:48px;line-height:1.6}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
+.chip.accent{color:var(--accent);border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.07)}
+.chip.yellow{color:var(--accent-2);border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.07)}
+
+/* Stats strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 24px;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.stat .num{font-size:48px;line-height:1;letter-spacing:-.04em;font-weight:700;font-feature-settings:'tnum'}
+.stat .sub{margin-top:10px;font-size:12px;color:var(--text-dim)}
+.stat .num.orange{color:var(--accent)}
+.stat .num.yellow{color:var(--accent-2)}
+.stat .num.green{color:var(--accent-3)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}}
+
+/* Section header */
+.sh{margin-bottom:64px;display:grid;grid-template-columns:180px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.12em;padding-top:10px}
+.sh-no span{color:var(--accent)}
+.sh-title h2{font-size:clamp(38px,5vw,58px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin-bottom:18px}
+.sh-title p{font-size:18px;color:var(--text-dim);max-width:none;line-height:1.6}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}}
+
+/* Insight bar */
+.insight{background:var(--panel);border:1px solid var(--border-bright);border-left:3px solid var(--accent);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start}
+.insight svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.insight p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.insight p strong{color:var(--text)}
+
+/* Architecture diagram */
+.arch-wrap{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;overflow:hidden;position:relative}
+.arch-diagram{display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr 32px 1fr;gap:0;align-items:center}
+.arch-node{background:var(--panel-2);border:1px solid var(--border-bright);border-radius:var(--radius);padding:18px 14px;text-align:center;transition:border-color .2s,box-shadow .2s}
+.arch-node.upload:hover{border-color:rgba(16,185,129,.7);box-shadow:0 0 24px rgba(16,185,129,.18)}
+.arch-node.validate:hover,.arch-node.ready:hover{border-color:rgba(56,189,248,.7);box-shadow:0 0 24px rgba(56,189,248,.18)}
+.arch-node.db:hover{border-color:rgba(245,158,11,.7);box-shadow:0 0 24px rgba(245,158,11,.18)}
+.arch-node .n-icon{font-size:20px;margin-bottom:10px}
+.arch-node .n-label{font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.arch-node .n-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.arch-node .n-sub{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
+.arch-node.upload{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.06)}
+.arch-node.validate{border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.05)}
+.arch-node.validate .n-label{color:var(--accent-2)}
+.arch-node.ready{border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.06)}
+.arch-node.ready .n-label{color:var(--accent-2)}
+.arch-node.db{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.06)}
+.arch-node.db .n-label{color:var(--accent-3)}
+.arch-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim)}
+.arch-arrow svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.arch-footer{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px}
+.arch-badge{display:flex;align-items:center;gap:6px;color:var(--muted);padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg)}
+.arch-badge .dot{width:6px;height:6px;border-radius:50%}
+@media(max-width:900px){.arch-diagram{grid-template-columns:1fr}.arch-arrow svg{transform:rotate(90deg)}}
+#features .sh-no span{color:var(--accent-2)}
+
+/* Validation pipeline */
+.pipeline-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.pl-step{background:var(--panel);padding:24px 20px}
+.pl-step .ps-num{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;margin-bottom:12px}
+.pl-step .ps-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.pl-step .ps-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px}
+.pl-step ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.pl-step li{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.pl-step li::before{content:"›";color:var(--dim);flex-shrink:0}
+.pl-step:nth-child(1) .ps-label{color:var(--accent)}
+.pl-step:nth-child(2) .ps-label{color:#1FB8A8}
+.pl-step:nth-child(3) .ps-label{color:var(--accent-2)}
+@media(max-width:600px){.pipeline-row{grid-template-columns:1fr}}
+
+/* Schema table */
+.schema-table{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.schema-head{display:grid;grid-template-columns:200px 100px 1fr;background:var(--panel-2);border-bottom:1px solid var(--border);padding:0}
+.schema-head .sh-cell{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:12px 16px;border-right:1px solid var(--border)}
+.schema-head .sh-cell:last-child{border-right:none}
+.schema-row{display:grid;grid-template-columns:200px 100px 1fr;border-bottom:1px solid var(--border);transition:background .15s}
+.schema-row:last-child{border-bottom:none}
+.schema-row:hover{background:var(--panel-2)}
+.schema-cell{padding:12px 16px;border-right:1px solid var(--border);font-size:13px;display:flex;align-items:center}
+.schema-cell:last-child{border-right:none;color:var(--muted)}
+.schema-cell.col-name{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text)}
+.schema-cell.col-type{font-family:var(--mono);font-size:11px}
+.type-str{color:var(--text-dim)}
+.type-int{color:var(--text-dim)}
+@media(max-width:760px){.schema-head,.schema-row{grid-template-columns:160px 80px 1fr}}
+
+/* Features grid */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;transition:border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+.feat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px}
+.feat-card:hover{border-color:var(--border-bright);box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.feat-card.c-orange::before{background:var(--accent)}
+.feat-card.c-yellow::before{background:var(--accent-2)}
+.feat-card.c-green::before{background:var(--accent-3)}
+.feat-card.c-warn::before{background:var(--warn)}
+.feat-card.c-blue::before{background:var(--accent-2)}
+.feat-card .fc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.c-orange .fc-tag{color:var(--accent)}
+.c-yellow .fc-tag{color:var(--accent-2)}
+.c-green .fc-tag{color:var(--accent-3)}
+.c-warn .fc-tag{color:var(--warn)}
+.c-blue .fc-tag{color:var(--accent-2)}
+.feat-card h3{font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin-bottom:10px}
+.feat-card p{font-size:14px;color:var(--muted);line-height:1.6}
+.feat-card .fc-items{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.feat-card .fc-item{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:flex-start;line-height:1.4}
+.feat-card .fc-item::before{content:"→";color:var(--dim);flex-shrink:0}
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.feat-grid{grid-template-columns:1fr}}
+
+/* Tech grid */
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tech-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s}
+.tech-card:hover{border-color:var(--border-bright)}
+.tech-card .tc-cat{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+.tech-card .tc-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+.tech-card .tc-why{font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:760px){.tech-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:48px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
+.footer-brand span{color:var(--accent)}
+.footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.footer-links a{transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-note{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+/* Scroll animation */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <a class="tb-back" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portfolio
+    </a>
+    <div class="tb-path">
+      <span class="slash">/</span>Data Engineering<span class="slash">/</span><span class="here">Wholesaler Upload Demo</span>
+    </div>
+    <div class="tb-status">
+      <nav class="tb-nav">
+        <a href="#problem">Problem</a>
+        <a href="#architecture">Arch</a>
+        <a href="#validation">Validation</a>
+        <a href="#schema">Schema</a>
+        <a href="#features">Features</a>
+      </nav>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="meta">
+      Data Engineering &nbsp;·&nbsp; Pharma Sales Validation &nbsp;·&nbsp; 2026
+    </div>
+    <h1>Wholesaler Data Upload</h1>
+    <p class="lede">A Streamlit data validation tool built for pharmaceutical wholesalers to upload, validate, and submit monthly sales data, without manual intervention and with a three-layer compliance engine</p>
+    <p class="sublede">Wholesalers submit Excel files in inconsistent formats. This app enforces a strict schema: 13 required columns with typed validation, Italian month name normalization, and quality checks, before data reaches the database</p>
+    <div class="chips">
+      <span class="chip accent">Streamlit</span>
+      <span class="chip accent">Pandas</span>
+      <span class="chip accent">Data Validation</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- Problem -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>01</span> - Problem</div>
+      <div class="sh-title">
+        <h2>Wholesaler data arrives inconsistent by default</h2>
+        <p>Pharmacies and wholesalers submit monthly sales files in varied formats: wrong column names, mixed data types, Italian month names, negative quantities, and out-of-range years. Manual review was the bottleneck</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px" class="reveal">
+      <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.35);border-radius:var(--radius-lg);padding:28px">
+        <div style="font-family:var(--mono);font-size:10px;color:#fff;letter-spacing:.14em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px"><span style="width:8px;height:8px;border-radius:2px;background:var(--accent-3);display:inline-block"></span>Without the tool</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--dim);font-family:var(--mono)">|</span>Wholesalers use inconsistent column names and order</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--dim);font-family:var(--mono)">|</span>Month submitted as "marzo" or "3" unpredictably</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--dim);font-family:var(--mono)">|</span>Quantities sometimes negative, years sometimes invalid</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--dim);font-family:var(--mono)">|</span>Null values in required fields reach the database silently</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--dim);font-family:var(--mono)">|</span>Manual review needed before every import</li>
+        </ul>
+      </div>
+      <div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.35);border-radius:var(--radius-lg);padding:28px">
+        <div style="font-family:var(--mono);font-size:10px;color:#fff;letter-spacing:.14em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:10px"><span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block"></span>With the tool</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--accent);font-family:var(--mono)">→</span>13-column schema enforced on upload, missing columns flagged instantly</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--accent);font-family:var(--mono)">→</span>Italian month names auto-converted to integers, case-insensitive</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--accent);font-family:var(--mono)">→</span>Negative quantities and out-of-range years caught in quality layer</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--accent);font-family:var(--mono)">→</span>Null counts shown per column before submission</li>
+          <li style="display:flex;gap:12px;font-size:14px;color:#fff"><span style="color:var(--accent);font-family:var(--mono)">→</span>Submit button enabled only after all checks pass</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight reveal">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Key design principle:</strong> validation is a gate, not a warning. The submit button is never shown until all three layers pass. Quality warnings are surfaced as warnings, not blockers: the wholesaler can proceed but sees exactly what's imperfect before committing</p>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>02</span> - Architecture</div>
+      <div class="sh-title">
+        <h2>Upload → Validate → Submit</h2>
+        <p>Linear flow: each stage must pass before the next renders. No submit button without a clean validation result</p>
+      </div>
+    </div>
+    <div class="arch-wrap reveal">
+      <div class="arch-diagram">
+        <div class="arch-node upload">
+          <div class="n-icon">📤</div>
+          <div class="n-label">Upload</div>
+          <div class="n-name">File Ingestion</div>
+          <div class="n-sub">xlsx/xls → raw DataFrame preview</div>
+        </div>
+        <div class="arch-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="arch-node validate">
+          <div class="n-icon">🔍</div>
+          <div class="n-label">Compliance</div>
+          <div class="n-name">3-Layer Validation</div>
+          <div class="n-sub">Columns → Types → Quality</div>
+        </div>
+        <div class="arch-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="arch-node ready">
+          <div class="n-icon">✅</div>
+          <div class="n-label">Review</div>
+          <div class="n-name">Summary Metrics</div>
+          <div class="n-sub">Rows · Quantity · Clients · Products</div>
+        </div>
+        <div class="arch-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="arch-node db">
+          <div class="n-icon">🗄️</div>
+          <div class="n-label">Submit</div>
+          <div class="n-name">Database Upload</div>
+          <div class="n-sub">Validated DataFrame → Azure DB</div>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- Validation -->
+<section id="validation">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>03</span> - Validation</div>
+      <div class="sh-title">
+        <h2>Three layers, early exit on failure</h2>
+        <p>RunComplianceChecks orchestrates all three layers in sequence. If any layer fails, it returns immediately</p>
+      </div>
+    </div>
+    <div class="pipeline-row reveal">
+      <div class="pl-step">
+        <div class="ps-num">01</div>
+        <div class="ps-label">Column Validation</div>
+        <div class="ps-title">Schema presence check</div>
+        <ul>
+          <li>ValidateColumns checks all 13 required columns</li>
+          <li>Missing columns → immediate failure + list</li>
+          <li>Extra columns flagged as warning (not blocking)</li>
+          <li>Early exit if any column missing</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">02</div>
+        <div class="ps-label">Type Coercion</div>
+        <div class="ps-title">Month normalization + type enforcement</div>
+        <ul>
+          <li>ConvertMonthToNumber: Italian names → int</li>
+          <li>Case-insensitive: "Marzo" = "marzo" = 3</li>
+          <li>ValidateDataTypes: int64 / float64 / object per column</li>
+          <li>Any coercion failure → error list + exit</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">03</div>
+        <div class="ps-label">Quality Checks</div>
+        <div class="ps-title">Business rule validation</div>
+        <ul>
+          <li>Null count per required column</li>
+          <li>Quantity &lt; 0 flagged</li>
+          <li>Year outside [2000, current year] flagged</li>
+          <li>Month outside [1, 12] flagged</li>
+          <li>Duplicate rows detected and counted</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Schema -->
+<section id="schema">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>04</span> - Required Schema</div>
+      <div class="sh-title">
+        <h2>13 columns, strict types</h2>
+        <p>Every submission must match this schema exactly. The app shows it in an expandable panel so wholesalers can self-diagnose before uploading</p>
+      </div>
+    </div>
+    <div class="schema-table reveal">
+      <div class="schema-head">
+        <div class="sh-cell">Column</div>
+        <div class="sh-cell">Type</div>
+        <div class="sh-cell">Description</div>
+      </div>
+      <div class="schema-row"><div class="schema-cell col-name">Wholesaler Code</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">Unique identifier for the wholesaler (P. Iva)</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Wholesaler Name</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">Name of the wholesaler company</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Client Name</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">Name of the final client / pharmacy</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Client Code</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">Unique identifier for the pharmacy (P. Iva)</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Product Code</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">AIC Code of the product</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Product Name</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">Name of the pharmaceutical product</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Address</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">Street address of the pharmacy</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">City</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">City where the pharmacy is located</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Province</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">Province / State of the pharmacy</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">ZIP Code</div><div class="schema-cell col-type"><span class="type-str">string</span></div><div class="schema-cell">Postal / ZIP code</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Year</div><div class="schema-cell col-type"><span class="type-int">int64</span></div><div class="schema-cell">Year of the sale - Between 2000 and current year</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Month</div><div class="schema-cell col-type"><span class="type-int">int64</span></div><div class="schema-cell">Month of the sale - Integer or Italian name</div></div>
+      <div class="schema-row"><div class="schema-cell col-name">Quantity</div><div class="schema-cell col-type"><span class="type-int">int64</span></div><div class="schema-cell">Number of units sold - Non-negative</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>05</span> - Features</div>
+      <div class="sh-title">
+        <h2>Built for the user, not just the pipeline</h2>
+        <p>Validation accuracy is the baseline. The UX layer is what makes it usable in the field</p>
+      </div>
+    </div>
+    <div class="feat-grid reveal">
+      <div class="feat-card c-blue">
+        <div class="fc-tag">Branding</div>
+        <h3>Zoetis Dark Mode</h3>
+        <div class="fc-items">
+          <div class="fc-item">ApplyZoetisBranding injects full CSS override via st.markdown</div>
+          <div class="fc-item">Material Icons for UI elements</div>
+          <div class="fc-item">Branded file uploader, buttons, alerts, dataframes, spinner</div>
+          <div class="fc-item">Glassmorphism card components via GlassCard helper</div>
+        </div>
+      </div>
+      <div class="feat-card c-blue">
+        <div class="fc-tag">Transparency · Template</div>
+        <h3>Schema Viewer &amp; Sample Download</h3>
+        <div class="fc-items">
+          <div class="fc-item">ShowSchema: expandable table with column name, type, plain-English label</div>
+          <div class="fc-item">Collapsed by default, one click to expand</div>
+          <div class="fc-item">SalesTemplate.xlsx exported via openpyxl from BytesIO buffer</div>
+          <div class="fc-item">SampleData has 2 realistic pharma rows; always mirrors current schema</div>
+        </div>
+      </div>
+      <div class="feat-card c-blue">
+        <div class="fc-tag">Feedback · Submission</div>
+        <h3>Layered Validation UI &amp; Gated Submit Flow</h3>
+        <div class="fc-items">
+          <div class="fc-item">ShowResults: col1 column validation, col2 type validation; ✅ / ❌ / ⚠️ per check</div>
+          <div class="fc-item">Global failure banner if any blocker present</div>
+          <div class="fc-item">ShowReadyToSubmit: renders only when results.passed is True and convertedDf is not None</div>
+          <div class="fc-item">Total rows, quantity, unique clients, products preview → centered submit → success</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Simone Caruso</div>
+      <div class="footer-links">
+        <a href="../index.html">Portfolio</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('.feat-grid, .tech-grid').forEach(parent => {
+  [...parent.children].forEach((child, i) => { child.style.transitionDelay = `${i * 60}ms`; });
+});
+</script>
+</body>
+</html>

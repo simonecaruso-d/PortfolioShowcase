@@ -12,8 +12,8 @@
   --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
   --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
   --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
-  --accent:#38BDF8; --accent-2:#818CF8; --accent-3:#34D399;
-  --warn:#FBBF24; --danger:#F87171;
+  --accent:#38BDF8; --accent-2:#C084FC; --accent-3:#A3E635;
+  --warn:#F59E0B; --danger:#F97316;
   --radius:6px; --radius-lg:10px;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --sans:'Inter Tight',ui-sans-serif,system-ui,sans-serif;
@@ -32,28 +32,43 @@ section{padding:96px 0;border-top:1px solid var(--border)}
 section:first-of-type{border-top:none}
 
 /* Topbar */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
 .topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
 .tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
 .tb-back:hover{color:var(--text)}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tb-path{color:var(--text-dim)}
 .tb-path .slash{color:var(--dim);margin:0 8px}
 .tb-path .here{color:var(--accent)}
-.tb-status{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted)}
-.tb-status .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3)}
-.tb-status .nav{display:flex;gap:18px}
-.tb-status .nav a{color:var(--muted);transition:color .15s}
-.tb-status .nav a:hover{color:var(--text)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:20px;color:var(--muted)}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3);animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--accent-3)}50%{opacity:.5;box-shadow:0 0 4px var(--accent-3)}}
+.tb-nav{display:flex;gap:20px}
+.tb-nav a{color:var(--muted);transition:color .15s}
+.tb-nav a:hover{color:var(--text)}
 
 /* Hero */
-.hero{padding:128px 0 96px;position:relative}
-.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:32px;display:flex;align-items:center;gap:12px}
-.hero h1{font-size:clamp(44px,7vw,90px);line-height:.98;letter-spacing:-.04em;font-weight:700;margin-bottom:32px}
-.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:500;white-space:nowrap}
-.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:680px;margin-bottom:48px;font-weight:400}
+.hero{padding:136px 0 96px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(56,189,248,.06) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(192,132,252,.04) 0%,transparent 65%);pointer-events:none}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
+.hero .meta .line{width:48px;height:1px;background:var(--accent);opacity:.6}
+.hero h1{font-size:clamp(52px,8vw,100px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:600;white-space:nowrap}
+.hero .lede{font-size:21px;line-height:1.5;color:var(--text-dim);max-width:90ch;margin-bottom:20px;font-weight:400}
+.hero .sublede{font-size:16px;color:var(--muted);max-width:110ch;margin-bottom:48px;line-height:1.6}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);transition:background .15s,transform .1s}
+.btn-primary:hover{background:#60CCFA;transform:translateY(-1px)}
+.btn-primary svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--accent);padding:6px 14px;border:1px solid rgba(56,189,248,.25);border-radius:999px;background:rgba(56,189,248,.08);display:inline-flex;align-items:center;transition:background .18s,border-color .18s}
-.chip:hover{background:rgba(56,189,248,.18);border-color:rgba(56,189,248,.5)}
+.chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
+.chip.accent{color:var(--accent);border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.07)}
+.chip.purple{color:var(--accent-2);border-color:rgba(192,132,252,.25);background:rgba(192,132,252,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(163,230,53,.25);background:rgba(163,230,53,.07)}
 
 /* Stats strip */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
@@ -61,24 +76,28 @@ section:first-of-type{border-top:none}
 .stat:last-child{border-right:none}
 .stat .label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
 .stat .label .tag{color:var(--dim)}
-.stat .num{font-size:64px;line-height:1;letter-spacing:-.04em;font-weight:600;font-feature-settings:'tnum'}
-.stat .num .unit{font-size:24px;color:var(--muted);margin-left:6px;font-weight:500;letter-spacing:.06em}
-.stat .sub{margin-top:12px;font-size:13px;color:var(--text-dim)}
+.stat .num{font-size:52px;line-height:1;letter-spacing:-.04em;font-weight:700;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:20px;color:var(--muted);margin-left:4px;font-weight:500;letter-spacing:.06em}
+.stat .sub{margin-top:10px;font-size:12px;color:var(--text-dim)}
+.stat .num.cyan{color:var(--accent)}
+.stat .num.purple{color:var(--accent-2)}
+.stat .num.green{color:var(--accent-3)}
+.stat .num.warn{color:var(--warn)}
 @media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}.stat:nth-child(-n+2){border-bottom:1px solid var(--border)}}
 
 /* Section header */
 .sh{margin-bottom:56px;display:grid;grid-template-columns:200px 1fr;gap:48px;align-items:start}
 .sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.12em}
 .sh-no span{color:var(--accent)}
-.sh-title h2{font-size:48px;line-height:1.05;letter-spacing:-.03em;font-weight:600;margin-bottom:16px;max-width:32ch}
-.sh-title p{font-size:17px;color:var(--text-dim);max-width:80ch}
+.sh-title h2{font-size:clamp(36px,4vw,56px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin-bottom:18px}
+.sh-title p{font-size:17px;color:var(--text-dim);max-width:72ch;line-height:1.6}
 @media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}.sh-title h2{font-size:36px}}
 
 /* Problem */
 .problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .problem-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
-.problem-col.before{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.35)}
-.problem-col.after{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.35)}
+.problem-col.before{background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.35)}
+.problem-col.after{background:rgba(163,230,53,.06);border-color:rgba(163,230,53,.35)}
 .problem-col h3{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
 .problem-col h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--danger)}
 .problem-col.after h3::before{background:var(--accent-3)}
@@ -91,11 +110,11 @@ section:first-of-type{border-top:none}
 .domain-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 @media(max-width:1100px){.domain-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.domain-grid{grid-template-columns:1fr}}
-.domain-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;position:relative;overflow:hidden;transition:border-color .15s}
-.domain-card:hover{border-color:var(--border-bright)}
-.dc-glyph{font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:-.04em;color:var(--accent);margin-bottom:14px}
+.domain-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.domain-card:hover{border-color:rgba(245,158,11,.5);box-shadow:0 0 24px rgba(245,158,11,.15),0 0 8px rgba(245,158,11,.08)}
+.dc-glyph{font-family:var(--mono);font-size:28px;font-weight:700;letter-spacing:-.04em;color:var(--warn);margin-bottom:14px}
 .dc-name{font-size:16px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
-.dc-key{font-family:var(--mono);font-size:11px;color:var(--accent-3);letter-spacing:.06em;margin-bottom:10px;text-transform:uppercase}
+.dc-key{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.06em;margin-bottom:10px;text-transform:uppercase}
 .dc-detail{font-size:13px;color:var(--muted);line-height:1.55}
 
 /* Pipeline */
@@ -134,10 +153,10 @@ section:first-of-type{border-top:none}
 .schema-side .col .name{color:var(--text)}
 .schema-side .col .type{color:var(--muted);font-size:11px}
 .schema-side .col .name.pk{color:var(--accent)}
-.schema-side .col .name.fk{color:var(--accent-2)}
+.schema-side .col .name.fk{color:var(--accent)}
 .schema-side .col-tag{font-size:9px;letter-spacing:.08em;font-weight:700;padding:2px 5px;border-radius:2px;margin-left:6px}
 .schema-side .col-tag.pk{background:rgba(56,189,248,.1);color:var(--accent)}
-.schema-side .col-tag.fk{background:rgba(129,140,248,.1);color:var(--accent-2)}
+.schema-side .col-tag.fk{background:rgba(56,189,248,.1);color:var(--accent)}
 .schema-side .ss-empty{font-family:var(--mono);font-size:12px;color:var(--muted);padding:24px 0;text-align:center;border:1px dashed var(--border);border-radius:6px}
 @media(max-width:900px){.schema-shell{grid-template-columns:1fr}.schema-canvas{border-right:none;border-bottom:1px solid var(--border)}}
 
@@ -178,7 +197,7 @@ pre.dax{margin:0;padding:24px;background:#06080B;font-family:var(--mono);font-si
 /* Pages */
 .pages-stack{display:flex;flex-direction:column;gap:64px}
 .page-row{display:grid;grid-template-columns:380px 1fr;gap:48px;align-items:start}
-.page-meta .num{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;margin-bottom:16px}
+.page-meta .num{font-family:var(--mono);font-size:11px;color:var(--accent-2);letter-spacing:.12em;margin-bottom:16px}
 .page-meta h3{font-size:28px;letter-spacing:-.02em;font-weight:600;margin-bottom:16px}
 .page-meta p{font-size:15px;color:var(--text-dim);line-height:1.6;margin-bottom:20px}
 .page-meta .features{display:flex;flex-wrap:wrap;gap:6px}
@@ -189,69 +208,89 @@ pre.dax{margin:0;padding:24px;background:#06080B;font-family:var(--mono);font-si
 .ph{aspect-ratio:16/9;background:repeating-linear-gradient(135deg,var(--panel) 0,var(--panel) 12px,var(--panel-2) 12px,var(--panel-2) 24px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:.04em}
 @media(max-width:900px){.page-row{grid-template-columns:1fr;gap:24px}.page-frame{width:100%}}
 
+/* Insight */
+.insight{background:var(--panel);border:1px solid var(--border-bright);border-left:3px solid var(--accent);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start}
+.insight svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.insight p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.insight p strong{color:var(--text)}
+
 /* Footer */
-footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
-.foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
-.foot-inner a{color:var(--text-dim);transition:color .15s}
-.foot-inner a:hover{color:var(--accent)}
+footer{border-top:1px solid var(--border);padding:48px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
+.footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.footer-links a{transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+
+/* Scroll reveal */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:none}
 </style>
 </head>
 <body>
 
 <!-- TOPBAR -->
-<div class="topbar">
-  <div class="wide topbar-inner">
-    <a href="index.html" class="tb-back">← Portfolio</a>
-    <span class="tb-path">
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <a class="tb-back" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portfolio
+    </a>
+    <div class="tb-path">
       <span class="slash">/</span>Data Visualization<span class="slash">/</span><span class="here">People Analytics</span>
-    </span>
+    </div>
     <div class="tb-status">
-      <span class="nav">
+      <nav class="tb-nav">
         <a href="#problem">Problem</a>
         <a href="#solution">Solution</a>
         <a href="#architecture">Architecture</a>
         <a href="#dax">DAX</a>
         <a href="#pages">Pages</a>
-      </span>
+      </nav>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="meta">Data Visualization · Power BI &nbsp;·&nbsp; 2023</div>
+    <h1>People data, <span class="accent">hire to exit</span></h1>
+    <p class="lede">End-to-end HR intelligence platform: headcount, cost, turnover, gender gap, recruiting, learning, and much more</p>
+    <p class="sublede">160+ DAX measures, a 66-table model, and an ML regression for churn prediction embedded directly in DAX</p>
+    <div class="chips">
+      <span class="chip accent">Power BI</span>
+      <span class="chip accent">DAX</span>
+      <span class="chip accent">Power Query (M)</span>
+      <span class="chip accent">SharePoint</span>
+      <span class="chip accent">Oracle ERP</span>
+      <span class="chip accent">ML in DAX</span>
     </div>
   </div>
 </div>
 
-<!-- HERO -->
-<header class="hero wrap">
-  <div class="meta">Data Visualization Project · Power BI · 2023</div>
-  <h1>People data,<br><span class="accent">hire to exit</span></h1>
-  <p class="lede">End-to-end HR intelligence platform: headcount, cost, turnover, gender gap, recruiting, learning, and much more across 160+ DAX measures, a 66-table model, and an ML regression for churn prediction embedded directly in DAX</p>
-  <div class="chips">
-    <span class="chip">Power BI</span>
-    <span class="chip">DAX</span>
-    <span class="chip">Power Query (M)</span>
-    <span class="chip">SharePoint</span>
-    <span class="chip">Oracle ERP</span>
-    <span class="chip">ML in DAX</span>
-  </div>
-</header>
-
 <!-- STATS -->
-<div class="stats">
+<div class="stats reveal">
   <div class="stat">
     <div class="label"><span>DAX measures</span><span class="tag">model</span></div>
-    <div class="num">160+<span class="unit"></span></div>
+    <div class="num cyan">160+<span class="unit"></span></div>
     <div class="sub">Turnover · Cost · Learning · Compliance </div>
   </div>
   <div class="stat">
     <div class="label"><span>Report pages</span><span class="tag">published</span></div>
-    <div class="num">17+</div>
+    <div class="num purple">17+</div>
     <div class="sub">12+ domain pages & executive views</div>
   </div>
   <div class="stat">
     <div class="label"><span>Tables in model</span><span class="tag">data model</span></div>
-    <div class="num">66</div>
+    <div class="num green">66</div>
     <div class="sub">Including 9 parameter tables</div>
   </div>
   <div class="stat">
     <div class="label"><span>ML predictors</span><span class="tag">regression</span></div>
-    <div class="num">6</div>
+    <div class="num warn">6</div>
     <div class="sub">From a reactive to a proactive approach</div>
   </div>
 </div>
@@ -259,14 +298,14 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 01 PROBLEM -->
 <section id="problem">
   <div class="wrap">
-    <div class="sh">
+    <div class="sh reveal">
       <div class="sh-no"><span>01</span> · Problem</div>
       <div class="sh-title">
         <h2>HR data in hundreds of different Excel files</h2>
         <p>Every domain (cost, recruiting, turnover, learning, and so on) lived in a separate workbook owned by a different person. No shared definitions, no common date spine, no way to cross-reference headcount against cost against exits</p>
       </div>
     </div>
-    <div class="problem-grid">
+    <div class="problem-grid reveal">
       <div class="problem-col before">
         <h3>Before</h3>
         <ul>
@@ -292,8 +331,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 02 SOLUTION -->
 <section id="solution">
   <div class="wrap">
-    <div class="sh">
-      <div class="sh-no"><span>02</span> · Solution</div>
+    <div class="sh reveal">
+      <div class="sh-no"><span style="color:var(--warn)">02</span> · Solution</div>
       <div class="sh-title">
         <h2>Eight domains, one command centre</h2>
         <p>Each domain has its own page cluster, its own measure group, and its own data source, but all share the same Registry, so every filter propagates across the full model</p>
@@ -355,11 +394,11 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 03 ARCHITECTURE -->
 <section id="architecture">
   <div class="wrap">
-    <div class="sh">
+    <div class="sh reveal">
       <div class="sh-no"><span>03</span> · Architecture</div>
       <div class="sh-title">
         <h2>Hub-and-spoke, anchored to Master Registry</h2>
-        <p>Master Registry is the central hub: every domain fact table joins on <code style="font-family:var(--mono);font-size:.9em;color:var(--accent)">email</code>. Calendar Table provides the shared date spine for time-intelligence across all tables</p>
+        <p>Master Registry is the central hub: every domain fact table joins on email. Calendar Table provides the shared date spine for time-intelligence across all tables</p>
       </div>
     </div>
 
@@ -413,7 +452,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
           <!-- Connections -->
           <g class="connections" stroke="#4B7FA8" stroke-width="1.25" fill="none">
             <!-- Calendar Table → Viaggi (Date → Departure Date) -->
-            <path class="conn" data-pair="Calendar Table,Viaggi"
+            <path class="conn" data-pair="Calendar Table,Travels"
               d="M 350,48 L 127,48 L 127,215"
               stroke-dasharray="4,3" marker-end="url(#arr)"/>
             <!-- Calendar Table → Timesheet (Date → Competency Date) -->
@@ -421,27 +460,27 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
               d="M 565,48 L 792,48 L 792,215"
               stroke-dasharray="4,3" marker-end="url(#arr)"/>
             <!-- Anagrafica → Exit Interview (Email) -->
-            <path class="conn" data-pair="Anagrafica,Exit Interview"
+            <path class="conn" data-pair="Master Registry,Exit Interview"
               d="M 350,252 L 295,252 L 295,70 L 235,70"
               stroke-dasharray="4,3" marker-end="url(#arr)"/>
             <!-- Anagrafica → Viaggi (Employee → Traveler) -->
-            <path class="conn" data-pair="Anagrafica,Viaggi"
+            <path class="conn" data-pair="Master Registry,Viaggi"
               d="M 350,272 L 235,272"
               stroke-dasharray="4,3" marker-end="url(#arr)"/>
             <!-- Anagrafica → Timesheet (Email) -->
-            <path class="conn" data-pair="Anagrafica,Timesheet"
+            <path class="conn" data-pair="Master Registry,Timesheet"
               d="M 585,272 L 685,272"
               stroke-dasharray="4,3" marker-end="url(#arr)"/>
             <!-- Anagrafica ↔ Prices History (Employee, bidirectional) -->
-            <path class="conn" data-pair="Anagrafica,Prices History"
+            <path class="conn" data-pair="Master Registry,Prices History"
               d="M 400,363 L 400,408 L 127,408 L 127,430"
               stroke-dasharray="4,3" marker-end="url(#arr)"/>
             <!-- Anagrafica → Personnel Cost (Email) -->
-            <path class="conn" data-pair="Anagrafica,Personnel Cost"
+            <path class="conn" data-pair="Master Registry,Personnel Cost"
               d="M 467,363 L 467,430"
               stroke-dasharray="4,3" marker-end="url(#arr)"/>
             <!-- Anagrafica → Onboarding Survey (Email) -->
-            <path class="conn" data-pair="Anagrafica,Onboarding Survey"
+            <path class="conn" data-pair="Master Registry,Onboarding Survey"
               d="M 585,320 L 645,320 L 645,480 L 685,480"
               stroke-dasharray="4,3" marker-end="url(#arr)"/>
           </g>
@@ -475,8 +514,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
             <text x="12" y="40" font-size="10" fill="#38BDF8">Id</text>
             <text x="195" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
-            <text x="12" y="54" font-size="10" fill="#818CF8">Email</text>
-            <text x="197" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#38BDF8">Email</text>
+            <text x="197" y="54" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="68" font-size="10" fill="#B5BCC8">Start time</text>
             <text x="12" y="82" font-size="10" fill="#B5BCC8">Question</text>
             <text x="12" y="96" font-size="10" fill="#B5BCC8">Answer</text>
@@ -510,7 +549,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
           </g>
 
           <!-- TRAVELS (middle-left) -->
-          <g class="tbl fact" data-table="Viaggi" transform="translate(20,215)">
+          <g class="tbl fact" data-table="Travels" transform="translate(20,215)">
             <rect class="tbl-bg" width="215" height="110" rx="6"/>
             <rect class="tbl-header" width="215" height="24" rx="6"/>
             <rect class="tbl-header" y="14" width="215" height="10"/>
@@ -518,16 +557,16 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
             <text x="12" y="40" font-size="10" fill="#38BDF8">Travel Id</text>
             <text x="195" y="40" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
-            <text x="12" y="54" font-size="10" fill="#818CF8">Traveler</text>
-            <text x="197" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
-            <text x="12" y="68" font-size="10" fill="#818CF8">Departure Date</text>
-            <text x="197" y="68" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#38BDF8">Traveler</text>
+            <text x="197" y="54" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#38BDF8">Departure Date</text>
+            <text x="197" y="68" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="82" font-size="10" fill="#B5BCC8">Cost</text>
             <text x="12" y="96" font-size="10" fill="#B5BCC8">Destination</text>
           </g>
 
           <!-- ANAGRAFICA (center — HUB) -->
-          <g class="tbl hub" data-table="Anagrafica" transform="translate(350,215)">
+          <g class="tbl hub" data-table="Master Registry" transform="translate(350,215)">
             <rect class="tbl-bg" width="235" height="148" rx="6"/>
             <rect class="tbl-header" width="235" height="28" rx="6"/>
             <rect class="tbl-header" y="14" width="235" height="14"/>
@@ -549,10 +588,10 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="215" height="10"/>
             <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Timesheet</text>
             <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="12" y="40" font-size="10" fill="#818CF8">Email</text>
-            <text x="197" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
-            <text x="12" y="54" font-size="10" fill="#818CF8">Competency Date</text>
-            <text x="197" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Email</text>
+            <text x="197" y="40" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#38BDF8">Competency Date</text>
+            <text x="197" y="54" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="68" font-size="10" fill="#B5BCC8">Activity Code</text>
             <text x="12" y="82" font-size="10" fill="#B5BCC8">Hours</text>
             <text x="12" y="96" font-size="10" fill="#B5BCC8">Internal Price</text>
@@ -565,8 +604,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="215" height="10"/>
             <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Prices History</text>
             <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="12" y="40" font-size="10" fill="#818CF8">Employee</text>
-            <text x="197" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Employee</text>
+            <text x="197" y="40" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="54" font-size="10" fill="#B5BCC8">Price Date</text>
             <text x="12" y="68" font-size="10" fill="#B5BCC8">Internal Cost</text>
             <text x="12" y="82" font-size="10" fill="#B5BCC8">Notes</text>
@@ -579,10 +618,10 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="235" height="10"/>
             <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Personnel Cost</text>
             <text x="203" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="12" y="40" font-size="10" fill="#818CF8">Email</text>
-            <text x="213" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
-            <text x="12" y="54" font-size="10" fill="#818CF8">Competency Date</text>
-            <text x="213" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Email</text>
+            <text x="213" y="40" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#38BDF8">Competency Date</text>
+            <text x="213" y="54" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="68" font-size="10" fill="#B5BCC8">Amount</text>
           </g>
 
@@ -593,10 +632,10 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="215" height="10"/>
             <text x="12" y="16" font-size="10" fill="#E5E9F0" font-weight="600">Onboarding Survey</text>
             <text x="183" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="12" y="40" font-size="10" fill="#818CF8">Email</text>
-            <text x="197" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
-            <text x="12" y="54" font-size="10" fill="#818CF8">Date</text>
-            <text x="197" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Email</text>
+            <text x="197" y="40" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#38BDF8">Date</text>
+            <text x="197" y="54" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="68" font-size="10" fill="#B5BCC8">Question</text>
             <text x="12" y="82" font-size="10" fill="#B5BCC8">Answer</text>
             <text x="12" y="96" font-size="10" fill="#B5BCC8">Area</text>
@@ -616,7 +655,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 04 DAX -->
 <section id="dax">
   <div class="wrap">
-    <div class="sh">
+    <div class="sh reveal">
       <div class="sh-no"><span>04</span> · DAX</div>
       <div class="sh-title">
         <h2>The logic, in code</h2>
@@ -692,8 +731,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </div>
         <div class="code-bar"><span class="lang">DAX</span></div>
 <pre class="dax">
-<span class="ln"> 1</span><span class="dx-kw">VAR</span> SSR <span class="dx-op">=</span> <span class="dx-fn">SUMX</span>(<span class="dx-tbl">'Z - Regression on Negative Turnover'</span>, <span class="dx-tbl">'Z - Regression on Negative Turnover'</span>[<span class="dx-col">Z - SSR</span>])
-<span class="ln"> 2</span><span class="dx-kw">VAR</span> SST <span class="dx-op">=</span> <span class="dx-fn">SUMX</span>(<span class="dx-tbl">'Regression on Negative Turnover'</span>, <span class="dx-tbl">'Regression on Negative Turnover'</span>[<span class="dx-col">Z - SST</span>])
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> SSR <span class="dx-op">=</span> <span class="dx-fn">SUMX</span>(<span class="dx-tbl">'Regression on Negative Turnover'</span>, <span class="dx-tbl">'Regression on Negative Turnover'</span>[<span class="dx-col">SSR</span>])
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> SST <span class="dx-op">=</span> <span class="dx-fn">SUMX</span>(<span class="dx-tbl">'Regression on Negative Turnover'</span>, <span class="dx-tbl">'Regression on Negative Turnover'</span>[<span class="dx-col">SST</span>])
 <span class="ln"> 3</span><span class="dx-kw">RETURN</span> <span class="dx-num">1</span> <span class="dx-op">-</span> <span class="dx-fn">DIVIDE</span>(SSR, SST)</pre>
       </article>
 
@@ -707,8 +746,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </div>
         <div class="code-bar"><span class="lang">DAX</span></div>
 <pre class="dax">
-<span class="ln"> 1</span><span class="dx-kw">VAR</span> Detrattori <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">DISTINCTCOUNT</span>(<span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Name</span>]), <span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Z - NPS</span>] <span class="dx-op">&lt;</span> <span class="dx-num">7</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Z - NPS</span>] <span class="dx-op">&gt;</span> <span class="dx-num">0</span>)
-<span class="ln"> 2</span><span class="dx-kw">VAR</span> Difensori  <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">DISTINCTCOUNT</span>(<span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Name</span>]), <span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Z - NPS</span>] <span class="dx-op">&gt;</span> <span class="dx-num">8</span>)
+<span class="ln"> 1</span><span class="dx-kw">VAR</span> Detrattori <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">DISTINCTCOUNT</span>(<span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Name</span>]), <span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">NPS</span>] <span class="dx-op">&lt;</span> <span class="dx-num">7</span> <span class="dx-op">&amp;&amp;</span> <span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">NPS</span>] <span class="dx-op">&gt;</span> <span class="dx-num">0</span>)
+<span class="ln"> 2</span><span class="dx-kw">VAR</span> Difensori  <span class="dx-op">=</span> <span class="dx-fn">CALCULATE</span>(<span class="dx-fn">DISTINCTCOUNT</span>(<span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">Name</span>]), <span class="dx-tbl">'Exit Interview'</span>[<span class="dx-col">NPS</span>] <span class="dx-op">&gt;</span> <span class="dx-num">8</span>)
 <span class="ln"> 3</span><span class="dx-kw">RETURN</span> Difensori <span class="dx-op">-</span> Detrattori</pre>
       </article>
 
@@ -741,8 +780,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 05 PAGES -->
 <section id="pages">
   <div class="wrap">
-    <div class="sh">
-      <div class="sh-no"><span>05</span> · Pages</div>
+    <div class="sh reveal">
+      <div class="sh-no"><span style="color:var(--accent-2)">05</span> · Pages</div>
       <div class="sh-title">
         <h2>Pages showcase</h2>
         <p>HR operations, people analytics, ML forecasting, and executive views</p>
@@ -759,7 +798,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </div>
         <div class="page-frame">
           <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <img src="../screenshots/PAHome.png" alt="Home" style="width:100%;display:block">
+          <img src="screenshots/PAHome.png" alt="Home" style="width:100%;display:block">
         </div>
       </div>
 
@@ -772,7 +811,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </div>
         <div class="page-frame">
           <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <img src="../screenshots/PAOverview.png" alt="Overview" style="width:100%;display:block">
+          <img src="screenshots/PAOverview.png" alt="Overview" style="width:100%;display:block">
         </div>
       </div>
 
@@ -785,7 +824,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </div>
         <div class="page-frame">
           <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <img src="../screenshots/PATime.png" alt="Time Analysis" style="width:100%;display:block">
+          <img src="screenshots/PATime.png" alt="Time Analysis" style="width:100%;display:block">
         </div>
       </div>
 
@@ -798,7 +837,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </div>
         <div class="page-frame">
           <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <img src="../screenshots/PARecruiting.png" alt="Recruiting" style="width:100%;display:block">
+          <img src="screenshots/PARecruiting.png" alt="Recruiting" style="width:100%;display:block">
         </div>
       </div>
 
@@ -811,7 +850,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </div>
         <div class="page-frame">
           <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <img src="../screenshots/PATurnover.png" alt="Turnover" style="width:100%;display:block">
+          <img src="screenshots/PATurnover.png" alt="Turnover" style="width:100%;display:block">
         </div>
       </div>
 
@@ -824,7 +863,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </div>
         <div class="page-frame">
           <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <img src="../screenshots/PAMl.png" alt="ML" style="width:100%;display:block">
+          <img src="screenshots/PAMl.png" alt="ML" style="width:100%;display:block">
         </div>
       </div>
 
@@ -837,7 +876,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </div>
         <div class="page-frame">
           <div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          <img src="../screenshots/PACompliance.png" alt="Compliance KPI" style="width:100%;display:block">
+          <img src="screenshots/PACompliance.png" alt="Compliance KPI" style="width:100%;display:block">
         </div>
       </div>
 
@@ -846,15 +885,34 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 </section>
 
 <footer>
-  <div class="wrap foot-inner">
-    <span>© 2023 Simone Caruso</span>
-    <span><a href="index.html">← Back to portfolio</a></span>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Simone Caruso</div>
+      <div class="footer-links">
+        <a href="../index.html">Portfolio</a>
+      </div>
+    </div>
   </div>
 </footer>
 
 <script>
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Stagger children in grid/list parents
+document.querySelectorAll('.feat-grid, .tech-grid, .provider-grid').forEach(parent => {
+  [...parent.children].forEach((child, i) => {
+    child.style.transitionDelay = `${i * 60}ms`;
+  });
+});
+
 const tableData = {
-  "Anagrafica": {
+  "Master Registry": {
     kind: "HUB",
     desc: "Employee master: 100+ columns from a 10-table Oracle JOIN. Calculated columns add Status, Age, Tenure, Generation, Office groups, Education/Major buckets, and Living Address fallback logic. Central hub for all fact tables via Employee (PK) and Email (UK).",
     cols: [
@@ -883,7 +941,7 @@ const tableData = {
       { n: "MonthName", t: "str" },
     ]
   },
-  "Viaggi": {
+  "Travels": {
     kind: "FACT",
     desc: "Travel requests from Oracle ERP: one row per travel segment. Joined to Master Registry on Traveler→Employee (1:N) and to Calendar Table on Departure Date. Calculated columns compute alert flags for cost outliers, weekend travel, pipeline status, and team mismatch.",
     cols: [

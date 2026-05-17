@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HubSpot Deals Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#060A08; --panel:#0A1210; --panel-2:#0F1A17; --panel-3:#14231E;
+  --border:#1A2E28; --border-bright:#254038; --grid:#0A1210;
+  --text:#F2F4F7; --text-dim:#C4CAD6; --muted:#7A8494; --dim:#3D4654;
+  --accent:#10B981;
+  --accent-2:#38BDF8;
+  --accent-3:#F59E0B;
+  --warn:#FB923C; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:56px 56px;background-position:-1px -1px}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#fff}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(6,10,8,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:20px;color:var(--muted)}
+.tb-nav{display:flex;gap:20px}
+.tb-nav a{color:var(--muted);transition:color .15s}
+.tb-nav a:hover{color:var(--text)}
+
+/* Hero */
+.hero{padding:136px 0 96px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(16,185,129,.07) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(56,189,248,.04) 0%,transparent 65%);pointer-events:none}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
+.hero .meta .line{width:48px;height:1px;background:var(--accent);opacity:.6}
+.hero h1{font-size:clamp(48px,7vw,92px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:600}
+.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:none;margin-bottom:20px;font-weight:400}
+.hero .sublede{font-size:16px;color:var(--muted);max-width:none;margin-bottom:48px;line-height:1.6}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
+.chip.accent{color:var(--accent);border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.07)}
+.chip.purple{color:var(--accent-2);border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.07)}
+
+/* Stats strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 24px;border-right:1px solid var(--border);position:relative}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.stat .num{font-size:48px;line-height:1;letter-spacing:-.04em;font-weight:700;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:18px;color:var(--muted);margin-left:4px;font-weight:500}
+.stat .sub{margin-top:10px;font-size:12px;color:var(--text-dim)}
+.stat .num.orange{color:var(--accent)}
+.stat .num.purple{color:var(--accent-2)}
+.stat .num.green{color:var(--accent-3)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}}
+
+/* Section header */
+.sh{margin-bottom:64px;display:grid;grid-template-columns:180px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.12em;padding-top:10px}
+.sh-no span{color:var(--accent)}
+.sh-title h2{font-size:clamp(40px,5vw,60px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin-bottom:18px}
+.sh-title p{font-size:18px;color:var(--text-dim);max-width:none;line-height:1.6}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}}
+
+/* Problem grid */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+.prob-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
+.prob-col.before{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.35)}
+.prob-col.after{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.35)}
+.prob-col h3{font-family:var(--mono);font-size:10px;color:#fff;letter-spacing:.14em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.prob-col.before h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent-3)}
+.prob-col.after h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.prob-col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.prob-col li{display:flex;gap:14px;font-size:15px;line-height:1.55;color:#fff}
+.prob-col li .marker{color:var(--dim);font-family:var(--mono);flex-shrink:0;margin-top:2px}
+.prob-col.after li .marker{color:var(--accent)}
+@media(max-width:760px){.problem-grid{grid-template-columns:1fr}}
+
+/* Insight bar */
+.insight{background:var(--panel);border:1px solid var(--border-bright);border-left:3px solid var(--accent);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start}
+.insight svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.insight p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.insight p strong{color:var(--text)}
+
+/* Architecture */
+.arch-wrap{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;overflow:hidden;position:relative}
+.arch-diagram{display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr 32px 1fr 32px 1fr;gap:0;align-items:center}
+.arch-node{background:var(--panel-2);border:1px solid var(--border-bright);border-radius:var(--radius);padding:18px 14px;text-align:center;transition:border-color .2s,box-shadow .2s}
+.arch-node .n-icon{font-size:20px;margin-bottom:10px}
+.arch-node .n-label{font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.arch-node .n-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.arch-node .n-sub{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
+.arch-node.source{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.06)}
+.arch-node.source .n-label{color:var(--accent-3)}
+.arch-node.source:hover{border-color:rgba(245,158,11,.7);box-shadow:0 0 24px rgba(245,158,11,.18)}
+.arch-node.engine{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.06)}
+.arch-node.engine:hover{border-color:rgba(16,185,129,.7);box-shadow:0 0 24px rgba(16,185,129,.18)}
+.arch-node.enrich{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.06)}
+.arch-node.enrich .n-label{color:var(--accent)}
+.arch-node.enrich:hover{border-color:rgba(16,185,129,.7);box-shadow:0 0 24px rgba(16,185,129,.18)}
+.arch-node.out{border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.06)}
+.arch-node.out .n-label{color:var(--accent-2)}
+.arch-node.out:hover{border-color:rgba(56,189,248,.7);box-shadow:0 0 24px rgba(56,189,248,.18)}
+.arch-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim)}
+.arch-arrow svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.arch-footer{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px}
+.arch-badge{display:flex;align-items:center;gap:6px;color:var(--muted);padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg)}
+.arch-badge .dot{width:6px;height:6px;border-radius:50%}
+@media(max-width:900px){.arch-diagram{grid-template-columns:1fr}.arch-arrow svg{transform:rotate(90deg)}}
+
+/* Pipeline */
+.pipeline-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.pl-step{background:var(--panel);padding:24px 18px}
+.pl-step .ps-num{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;margin-bottom:12px}
+.pl-step .ps-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.pl-step .ps-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
+.pl-step ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.pl-step li{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.pl-step li::before{content:"›";color:var(--dim);flex-shrink:0}
+@media(max-width:900px){.pipeline-row{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.pipeline-row{grid-template-columns:1fr}}
+
+/* Features grid */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;transition:border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+.feat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:transparent;transition:background .2s}
+.feat-card:hover{border-color:var(--border-bright);box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.feat-card.c-orange::before{background:var(--accent)}
+.feat-card.c-purple::before{background:var(--accent-2)}
+.feat-card.c-green::before{background:var(--accent-3)}
+.feat-card.c-warn::before{background:var(--warn)}
+.feat-card .fc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.c-orange .fc-tag{color:var(--accent)}
+.c-purple .fc-tag{color:var(--accent-2)}
+.c-green .fc-tag{color:var(--accent-3)}
+.c-warn .fc-tag{color:var(--warn)}
+.feat-card h3{font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin-bottom:10px}
+.feat-card p{font-size:14px;color:var(--muted);line-height:1.6}
+.feat-card .fc-items{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.feat-card .fc-item{font-family:var(--mono);font-size:11px;color:var(--text-dim);display:flex;gap:8px;align-items:flex-start;line-height:1.4}
+.feat-card .fc-item::before{content:"→";color:var(--dim);flex-shrink:0}
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.feat-grid{grid-template-columns:1fr}}
+
+/* Decision log */
+.decision-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.decision{display:grid;grid-template-columns:260px 1fr 1fr;border-bottom:1px solid var(--border);transition:background .15s}
+.decision:last-child{border-bottom:none}
+.decision:hover{background:var(--panel-2)}
+.decision>div{padding:20px 22px;border-right:1px solid var(--border)}
+.decision>div:last-child{border-right:none}
+.dec-context .dc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.dec-context .dc-title{font-size:14px;font-weight:600;color:var(--text)}
+.dec-chosen h4{font-size:12px;font-weight:600;color:var(--accent-2);font-family:var(--mono);letter-spacing:.04em;margin-bottom:8px}
+.dec-chosen p{font-size:13px;color:var(--text-dim);line-height:1.55}
+.dec-why h4{font-size:12px;font-weight:600;color:var(--muted);font-family:var(--mono);letter-spacing:.04em;margin-bottom:8px}
+.dec-why p{font-size:13px;color:var(--muted);line-height:1.55}
+@media(max-width:900px){.decision{grid-template-columns:1fr}.decision>div{border-right:none}}
+
+/* Tech grid */
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tech-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s}
+.tech-card:hover{border-color:var(--border-bright)}
+.tech-card .tc-cat{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+.tech-card .tc-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+.tech-card .tc-why{font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:760px){.tech-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:48px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
+.footer-brand span{color:var(--accent)}
+.footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.footer-links a{transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-note{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+#decisions .sh-no span{color:var(--accent-2)}
+
+/* Scroll animation */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <a class="tb-back" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portfolio
+    </a>
+    <div class="tb-path">
+      <span class="slash">/</span>Data Engineering<span class="slash">/</span><span class="here">HubSpot Deals Pipeline</span>
+    </div>
+    <div class="tb-status">
+      <nav class="tb-nav">
+        <a href="#problem">Problem</a>
+        <a href="#architecture">Arch</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#decisions">Decisions</a>
+        <a href="#stack">Stack</a>
+      </nav>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="meta">
+      Data Engineering &nbsp;·&nbsp; Enterprise CRM Integration &nbsp;·&nbsp; 2022
+    </div>
+    <h1>HubSpot Deals Pipeline</h1>
+    <p class="lede">A production-grade data extraction engine that retrieves, enriches, and exports the full deal universe from HubSpot CRM</p>
+    <p class="sublede">Built to replace error-prone manual exports: 100+ properties per deal, paginated batch APIs for associated companies and contacts, and deterministic Excel output that matches an existing reporting schema exactly</p>
+    <div class="chips">
+      <span class="chip accent">HubSpot API v3</span>
+      <span class="chip accent">Process automation</span>
+      <span class="chip accent">Schema Enforcement</span>
+    </div>
+  </div>
+</div>
+
+<!-- Problem -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>01</span> - Problem</div>
+      <div class="sh-title">
+        <h2>Manual CRM exports break at scale</h2>
+        <p>HubSpot's UI export caps fields, loses time-in-stage data, and produces inconsistent column schemas. Sales reporting across three pipelines needed a reliable, automatable extraction layer</p>
+      </div>
+    </div>
+    <div class="problem-grid reveal">
+      <div class="prob-col before">
+        <h3>Before the pipeline</h3>
+        <ul>
+          <li><span class="marker">|</span>Manual UI exports capped at a subset of available fields</li>
+          <li><span class="marker">|</span>Time-in-stage metrics unavailable outside the API</li>
+          <li><span class="marker">|</span>Stage, pipeline, and team IDs left as raw numeric keys</li>
+          <li><span class="marker">|</span>Associated companies and contacts required separate lookups</li>
+          <li><span class="marker">|</span>Timezone inconsistencies between sources and reporting</li>
+          <li><span class="marker">|</span>No schema enforcement: column order and types varied by export</li>
+        </ul>
+      </div>
+      <div class="prob-col after">
+        <h3>After the pipeline</h3>
+        <ul>
+          <li><span class="marker">→</span>All 100+ properties fetched via API with dynamic property resolution</li>
+          <li><span class="marker">→</span>Cumulative + latest time-in-stage for all 22 stages, ms → HH:mm:ss</li>
+          <li><span class="marker">→</span>All IDs resolved to human-readable labels at runtime</li>
+          <li><span class="marker">→</span>Company and contact names batch-resolved (100 IDs per request)</li>
+          <li><span class="marker">→</span>All datetimes normalized to Europe/Rome, floored to minute</li>
+          <li><span class="marker">→</span>Output schema locked to reference file column order and types</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight reveal">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Design constraint:</strong> the output Excel had to match an existing reporting schema exactly. This drove the schema-lock pattern: load a reference file on startup, use it to derive required properties, enforce column order, and coerce types at the end</p>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>02</span> - Architecture</div>
+      <div class="sh-title">
+        <h2>Five stages, one schema-locked output</h2>
+        <p>Linear pipeline: each stage produces a clean DataFrame consumed by the next. Property resolution at startup drives everything downstream</p>
+      </div>
+    </div>
+    <div class="arch-wrap reveal">
+      <div class="arch-diagram">
+        <div class="arch-node source">
+          <div class="n-icon">🗂️</div>
+          <div class="n-label">Reference</div>
+          <div class="n-name">Schema File</div>
+          <div class="n-sub">Locks column names, order &amp; types</div>
+        </div>
+        <div class="arch-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="arch-node engine">
+          <div class="n-icon">🔍</div>
+          <div class="n-label">Discovery</div>
+          <div class="n-name">Property Resolution</div>
+          <div class="n-sub">API-driven name → label map</div>
+        </div>
+        <div class="arch-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="arch-node engine">
+          <div class="n-icon">📥</div>
+          <div class="n-label">Ingestion</div>
+          <div class="n-name">Paginated Deal Fetch</div>
+          <div class="n-sub">100 per page, cursor-based</div>
+        </div>
+        <div class="arch-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="arch-node enrich">
+          <div class="n-icon">🔗</div>
+          <div class="n-label">Enrichment</div>
+          <div class="n-name">Multi-Source Resolution</div>
+          <div class="n-sub">Owners · Users · Teams · Pipelines</div>
+        </div>
+        <div class="arch-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        <div class="arch-node out">
+          <div class="n-icon">📊</div>
+          <div class="n-label">Output</div>
+          <div class="n-name">Schema-Locked Excel</div>
+          <div class="n-sub">Typed · ordered · timezone-clean</div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<!-- Pipeline -->
+<section id="pipeline">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>03</span> - Pipeline</div>
+      <div class="sh-title">
+        <h2>API → Normalized DataFrame</h2>
+        <p>Each step is a pure transformation on the DataFrame. No state shared between steps except the running DataFrame</p>
+      </div>
+    </div>
+    <div class="pipeline-row reveal">
+      <div class="pl-step">
+        <div class="ps-num">01</div>
+        <div class="ps-label">Property Discovery</div>
+        <div class="ps-title">Dynamic field resolution</div>
+        <ul>
+          <li>Query HubSpot property definitions API</li>
+          <li>Filter to schema-required columns only</li>
+          <li>Build name → label mapping at runtime</li>
+          <li>Inject time-in-stage computed keys</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">02</div>
+        <div class="ps-label">Deal Ingestion</div>
+        <div class="ps-title">Paginated cursor fetch</div>
+        <ul>
+          <li>100 deals per request (API max)</li>
+          <li>Cursor-based pagination loop</li>
+          <li>Properties + associations in one call</li>
+          <li>Flatten JSON to DataFrame via json_normalize</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">03</div>
+        <div class="ps-label">Association Resolution</div>
+        <div class="ps-title">Batch company + contact lookup</div>
+        <ul>
+          <li>Extract all unique company/contact IDs</li>
+          <li>Batch POST: 100 IDs per request</li>
+          <li>Primary + all names resolved separately</li>
+          <li>Deduplication on ID level</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">04</div>
+        <div class="ps-label">Enrichment</div>
+        <div class="ps-title">ID → label + time conversion</div>
+        <ul>
+          <li>Stages, pipelines, teams: ID → label via API maps</li>
+          <li>Owners resolved via owner map</li>
+          <li>ms → HH:mm:ss for all 44 time-in-stage columns</li>
+          <li>Record source + forecast → human labels</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">05</div>
+        <div class="ps-label">Normalization</div>
+        <div class="ps-title">Schema lock + type coercion</div>
+        <ul>
+          <li>Column order locked to reference file</li>
+          <li>Bool / numeric / datetime types enforced per reference schema</li>
+          <li>Datetimes: UTC → Europe/Rome → floor minute</li>
+          <li>Export to dated Excel file</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight reveal">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Why batch association resolution:</strong> a naive approach would call the API once per deal to resolve company/contact names: that's N API calls for N deals. Instead, all unique IDs across all deals are collected first, then resolved in batches of 100. For 1000 deals with associations, that's ~10 calls instead of 1000. Same data, 100× fewer requests</p>
+    </div>
+  </div>
+</section>
+
+<!-- Decisions -->
+<section id="decisions">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>04</span> - Design</div>
+      <div class="sh-title">
+        <h2>Why it was built this way</h2>
+        <p>Key technical choices and the reasoning behind them</p>
+      </div>
+    </div>
+    <div class="decision-list reveal">
+      <div class="decision">
+        <div class="dec-context">
+          <div class="dc-tag">Pagination</div>
+          <div class="dc-title">Cursor-based deal retrieval</div>
+        </div>
+        <div class="dec-chosen">
+          <h4>Chosen</h4>
+          <p>While-loop with cursor extracted from paging.next.after, stops when key absent</p>
+        </div>
+        <div class="dec-why">
+          <h4>Why</h4>
+          <p>HubSpot caps results at 100 per request. Cursor pagination is the only correct approach: offset pagination would miss records inserted between pages</p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="dec-context">
+          <div class="dc-tag">Property Discovery</div>
+          <div class="dc-title">Dynamic property resolution vs hardcoded list</div>
+        </div>
+        <div class="dec-chosen">
+          <h4>Chosen</h4>
+          <p>Query /crm/v3/properties/deals at startup, filter to schema-required columns</p>
+        </div>
+        <div class="dec-why">
+          <h4>Why</h4>
+          <p>HubSpot property names can change. Dynamic resolution decouples the extraction from the API's internal naming: the reference file is the source of truth, not a hardcoded list</p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="dec-context">
+          <div class="dc-tag">Type Coercion</div>
+          <div class="dc-title">Reference-driven type enforcement</div>
+        </div>
+        <div class="dec-chosen">
+          <h4>Chosen</h4>
+          <p>Loop through ExampleDf column dtypes, apply matching conversion to DealsDf</p>
+        </div>
+        <div class="dec-why">
+          <h4>Why</h4>
+          <p>Explicit per-column type logic in a hardcoded switch would need updating every time a column is added. Deriving from the reference file makes the type enforcement self-maintaining</p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="dec-context">
+          <div class="dc-tag">Datetime</div>
+          <div class="dc-title">String serialization of datetime output</div>
+        </div>
+        <div class="dec-chosen">
+          <h4>Chosen</h4>
+          <p>dt.strftime("%Y-%m-%d %H:%M:%S") after timezone conversion, before Excel export</p>
+        </div>
+        <div class="dec-why">
+          <h4>Why</h4>
+          <p>Excel datetime handling with timezone-aware columns produces inconsistent output across pandas versions and Excel clients. String serialization is deterministic and portable</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stack -->
+<section id="stack">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>05</span> - Stack</div>
+      <div class="sh-title">
+        <h2>Technology choices</h2>
+        <p>Minimal dependencies</p>
+      </div>
+    </div>
+    <div class="tech-grid reveal">
+      <div class="tech-card">
+        <div class="tc-cat">Language</div>
+        <div class="tc-name">Python 3.10+</div>
+        <div class="tc-why">Native zoneinfo, PEP 604 type hints, built-in cursor handling</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">HTTP</div>
+        <div class="tc-name">requests</div>
+        <div class="tc-why">Simple, reliable REST calls. Bearer auth header. Response JSON parsing</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Data Processing</div>
+        <div class="tc-name">Pandas</div>
+        <div class="tc-why">json_normalize, dtype coercion, datetime tz_convert, column filtering</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Excel Export</div>
+        <div class="tc-name">openpyxl</div>
+        <div class="tc-why">Pandas Excel engine. Dated output filenames prevent overwrite conflicts</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Timezone</div>
+        <div class="tc-name">zoneinfo + dateutil</div>
+        <div class="tc-why">zoneinfo for tz-aware conversion, dateutil.parser.isoparse for robust ISO parsing</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">API</div>
+        <div class="tc-name">HubSpot CRM v3</div>
+        <div class="tc-why">Properties, deals, owners, users, teams, pipelines: all via REST</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Batch API</div>
+        <div class="tc-name">HubSpot Batch Read</div>
+        <div class="tc-why">/batch/read for companies and contacts: 100 IDs per POST, 200/207 accepted</div>
+      </div>
+      <div class="tech-card">
+        <div class="tc-cat">Auth</div>
+        <div class="tc-name">Bearer Token</div>
+        <div class="tc-why">Private app token in Authorization header. Scoped per HubSpot private app</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Simone Caruso</div>
+      <div class="footer-links">
+        <a href="../index.html">Portfolio</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('.feat-grid, .tech-grid').forEach(parent => {
+  [...parent.children].forEach((child, i) => { child.style.transitionDelay = `${i * 60}ms`; });
+});
+</script>
+</body>
+</html>

@@ -15,7 +15,7 @@
   --accent:#6BA37A;
   --accent-2:#C47848;
   --accent-3:#8DC49A;
-  --warn:#C4A54A; --danger:#E07070;
+  --warn:#C4A54A; --danger:#E07070; --blue:#5B8DD9;
   --radius:6px; --radius-lg:10px;
   --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
@@ -132,11 +132,13 @@ section:first-of-type{border-top:none}
 .arch-node .n-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
 .arch-node .n-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
 .arch-node .n-sub{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
-.arch-node.source{border-color:rgba(196,165,74,.35);background:rgba(196,165,74,.05)}
-.arch-node.source .n-label{color:var(--warn)}
+.arch-node.source{border-color:rgba(107,163,122,.35);background:rgba(107,163,122,.06)}
+.arch-node.source .n-label{color:var(--accent)}
 .arch-node.db{border-color:rgba(196,120,72,.35);background:rgba(196,120,72,.06)}
 .arch-node.db .n-label{color:var(--accent-2)}
 .arch-node.engine{border-color:rgba(107,163,122,.35);background:rgba(107,163,122,.06)}
+.arch-node.accuracy{border-color:rgba(196,165,74,.35);background:rgba(196,165,74,.05)}
+.arch-node.accuracy .n-label{color:var(--warn)}
 .arch-node.ui{border-color:rgba(141,196,154,.35);background:rgba(141,196,154,.06)}
 .arch-node.ui .n-label{color:var(--accent-3)}
 .arch-node.ai{border-color:rgba(196,120,72,.25);background:rgba(196,120,72,.04)}
@@ -156,10 +158,7 @@ section:first-of-type{border-top:none}
 .provider-card .pv-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-.01em}
 .provider-card .pv-type{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
 .provider-card .pv-desc{font-size:12px;color:var(--muted);line-height:1.5}
-.provider-card.p-open-meteo{border-color:rgba(107,163,122,.3);background:rgba(107,163,122,.05)}
-.provider-card.p-met-norway{border-color:rgba(141,196,154,.3);background:rgba(141,196,154,.05)}
-.provider-card.p-visual{border-color:rgba(196,165,74,.3);background:rgba(196,165,74,.05)}
-.provider-card.p-bright{border-color:rgba(196,120,72,.3);background:rgba(196,120,72,.05)}
+.provider-card.p-open-meteo,.provider-card.p-met-norway,.provider-card.p-visual,.provider-card.p-bright{border-color:rgba(107,163,122,.3);background:rgba(107,163,122,.05)}
 @media(max-width:760px){.provider-grid{grid-template-columns:repeat(2,1fr)}}
 
 /* ── Pipeline ── */
@@ -176,18 +175,18 @@ section:first-of-type{border-top:none}
 /* ── Accuracy metrics ── */
 .accuracy-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px}
 .acc-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px}
-.acc-card .ac-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+.acc-card .ac-label{font-family:var(--mono);font-size:10px;color:var(--warn);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
 .acc-card h3{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.02em;margin-bottom:10px}
 .acc-card p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:16px}
 .acc-card .ac-formula{font-family:var(--mono);font-size:13px;color:var(--text-dim);background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;letter-spacing:.02em}
-.acc-card .ac-formula .kw{color:var(--accent-3)}
+.acc-card .ac-formula .kw{color:var(--warn)}
 .acc-card .ac-formula .num{color:var(--warn)}
 @media(max-width:760px){.accuracy-grid{grid-template-columns:1fr}}
 
 /* ── Lead time buckets ── */
 .bucket-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
 .bucket{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;text-align:center;flex:1;min-width:60px}
-.bucket .bk-day{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent);letter-spacing:-.03em}
+.bucket .bk-day{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--warn);letter-spacing:-.03em}
 .bucket .bk-label{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
 
 /* ── Features grid ── */
@@ -223,7 +222,7 @@ section:first-of-type{border-top:none}
 .wf-meta .wf-tag{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
 .wf-meta .wf-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-.01em}
 .wf-meta .wf-trigger{font-family:var(--mono);font-size:11px;color:var(--muted)}
-.wf-detail h4{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.wf-detail h4{font-family:var(--mono);font-size:10px;color:var(--accent-2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
 .wf-detail p{font-size:13px;color:var(--text-dim);line-height:1.55}
 .wf-badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .wf-badge{font-family:var(--mono);font-size:10px;color:var(--muted);padding:3px 8px;border:1px solid var(--border);border-radius:3px;background:var(--bg)}
@@ -263,16 +262,16 @@ section:first-of-type{border-top:none}
 .rm-items{padding:16px;display:flex;flex-direction:column;gap:10px}
 .rm-item{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--text-dim);line-height:1.4;position:relative;padding-left:20px}
 .rm-item::before{content:"";position:absolute;left:8px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:var(--dim)}
-.rm-col.col-done .rm-item::before{background:var(--accent-3)}
+.rm-col.col-done .rm-item::before{background:var(--blue)}
 .rm-col.col-now .rm-item::before{background:var(--accent)}
-.rm-col.col-next .rm-item::before{background:var(--accent-2)}
-.rm-col.col-later .rm-item::before{background:var(--dim)}
+.rm-col.col-next .rm-item::before{background:var(--warn)}
+.rm-col.col-later .rm-item::before{background:var(--accent-2)}
 @media(max-width:760px){.roadmap{grid-template-columns:1fr 1fr}.rm-col{border-right:none;border-bottom:1px solid var(--border)}}
 
 /* ── Footer ── */
 footer{border-top:1px solid var(--border);padding:48px 0}
 .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
-.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text)}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
 .footer-brand span{color:var(--accent)}
 .footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
 .footer-links a{transition:color .15s}
@@ -305,6 +304,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
         <a href="#product">Product</a>
         <a href="#screenshots">Preview</a>
         <a href="#automation">Ops</a>
+        <a href="#decisions">Design</a>
         <a href="#stack">Stack</a>
       </nav>
     </div>
@@ -319,9 +319,9 @@ footer{border-top:1px solid var(--border);padding:48px 0}
     <div class="hero-meta meta" style="font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px">
       Full-Stack Data Product &nbsp;·&nbsp; 2026
     </div>
-    <h1>Domani <span class="accent">Piove</span></h1>
+    <h1>Domani Piove</span></h1>
     <p class="lede">A weather intelligence platform built around one question: <em>"Can I go out?"</em> with confidence</p>
-    <p class="sublede">A decision-support system that aggregates independent meteorological providers, scores them against historical observations, and weights every prediction by proven accuracy</p>
+    <p class="sublede">A decision-support system that aggregates meteorological providers, scores them against historical data, and weights prediction by accuracy</p>
     <div class="hero-cta">
       <a class="btn-primary" href="https://domanipiove.streamlit.app/" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -335,11 +335,11 @@ footer{border-top:1px solid var(--border);padding:48px 0}
     <div class="chips">
       <span class="chip accent">Python</span>
       <span class="chip accent">Streamlit</span>
-      <span class="chip green">Supabase · PostgreSQL</span>
-      <span class="chip purple">4 Weather APIs</span>
-      <span class="chip purple">Accuracy Engine</span>
-      <span class="chip">GitHub Actions</span>
-      <span class="chip">Plotly · Altair · Folium</span>
+      <span class="chip accent">Plotly · Altair · Folium</span>
+      <span class="chip accent">Supabase · PostgreSQL</span>
+      <span class="chip accent">4 Weather APIs</span>
+      <span class="chip accent">Accuracy Engine</span>
+      <span class="chip accent">GitHub Actions</span>
     </div>
   </div>
 </div>
@@ -349,7 +349,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
   <div class="stat">
     <div class="label">Weather providers</div>
     <div class="num cyan">4</div>
-    <div class="sub">Open-Meteo · Met Norway · Visual Crossing · Bright Sky</div>
+    <div class="sub">Open Meteo · Met Norway · Visual Crossing · Bright Sky</div>
   </div>
   <div class="stat">
     <div class="label">Accuracy lead-time buckets</div>
@@ -359,12 +359,12 @@ footer{border-top:1px solid var(--border);padding:48px 0}
   <div class="stat">
     <div class="label">Automation schedules</div>
     <div class="num warn">3 flows</div>
-    <div class="sub">Daily refresh · Accuracy computation · Cache</div>
+    <div class="sub">Daily data · Accuracy calculus · Cache Streamlit</div>
   </div>
   <div class="stat">
     <div class="label">Persistence</div>
-    <div class="num orange" style="font-size:36px;padding-top:8px">Supabase<br>PostgreSQL</div>
-    <div class="sub">Typed schema · Composite indexes · JSONB analytics</div>
+    <div class="num orange">Supabase</div>
+    <div class="sub">PostgreSQL DB · 7 tables</div>
   </div>
 </div>
 
@@ -423,7 +423,6 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="n-icon">🌦️</div>
           <div class="n-label">Sources</div>
           <div class="n-name">4 Weather APIs</div>
-          <div class="n-sub">Open-Meteo · Met Norway · Visual Crossing · Bright Sky</div>
         </div>
         <div class="arch-arrow">
           <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -432,7 +431,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="n-icon">⚙️</div>
           <div class="n-label">Ingestion</div>
           <div class="n-name">Fetch + Normalize</div>
-          <div class="n-sub">Retry logic · Concurrent fetch · Typed schema mapping</div>
+          <div class="n-sub">Retry logic · Concurrent fetch Typed schema mapping</div>
         </div>
         <div class="arch-arrow">
           <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -440,17 +439,17 @@ footer{border-top:1px solid var(--border);padding:48px 0}
         <div class="arch-node db">
           <div class="n-icon">🗄️</div>
           <div class="n-label">Storage</div>
-          <div class="n-name">Supabase / PostgreSQL</div>
-          <div class="n-sub">Forecasts · Actuals · Accuracy · Analytics</div>
+          <div class="n-name">Supabase DBL</div>
+          <div class="n-sub">Forecasts · Actuals · Accuracy Analytics</div>
         </div>
         <div class="arch-arrow">
           <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </div>
-        <div class="arch-node engine">
+        <div class="arch-node accuracy">
           <div class="n-icon">📐</div>
           <div class="n-label">Accuracy</div>
           <div class="n-name">MAE / MAPE Engine</div>
-          <div class="n-sub">Provider scoring across 7 lead-time spans</div>
+          <div class="n-sub">Provider scoring across 7 time spans</div>
         </div>
         <div class="arch-arrow">
           <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -459,18 +458,17 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="n-icon">🖥️</div>
           <div class="n-label">UI</div>
           <div class="n-name">Streamlit Product</div>
-          <div class="n-sub">Home · Forecast · Accuracy · AI</div>
+          <div class="n-sub">Home · Forecast · Accuracy</div>
         </div>
-      </div>
-      <div class="arch-footer">
-        <div class="arch-badge"><div class="dot" style="background:var(--accent-3)"></div>Modular Python (app / weather / accuracy / db / configuration)</div>
-        <div class="arch-badge"><div class="dot" style="background:var(--accent)"></div>Concurrent multi-threaded DB load</div>
-        <div class="arch-badge"><div class="dot" style="background:var(--accent-2)"></div>6-hour cache TTL with st.cache_data</div>
       </div>
     </div>
     <div class="insight reveal" style="margin-top:28px">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <p><strong>Why a database:</strong> DomaniPiove's data is temporal: forecasts are issued days before actuals arrive. Accuracy can only be computed after the fact, which requires durable storage. Supabase provides managed PostgreSQL with composite indexes on city-datetime pairs, giving sub-second joins on the forecast-actual merge that drives every accuracy metric</p>
+      <p><strong>Why a database:</strong> DomaniPiove's data is temporal: forecasts are issued days before actuals arrive. Accuracy can only be computed after the fact, which requires durable storage. Supabase provides managed PostgreSQL with composite indexes, giving sub-second joins on the forecast-actual merge that drives every accuracy metric</p>
+    </div>
+    <div class="insight reveal" style="margin-top:16px">
+      <svg viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+      <p><strong>Built modularly:</strong> every layer (ingestion, storage, accuracy engine, and UI) is independently deployable, testable, and replaceable. Adding a fifth weather provider, a new error metric, or a new UI view requires changes in exactly one place. The system is designed to grow without rewrites</p>
     </div>
   </div>
 </section>
@@ -497,19 +495,19 @@ footer{border-top:1px solid var(--border);padding:48px 0}
         <div class="pv-icon">🇳🇴</div>
         <div class="pv-name">Met Norway</div>
         <div class="pv-type">Nordic model · Free</div>
-        <div class="pv-desc">Norwegian Meteorological Institute. Strong accuracy at 1/3 day horizons in European geography</div>
+        <div class="pv-desc">Norwegian Meteorological Institute. Strong accuracy at 1/3 day horizons in Europe</div>
       </div>
       <div class="provider-card p-visual">
         <div class="pv-icon">☀️</div>
         <div class="pv-name">Visual Crossing</div>
         <div class="pv-type">Commercial · API key</div>
-        <div class="pv-desc">Multi-model commercial aggregator. Broad geographic coverage and extended forecast range</div>
+        <div class="pv-desc">Multi-model aggregator. Broad geographic coverage and extended forecast range</div>
       </div>
       <div class="provider-card p-bright">
         <div class="pv-icon">📡</div>
         <div class="pv-name">Bright Sky</div>
         <div class="pv-type">DWD-backed · Free</div>
-        <div class="pv-desc">Powered by Germany's national weather service. Reliable historical and near-term data for central Europe</div>
+        <div class="pv-desc">Powered by Germany's national weather service. Reliable historical data for Europe</div>
       </div>
     </div>
 
@@ -569,7 +567,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       <div class="sh-no"><span>04</span> - Accuracy Engine</div>
       <div class="sh-title">
         <h2>Scoring providers against reality</h2>
-        <p>Forecasts are promises. Actuals are truth. The accuracy engine runs every evening, joining past predictions against observed weather and computing two rigorous error metrics across seven lead-time buckets for every provider</p>
+        <p>The accuracy engine runs every evening, joining past predictions against observed weather and computing two rigorous error metrics across seven lead-time buckets for every provider</p>
       </div>
     </div>
 
@@ -599,8 +597,8 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       <div class="bucket"><div class="bk-day">15</div><div class="bk-label">days</div></div>
     </div>
 
-    <div class="insight reveal">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div class="insight reveal" style="border-left-color:var(--warn)">
+      <svg viewBox="0 0 24 24" style="stroke:var(--warn)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <p><strong>Why this matters:</strong> once each provider has a per-span accuracy score, the Forecast page can weight their predictions by proven reliability rather than displaying four numbers with equal credibility. A provider that is demonstrably 20% more accurate at 5-day forecasts earns proportionally more influence in the aggregated answer to "Can I go out?"</p>
     </div>
   </div>
@@ -617,7 +615,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       </div>
     </div>
     <div class="feat-grid reveal">
-      <div class="feat-card c-cyan">
+      <div class="feat-card c-green">
         <div class="fc-tag">Home</div>
         <h3>Product Story + Coverage</h3>
         <p>Sets expectations: explains the multi-provider approach, names the data sources, and shows geographic coverage. Trust is prerequisite to acting on a weather recommendation</p>
@@ -627,7 +625,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="fc-item">Navigation hub to other sections</div>
         </div>
       </div>
-      <div class="feat-card c-cyan">
+      <div class="feat-card c-green">
         <div class="fc-tag">Forecast</div>
         <h3>Forecast Decision Center</h3>
         <p>The core view. Multi-provider comparison, "Can I go out?" score, and AI concierge. All filterable by city and timeframe. Designed to answer one question, not to display all available data</p>
@@ -651,7 +649,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="fc-item">Provider-level performance narrative summaries</div>
         </div>
       </div>
-      <div class="feat-card c-warn">
+      <div class="feat-card c-green">
         <div class="fc-tag">AI Concierge</div>
         <h3>Contextual Forecast Interpreter</h3>
         <p>Grounded AI: reads the actual provider outputs and accuracy scores as structured context, then answers the user's specific planning question in natural language</p>
@@ -662,7 +660,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="fc-item">Retry logic + fallback model chain</div>
         </div>
       </div>
-      <div class="feat-card c-orange">
+      <div class="feat-card c-green">
         <div class="fc-tag">Performance</div>
         <h3>UX Engineering</h3>
         <p>A Streamlit app that feels fast despite hitting a database. Concurrent DB reads, aggressive caching, and resolution-aware layout all combine to eliminate unnecessary wait time</p>
@@ -674,7 +672,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="fc-item">Query parameter state preserved across navigation</div>
         </div>
       </div>
-      <div class="feat-card c-danger">
+      <div class="feat-card c-green">
         <div class="fc-tag">Analytics</div>
         <h3>Privacy-Aware Visit Tracking</h3>
         <p>Product instrumentation built in from the start: sessions, page views, geographic origin, and referrers, with optional IP hashing to protect user privacy</p>
@@ -790,8 +788,8 @@ footer{border-top:1px solid var(--border);padding:48px 0}
         </div>
       </div>
     </div>
-    <div class="insight reveal">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div class="insight reveal" style="border-left-color:var(--accent-2)">
+      <svg viewBox="0 0 24 24" style="stroke:var(--accent-2)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <p><strong>Timezone-aware scheduling:</strong> a naive UTC cron for an Italian-facing product would drift by an hour every DST transition. Using a Rome-timezone gate inside the workflow means the data lifecycle stays aligned to local business time regardless of UTC offset changes across the year, a small but operationally important detail</p>
     </div>
   </div>
@@ -960,7 +958,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
     <div class="roadmap reveal">
       <div class="rm-col col-done">
         <div class="rm-head">
-          <div class="rh-dot" style="background:var(--accent-3)"></div>
+          <div class="rh-dot" style="background:var(--blue)"></div>
           Done
         </div>
         <div class="rm-items">
@@ -992,7 +990,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       </div>
       <div class="rm-col col-next">
         <div class="rm-head">
-          <div class="rh-dot" style="background:var(--accent-2)"></div>
+          <div class="rh-dot" style="background:var(--warn)"></div>
           Later
         </div>
         <div class="rm-items">
@@ -1004,7 +1002,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       </div>
       <div class="rm-col col-later">
         <div class="rm-head">
-          <div class="rh-dot" style="background:var(--dim)"></div>
+          <div class="rh-dot" style="background:var(--accent-2)"></div>
           Horizon
         </div>
         <div class="rm-items">
@@ -1024,11 +1022,10 @@ footer{border-top:1px solid var(--border);padding:48px 0}
     <div class="footer-inner">
       <div class="footer-brand">Simone Caruso</div>
       <div class="footer-links">
-        <a href="https://domanipiove.streamlit.app/" target="_blank" rel="noopener">Live App ↗</a>
-        <a href="https://github.com/simonecaruso-d/DomaniPiove" target="_blank" rel="noopener">GitHub ↗</a>
-        <a href="../index.html">← Portfolio</a>
+        <a href="https://domanipiove.streamlit.app/" target="_blank" rel="noopener">Live App</a>
+        <a href="https://github.com/simonecaruso-d/DomaniPiove" target="_blank" rel="noopener">GitHub</a>
+        <a href="../index.html">Portfolio</a>
       </div>
-      <div class="footer-note">Full-Stack · Data Product · 2026</div>
     </div>
   </div>
 </footer>

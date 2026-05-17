@@ -13,9 +13,9 @@
   --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
   --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
   --accent:#38BDF8;       /* electric cyan */
-  --accent-2:#818CF8;     /* periwinkle */
-  --accent-3:#34D399;     /* mint */
-  --warn:#FBBF24; --danger:#F87171;
+  --accent-2:#C084FC;     /* lavender */
+  --accent-3:#A3E635;     /* lime */
+  --warn:#F59E0B; --danger:#F97316;
   --radius:6px; --radius-lg:10px;
   --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
@@ -39,29 +39,44 @@ section{padding:96px 0;border-top:1px solid var(--border)}
 section:first-of-type{border-top:none}
 
 /* ───────── Top bar ───────── */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
-.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:0.02em}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
 .tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
 .tb-back:hover{color:var(--text)}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tb-path{color:var(--text-dim)}
 .tb-path .slash{color:var(--dim);margin:0 8px}
 .tb-path .here{color:var(--accent)}
-.tb-status{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted)}
-.tb-status .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3)}
-.tb-status .nav{display:flex;gap:18px}
-.tb-status .nav a{color:var(--muted);transition:color .15s}
-.tb-status .nav a:hover{color:var(--text)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:20px;color:var(--muted)}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3);animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--accent-3)}50%{opacity:.5;box-shadow:0 0 4px var(--accent-3)}}
+.tb-nav{display:flex;gap:20px}
+.tb-nav a{color:var(--muted);transition:color .15s}
+.tb-nav a:hover{color:var(--text)}
 
 /* ───────── Hero ───────── */
-.hero{padding:128px 0 96px;position:relative}
-.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:32px;display:flex;align-items:center;gap:12px}
-.hero .meta::before{content:"";width:32px;height:1px;background:var(--accent);display:none}
-.hero h1{font-size:clamp(44px,7vw,90px);line-height:0.98;letter-spacing:-0.04em;font-weight:700;margin-bottom:32px;max-width:none}
-.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:500;white-space:nowrap}
-.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:100%;margin-bottom:48px;font-weight:400}
+.hero{padding:136px 0 96px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(56,189,248,.06) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(129,140,248,.04) 0%,transparent 65%);pointer-events:none}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
+.hero .meta .line{width:48px;height:1px;background:var(--accent);opacity:.6}
+.hero h1{font-size:clamp(52px,8vw,100px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
+.hero h1 .dim{color:var(--muted);font-weight:400}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:600;white-space:nowrap}
+.hero .lede{font-size:21px;line-height:1.5;color:var(--text-dim);max-width:90ch;margin-bottom:20px;font-weight:400}
+.hero .sublede{font-size:16px;color:var(--muted);max-width:110ch;margin-bottom:48px;line-height:1.6}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);transition:background .15s,transform .1s}
+.btn-primary:hover{background:#60CCFA;transform:translateY(-1px)}
+.btn-primary svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--accent);padding:6px 14px;border:1px solid rgba(56,189,248,0.25);border-radius:999px;background:rgba(56,189,248,0.08);display:inline-flex;align-items:center;transition:background 0.18s,border-color 0.18s}
-.chip:hover{background:rgba(56,189,248,0.18);border-color:rgba(56,189,248,0.5)}
+.chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
+.chip.accent{color:var(--accent);border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.07)}
+.chip.purple{color:var(--accent-2);border-color:rgba(129,140,248,.25);background:rgba(129,140,248,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.07)}
 
 /* ───────── Stat strip ───────── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%, var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
@@ -69,9 +84,13 @@ section:first-of-type{border-top:none}
 .stat:last-child{border-right:none}
 .stat .label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
 .stat .label .tag{color:var(--dim)}
-.stat .num{font-size:64px;line-height:1;letter-spacing:-0.04em;font-weight:600;font-feature-settings:'tnum'}
-.stat .num .unit{font-size:24px;color:var(--muted);margin-left:6px;font-weight:500;letter-spacing:0.06em}
-.stat .sub{margin-top:12px;font-size:13px;color:var(--text-dim)}
+.stat .num{font-size:52px;line-height:1;letter-spacing:-.04em;font-weight:700;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:20px;color:var(--muted);margin-left:4px;font-weight:500;letter-spacing:.06em}
+.stat .sub{margin-top:10px;font-size:12px;color:var(--text-dim)}
+.stat .num.cyan{color:var(--accent)}
+.stat .num.purple{color:var(--accent-2)}
+.stat .num.green{color:var(--accent-3)}
+.stat .num.warn{color:var(--warn)}
 .stat[data-placeholder]::after{content:"PLACEHOLDER";position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:9px;color:var(--warn);letter-spacing:0.12em;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);padding:2px 6px;border-radius:3px}
 @media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}.stat:nth-child(-n+2){border-bottom:1px solid var(--border)}}
 
@@ -80,15 +99,15 @@ section:first-of-type{border-top:none}
 .sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.12em}
 .sh-no span{color:var(--accent)}
 .sh-no .line{display:none}
-.sh-title h2{font-size:48px;line-height:1.05;letter-spacing:-0.03em;font-weight:600;margin-bottom:16px;max-width:18ch}
-.sh-title p{font-size:17px;color:var(--text-dim);max-width:60ch}
+.sh-title h2{font-size:clamp(36px,4vw,56px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin-bottom:18px}
+.sh-title p{font-size:17px;color:var(--text-dim);max-width:72ch;line-height:1.6}
 @media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}.sh-title h2{font-size:36px}}
 
 /* ───────── Problem panel ───────── */
 .problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .problem-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
-.problem-col.before{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.35)}
-.problem-col.after{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.35)}
+.problem-col.before{background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.35)}
+.problem-col.after{background:rgba(163,230,53,.06);border-color:rgba(163,230,53,.35)}
 .problem-col h3{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
 .problem-col h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--danger)}
 .problem-col.after h3::before{background:var(--accent-3)}
@@ -182,7 +201,7 @@ section:first-of-type{border-top:none}
 .tbl.active rect.tbl-bg{stroke:var(--accent);stroke-width:2}
 .tbl rect.tbl-bg{stroke:var(--border-bright);stroke-width:1.5;fill:var(--panel-2);transition:stroke .2s, stroke-width .2s}
 .tbl.fact rect.tbl-bg{stroke:var(--accent);stroke-width:2}
-.tbl.param rect.tbl-bg{stroke:var(--accent-2);stroke-width:1.5;stroke-dasharray:5,3}
+.tbl.param rect.tbl-bg{stroke:var(--text);stroke-width:1.5;stroke-dasharray:5,3}
 .tbl rect.tbl-header{fill:var(--panel-3)}
 .tbl.fact rect.tbl-header{fill:rgba(56,189,248,.18)}
 .conn{transition:opacity .2s}
@@ -196,10 +215,10 @@ section:first-of-type{border-top:none}
 .schema-side .col .name{color:var(--text)}
 .schema-side .col .type{color:var(--muted);font-size:11px}
 .schema-side .col .name.pk{color:var(--accent)}
-.schema-side .col .name.fk{color:var(--accent-2)}
+.schema-side .col .name.fk{color:var(--accent)}
 .schema-side .col-tag{font-size:9px;letter-spacing:0.08em;font-weight:700;padding:2px 5px;border-radius:2px;margin-left:6px}
 .schema-side .col-tag.pk{background:rgba(56,189,248,.1);color:var(--accent)}
-.schema-side .col-tag.fk{background:rgba(129,140,248,.1);color:var(--accent-2)}
+.schema-side .col-tag.fk{background:rgba(56,189,248,.1);color:var(--accent)}
 .schema-side .ss-empty{font-family:var(--mono);font-size:12px;color:var(--muted);padding:24px 0;text-align:center;border:1px dashed var(--border);border-radius:6px}
 @media(max-width:900px){.schema-shell{grid-template-columns:1fr}.schema-canvas{border-right:none;border-bottom:1px solid var(--border)}}
 
@@ -247,11 +266,25 @@ pre.dax .ln{display:inline-block;width:32px;color:var(--dim);text-align:right;ma
 .stack-item .sk-detail{font-family:var(--mono);font-size:11px;color:var(--muted)}
 @media(max-width:900px){.stack-grid{grid-template-columns:repeat(2,1fr)}}
 
+/* ───────── Insight ───────── */
+.insight{background:var(--panel);border:1px solid var(--border-bright);border-left:3px solid var(--accent);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start}
+.insight svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.insight p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.insight p strong{color:var(--text)}
+
 /* ───────── Footer ───────── */
-footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.04em}
-.foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
-.foot-inner a{color:var(--text-dim);transition:color .15s}
-.foot-inner a:hover{color:var(--accent)}
+footer{border-top:1px solid var(--border);padding:48px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
+.footer-brand span{color:var(--accent)}
+.footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.footer-links a{transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-note{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+/* ───────── Scroll reveal ───────── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:none}
 
 /* PLACEHOLDER badge */
 .ph-tag{font-family:var(--mono);font-size:9px;color:var(--warn);letter-spacing:0.12em;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);padding:2px 6px;border-radius:3px;text-transform:uppercase;display:inline-block;vertical-align:middle;margin-left:8px}
@@ -260,57 +293,65 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <body>
 
 <!-- ════════ TOP BAR ════════ -->
-<div class="topbar">
-  <div class="wide topbar-inner">
-    <a href="index.html" class="tb-back">← Portfolio</a>
-    <span class="tb-path">
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <a class="tb-back" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portfolio
+    </a>
+    <div class="tb-path">
       <span class="slash">/</span>Data Visualization<span class="slash">/</span><span class="here">Clients Segmentation</span>
-    </span>
+    </div>
     <div class="tb-status">
-      <span class="nav">
+      <nav class="tb-nav">
         <a href="#problem">Problem</a>
         <a href="#solution">Solution</a>
         <a href="#architecture">Architecture</a>
         <a href="#dax">DAX</a>
         <a href="#pages">Pages</a>
-      </span>
+      </nav>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════ HERO ════════ -->
+<div class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="meta">Data Visualization · Power BI &nbsp;·&nbsp; 2026</div>
+    <h1>Multi-tier client classification,<span class="accent">at scale</span></h1>
+    <p class="lede">A governed segmentation engine for commercial teams across four European markets: replacing fragmented spreadsheets with one source of truth</p>
+    <p class="sublede">Benchmarks every customer on usage, lifecycle, and the next strategic action to take — live from Azure Analysis Services, no local data</p>
+    <div class="chips">
+      <span class="chip accent">Power BI</span>
+      <span class="chip accent">DAX</span>
+      <span class="chip accent">Power Query (M)</span>
+      <span class="chip accent">Azure Analysis Services</span>
     </div>
   </div>
 </div>
 
-<!-- ════════ HERO ════════ -->
-<header class="hero wrap">
-  <div class="meta">Data Visualization Project · Power BI · 2026</div>
-  <h1>Multi-tier client classification,<br><span class="accent">at scale</span></h1>
-  <p class="lede">A governed segmentation engine for commercial teams across four European markets: replacing fragmented spreadsheets with one source of truth that benchmarks every customer on usage, lifecycle, and the next strategic action to&nbsp;take</p>
-  <div class="chips">
-    <span class="chip">Power BI</span>
-    <span class="chip">DAX</span>
-    <span class="chip">Power Query (M)</span>
-    <span class="chip">Azure Analysis Services</span>
-  </div>
-</header>
-
 <!-- ════════ STAT STRIP ════════ -->
-<div class="stats">
+<div class="stats reveal">
   <div class="stat">
-    <div class="label"><span>Markets</span><span class="tag">EU</span></div>
-    <div class="num">4<span class="unit">countries</span></div>
+    <div class="label"><span>Markets</span><span class="tag">countries</span></div>
+    <div class="num cyan">4</div>
     <div class="sub">Italy, Greece, Spain, Portugal: a single governed model</div>
   </div>
   <div class="stat">
     <div class="label"><span>DAX measures</span><span class="tag">model</span></div>
-    <div class="num">46+<span class="unit"></span></div>
+    <div class="num purple">46+</div>
     <div class="sub">Plus 5 calculated columns across 3 tables</div>
   </div>
   <div class="stat">
     <div class="label"><span>Customers segmented</span><span class="tag">live</span></div>
-    <div class="num">28k+</div>
+    <div class="num green">28k+</div>
     <div class="sub">Total active customers across all markets</div>
   </div>
   <div class="stat">
     <div class="label"><span>Hours saved / week</span><span class="tag">vs. excel</span></div>
-    <div class="num">40</div>
+    <div class="num warn">40</div>
     <div class="sub">Replaced manual export-and-classify workflow</div>
   </div>
 </div>
@@ -318,14 +359,14 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- ════════ PROBLEM ════════ -->
 <section id="problem">
   <div class="wrap">
-    <div class="sh">
-      <div class="sh-no"><span>01</span> · Problem<span class="line"></span></div>
+    <div class="sh reveal">
+      <div class="sh-no"><span>01</span> · Problem</div>
       <div class="sh-title">
-        <h2 style="white-space:nowrap;max-width:none">Each market was running its own spreadsheet</h2>
-        <p style="max-width:none">Territory managers had to export raw sales, apply local rules in Excel, and reconcile by hand : every cycle.<br>Inconsistent definitions, no shared time windows, no audit trail</p>
+        <h2>Each market was running its own spreadsheet</h2>
+        <p>Territory managers had to export raw sales, apply local rules in Excel, and reconcile by hand every cycle. Inconsistent definitions, no shared time windows, no audit trail</p>
       </div>
     </div>
-    <div class="problem-grid">
+    <div class="problem-grid reveal">
       <div class="problem-col before">
         <h3>Before</h3>
         <ul>
@@ -345,21 +386,25 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         </ul>
       </div>
     </div>
+    <div class="insight reveal" style="margin-top:24px">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Strategic framing:</strong> four independent spreadsheets meant four incompatible definitions of "good customer." A centralised DAX model replaces local opinion with a single, auditable classification that every market reads the same way, making cross-territory comparison meaningful for the first time</p>
+    </div>
   </div>
 </section>
 
 <!-- ════════ SOLUTION / MATRIX ════════ -->
 <section id="solution">
   <div class="wrap">
-    <div class="sh">
-      <div class="sh-no"><span>02</span> · Solution<span class="line"></span></div>
+    <div class="sh reveal">
+      <div class="sh-no"><span>02</span> · Solution</div>
       <div class="sh-title">
         <h2 style="white-space:nowrap;max-width:none">Three classes, one decision matrix</h2>
         <p style="max-width:none">Class 1 measures <em>usage level</em> against the market median. Class 2 places each customer on a <em>lifecycle</em> arc.<br>Class 3 reads them both and emits a single <em>strategic action</em>: the only thing the territory manager actually needs</p>
       </div>
     </div>
 
-    <div class="matrix-wrap">
+    <div class="matrix-wrap reveal">
 
       <div class="matrix">
         <!-- Header row -->
@@ -406,8 +451,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- ════════ ARCHITECTURE ════════ -->
 <section id="architecture">
   <div class="wrap">
-    <div class="sh">
-      <div class="sh-no"><span>03</span> · Architecture<span class="line"></span></div>
+    <div class="sh reveal">
+      <div class="sh-no"><span>03</span> · Architecture</div>
       <div class="sh-title">
         <h2>Star schema, fed live</h2>
         <p>One fact table (<code style="font-family:var(--mono);font-size:0.9em;color:var(--accent)">DDP Data</code>) surrounded by four dimensions, a lookup table, and a parameter layer. Sourced directly from Azure Analysis Services: no local data</p>
@@ -415,7 +460,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
     </div>
 
     <!-- Pipeline -->
-    <div class="pipeline">
+    <div class="pipeline reveal">
       <div class="pipeline-title">Power Query Pipeline</div>
       <div class="pipeline-flow">
         <div class="pl-stage">
@@ -451,7 +496,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
     </div>
 
     <!-- Schema -->
-    <div class="schema-shell">
+    <div class="schema-shell reveal">
       <div class="schema-canvas" id="schema">
         <svg viewBox="0 0 920 600" xmlns="http://www.w3.org/2000/svg" style="font-family:var(--mono)">
           <defs>
@@ -463,25 +508,22 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
           <!-- Connections (drawn first so they sit behind tables) -->
           <g class="connections" stroke="#4B7FA8" stroke-width="1.25" fill="none">
             <!-- DdpData → Customer -->
-            <path class="conn" data-pair="Ddp Data,Customer" d="M 330,300 L 255,300 L 255,198" stroke-dasharray="4,3" marker-end="url(#arr)"/>
-            <!-- DdpData → Territory -->
-            <path class="conn" data-pair="Ddp Data,Territory" d="M 590,300 L 705,300 L 705,198" stroke-dasharray="4,3" marker-end="url(#arr)"/>
-            <!-- DdpData → Product -->
-            <path class="conn" data-pair="Ddp Data,Product" d="M 460,380 L 460,440" stroke-dasharray="4,3" marker-end="url(#arr)"/>
-            <!-- DdpData → DateTable -->
-            <path class="conn" data-pair="Ddp Data,DateTable" d="M 330,350 L 165,350 L 165,440" stroke-dasharray="4,3" marker-end="url(#arr)"/>
-            <!-- DdpData → ClassesLevels (via measures, dotted lookup) -->
-            <path class="conn" data-pair="Ddp Data,ClassesLevels" d="M 590,350 L 770,350 L 770,440" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <path class="conn" data-pair="DDP Data,Customer" d="M 330,300 L 165,300 L 165,198" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- DDP Data → Territory -->
+            <path class="conn" data-pair="DDP Data,Territory" d="M 590,300 L 770,300 L 770,198" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- DDP Data → Product -->
+            <path class="conn" data-pair="DDP Data,Product" d="M 460,380 L 460,440" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+            <!-- DDP Data → Date Table -->
+            <path class="conn" data-pair="DDP Data,Date Table" d="M 330,350 L 165,350 L 165,440" stroke-dasharray="4,3" marker-end="url(#arr)"/>
 
           </g>
 
           <!-- Cardinality labels -->
           <g font-family="var(--mono)" font-size="9" font-weight="700" fill="#9AA3B0">
-            <text x="286" y="296">N</text><text x="259" y="208">1</text>
-            <text x="618" y="296">N</text><text x="708" y="208">1</text>
-            <text x="464" y="394">N</text><text x="464" y="436">1</text>
-            <text x="286" y="346">N</text><text x="168" y="452">1</text>
-            <text x="618" y="346">N</text><text x="773" y="452">1</text>
+            <text x="310" y="290">N</text><text x="175" y="225">1</text>
+            <text x="610" y="290">N</text><text x="775" y="225">1</text>
+            <text x="465" y="395">N</text><text x="465" y="435">1</text>
+            <text x="310" y="340">N</text><text x="175" y="425">1</text>
           </g>
 
           <!-- Tables -->
@@ -534,14 +576,14 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="260" height="14"/>
             <text x="14" y="18" font-size="13" fill="#E5E9F0" font-weight="700">DDP Data</text>
             <text x="226" y="18" font-size="9" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="14" y="46" font-size="10" fill="#818CF8">Market Customer Key</text>
-            <text x="232" y="46" font-size="8" fill="#818CF8" font-weight="700">FK</text>
-            <text x="14" y="60" font-size="10" fill="#818CF8">Product ID</text>
-            <text x="232" y="60" font-size="8" fill="#818CF8" font-weight="700">FK</text>
-            <text x="14" y="74" font-size="10" fill="#818CF8">Territory Key</text>
-            <text x="232" y="74" font-size="8" fill="#818CF8" font-weight="700">FK</text>
-            <text x="14" y="88" font-size="10" fill="#818CF8">Date</text>
-            <text x="232" y="88" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="14" y="46" font-size="10" fill="#38BDF8">Market Customer Key</text>
+            <text x="232" y="46" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
+            <text x="14" y="60" font-size="10" fill="#38BDF8">Product ID</text>
+            <text x="232" y="60" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
+            <text x="14" y="74" font-size="10" fill="#38BDF8">Territory Key</text>
+            <text x="232" y="74" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
+            <text x="14" y="88" font-size="10" fill="#38BDF8">Date</text>
+            <text x="232" y="88" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="14" y="102" font-size="10" fill="#B5BCC8">Sales Quantity</text>
             <text x="14" y="116" font-size="10" fill="#B5BCC8">Sales Amount</text>
             <text x="14" y="130" font-size="10" fill="#B5BCC8">Sales Type</text>
@@ -598,8 +640,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- ════════ DAX ════════ -->
 <section id="dax">
   <div class="wrap">
-    <div class="sh">
-      <div class="sh-no"><span>04</span> · DAX<span class="line"></span></div>
+    <div class="sh reveal">
+      <div class="sh-no"><span>04</span> · DAX</div>
       <div class="sh-title">
         <h2>The logic, in code</h2>
         <p style="max-width:none">46+ measures across segmentation, time intelligence, growth analytics, and dynamic formatting.<br>The standout is the cascading classification: Class 3 reads Class 2 reads Class 1,<br>each evaluated at row context with market-specific overrides</p>
@@ -889,19 +931,19 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- ════════ PAGES ════════ -->
 <section id="pages">
   <div class="wrap">
-    <div class="sh">
-      <div class="sh-no"><span>05</span> · Pages<span class="line"></span></div>
+    <div class="sh reveal">
+      <div class="sh-no"><span>05</span> · Pages</div>
       <div class="sh-title">
         <h2>Three pages, one story</h2>
         <p style="max-width:none">The report is intentionally narrow: enter from a home that orients the user, work the whole question on a single overview page, and export the segmented list when you need to act offline</p>
       </div>
     </div>
 
-    <div class="pages-stack">
+    <div class="pages-stack reveal">
 
       <div class="page-row">
         <div class="page-meta">
-          <div class="num">PAGE 01 / HOME</div>
+          <div class="num">HOME</div>
           <h3>Orientation</h3>
           <p>Web-app-style entry point with usage guidance, a market dropdown, and direct links into each section. Replaces the typical "wall of slicers" landing page with a calmer, instructional surface</p>
           <div class="features">
@@ -912,13 +954,13 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
           <div class="frame-bar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           </div>
-          <img src="../screenshots/CSHome.png" alt="Home page">
+          <img src="screenshots/CSHome.png" alt="Home page">
         </div>
       </div>
 
       <div class="page-row">
         <div class="page-meta">
-          <div class="num">PAGE 02 / OVERVIEW</div>
+          <div class="num">OVERVIEW</div>
           <h3>The whole story, one canvas</h3>
           <p>KPI strip, scatter plot of Class 1 & Class 2, customer-count matrix by country and rating, and a pivot drill-down: all driven by a single time-window slicer. This is where 95 % of the work happens</p>
           <div class="features">
@@ -929,13 +971,13 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
           <div class="frame-bar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           </div>
-          <img src="../screenshots/CSOverview.png" alt="Overview page">
+          <img src="screenshots/CSOverview.png" alt="Overview page">
         </div>
       </div>
 
       <div class="page-row">
         <div class="page-meta">
-          <div class="num">PAGE 03 / DOWNLOADS</div>
+          <div class="num">DOWNLOADS</div>
           <h3>Export to act offline</h3>
           <p>Full segmentation table downloadable per territory: for managers who still review in Excel before the next sales meeting. Filtered by the same slicers as the overview, so the export always matches the on-screen state</p>
           <div class="features">
@@ -946,7 +988,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
           <div class="frame-bar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           </div>
-          <img src="../screenshots/CSDownload.png" alt="Downloads page">
+          <img src="screenshots/CSDownload.png" alt="Downloads page">
         </div>
       </div>
 
@@ -955,9 +997,13 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 </section>
 
 <footer>
-  <div class="wrap foot-inner">
-    <span>© 2026 Simone Caruso</span>
-    <span><a href="index.html">← Back to portfolio</a></span>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Simone Caruso</div>
+      <div class="footer-links">
+        <a href="../index.html">Portfolio</a>
+      </div>
+    </div>
   </div>
 </footer>
 
@@ -965,8 +1011,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <script>
 // ─── Schema interactivity ───────────────────────────────
 const tableData = {
-  DdpData: {
-    kind: 'FACT', desc: 'Single facts table : every sales transaction across all four markets, filtered to interested geographies and sales types.',
+  'DDP Data': {
+    kind: 'FACT', desc: 'Single facts table: every sales transaction across all four markets, filtered to interested geographies and sales types.',
     cols: [
       { n: 'Market Code', t: 'str' },
       { n: 'Market Customer Key', t: 'str', tag: 'fk' },
@@ -997,7 +1043,7 @@ const tableData = {
       { n: 'Area Business Manager', t: 'str' },
     ]
   },
-  DateTable: {
+  'Date Table': {
     kind: 'DIM', desc: 'Standard date dimension. Marked as date table: powers all time-intelligence measures.',
     cols: [
       { n: 'Date', t: 'date', tag: 'pk' },
@@ -1012,7 +1058,7 @@ const tableData = {
       { n: 'Brand', t: 'str' },
     ]
   },
-  ClassesLevels: {
+  'Classes Levels': {
     kind: 'LOOKUP', desc: 'Static lookup for ordering classes in slicers and visuals. Pure presentation: no relationships, no filter direction.',
     cols: [
       { n: 'Class 1', t: 'str' },
@@ -1095,6 +1141,21 @@ tabs.forEach(t => {
     panels.forEach(p => p.classList.remove('active'));
     t.classList.add('active');
     document.querySelector(`.dax-panel[data-panel="${t.dataset.panel}"]`).classList.add('active');
+  });
+});
+
+// ─── Scroll reveal ──────────────────────────────────────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Stagger children in grid/list parents
+document.querySelectorAll('.feat-grid, .tech-grid, .provider-grid').forEach(parent => {
+  [...parent.children].forEach((child, i) => {
+    child.style.transitionDelay = `${i * 60}ms`;
   });
 });
 

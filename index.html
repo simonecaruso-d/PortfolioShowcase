@@ -3,118 +3,339 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio - Simone Caruso</title>
+<title>Simone Caruso's Portfolio </title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 <style>
 :root{
-  --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
-  --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
-  --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
-  --accent:#38BDF8;
-  --accent-2:#818CF8;
-  --accent-3:#34D399;
-  --warn:#FBBF24; --danger:#F87171;
-  --radius:6px; --radius-lg:10px;
+  /* DomaniDono palette */
+  --bg:#08090C;
+  --bg-soft:#0E1218;
+  --panel:#0E1218;
+  --panel-2:#141923;
+  --border:#1F2630;
+  --border-bright:#2D3645;
+  --grid:#13171F;
+
+  --text:#F2F4F8;
+  --text-dim:#D5DAE3;
+  --muted:#9AA3B0;
+  --dim:#5A6471;
+  --faint:#3B424F;
+
+  /* Type colours */
+  --col-work:#1c6e7d;
+  --col-work-soft:rgba(28,110,125,.13);
+  --col-startup:#2a9aad;
+  --col-startup-soft:rgba(42,154,173,.11);
+  --col-edu:#8c7a9f;
+  --col-edu-soft:rgba(140,122,159,.11);
+  --col-pub:#b09fc8;
+  --col-pub-soft:rgba(176,159,200,.09);
+  --col-proj:#4bbc8e;
+  --col-proj-soft:rgba(75,188,142,.11);
+
+  /* General accent (used for chips, labels, glows) */
+  --accent:#4bbc8e;
+  --accent-soft:rgba(75,188,142,.10);
+  --accent-line:rgba(75,188,142,.28);
+
+  --radius:8px;
+  --radius-lg:14px;
   --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+html,body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:'ss01','cv11';
+}
 body{
   background-image:
+    radial-gradient(900px 700px at 15% -100px, rgba(28,110,125,.10), transparent 70%),
+    radial-gradient(700px 600px at 85% -50px, rgba(140,122,159,.08), transparent 70%),
+    radial-gradient(500px 400px at 50% 30%, rgba(42,154,173,.04), transparent 70%),
     linear-gradient(var(--grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size:56px 56px;
-  background-position:-1px -1px;
+  background-size:auto, auto, auto, 56px 56px, 56px 56px;
+  background-position:0 0, 0 0, 0 0, -1px -1px, -1px -1px;
 }
 a{color:inherit;text-decoration:none}
-::selection{background:var(--accent);color:#000}
+::selection{background:var(--col-proj);color:#000}
 
-.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
-section{padding:80px 0;border-top:1px solid var(--border)}
-section:first-of-type{border-top:none}
-
-/* ── Topbar ── */
-.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
-.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
-.tb-logo{color:var(--text-dim);font-weight:600}
-.tb-logo span{color:var(--accent)}
-.tb-status{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted)}
-.tb-status .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
 
 /* ── Hero ── */
-.hero{padding:120px 0 80px}
-.hero-label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
-.hero h1{font-size:clamp(40px,5vw,72px);font-weight:800;line-height:1.08;letter-spacing:-.03em;color:var(--text);margin-bottom:24px}
-.hero h1 .dim{color:var(--accent)}
-.hero-desc{font-size:18px;color:var(--muted);line-height:1.65;margin-bottom:40px}
+.hero{padding:140px 0 100px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;pointer-events:none;border-radius:50%}
+.hero-glow-1{top:-320px;left:-180px;width:860px;height:860px;background:radial-gradient(circle,rgba(28,110,125,.13) 0%,transparent 65%)}
+.hero-glow-2{top:-80px;right:-160px;width:680px;height:680px;background:radial-gradient(circle,rgba(140,122,159,.10) 0%,transparent 65%)}
+.hero-glow-3{bottom:-200px;left:30%;width:500px;height:500px;background:radial-gradient(circle,rgba(75,188,142,.05) 0%,transparent 65%)}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:24px;
+  background:linear-gradient(90deg, #67e8f9 0%, #a5b4fc 60%, #c4b5fd 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  display:inline-block;
+}
+.hero h1{font-size:clamp(40px,5.6vw,76px);font-weight:800;line-height:1.05;letter-spacing:-.035em;color:var(--text);margin-bottom:20px}
+.hero h1 .sub{
+  display:block;font-weight:500;font-size:.62em;letter-spacing:-.02em;margin-top:14px;
+  background:linear-gradient(90deg, #2a9aad 0%, #6d5f8a 60%, #8c7a9f 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-desc{font-size:17px;color:var(--muted);line-height:1.7;margin:28px 0 0}
+.hero-cta{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:32px 0 36px}
+.hero-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.04em;
+  padding:9px 18px;border-radius:var(--radius);
+  border:1px solid var(--border-bright);
+  color:var(--text-dim);background:var(--panel);
+  transition:border-color .18s,color .18s,background .18s,box-shadow .18s;
+}
+.hero-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.hero-btn:hover,.hero-loc:hover{
+  color:#e2d9f3;
+  background:linear-gradient(135deg,rgba(6,182,212,.10) 0%,rgba(99,102,241,.10) 50%,rgba(124,58,237,.10) 100%);
+  border-color:rgba(167,139,250,.55);
+  box-shadow:0 0 0 1px rgba(167,139,250,.18), 0 0 22px rgba(103,232,249,.08), 0 0 14px rgba(196,181,253,.10);
+}
+.hero-loc{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.04em;
+  padding:9px 18px;border-radius:var(--radius);
+  border:1px solid var(--border-bright);
+  color:var(--text-dim);background:var(--panel);
+  cursor:default;
+  transition:border-color .18s,color .18s,background .18s,box-shadow .18s;
+}
 .hero-tags{display:flex;flex-wrap:wrap;gap:8px}
-.tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:var(--radius);border:1px solid var(--border-bright);color:var(--accent);background:var(--panel)}
+.tag{font-family:var(--mono);font-size:11px;padding:5px 11px;border-radius:999px;border:1px solid var(--border-bright);color:var(--text-dim);background:var(--panel)}
+.tag.c1{background:rgba(6,182,212,.15);border-color:rgba(6,182,212,.55);color:#67e8f9;box-shadow:0 0 12px rgba(6,182,212,.20),inset 0 0 12px rgba(6,182,212,.06)}
+.tag.c2{background:rgba(56,143,230,.15);border-color:rgba(56,143,230,.55);color:#93c5fd;box-shadow:0 0 12px rgba(56,143,230,.20),inset 0 0 12px rgba(56,143,230,.06)}
+.tag.c3{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.55);color:#a5b4fc;box-shadow:0 0 12px rgba(99,102,241,.20),inset 0 0 12px rgba(99,102,241,.06)}
+.tag.c4{background:rgba(113,68,244,.15);border-color:rgba(113,68,244,.55);color:#b8a8fc;box-shadow:0 0 12px rgba(113,68,244,.20),inset 0 0 12px rgba(113,68,244,.06)}
+.tag.c5{background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.55);color:#c4b5fd;box-shadow:0 0 12px rgba(124,58,237,.20),inset 0 0 12px rgba(124,58,237,.06)}
 
 /* ── Section header ── */
-.sec-header{display:flex;align-items:baseline;gap:16px;margin-bottom:48px}
-.sec-label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-2)}
-.sec-title{font-size:clamp(22px,3vw,32px);font-weight:700;letter-spacing:-.02em}
-.sec-count{font-family:var(--mono);font-size:13px;color:var(--dim)}
+section{padding:64px 0 96px;border-top:1px solid var(--border)}
+.sec-header{display:flex;align-items:baseline;gap:18px;margin-bottom:18px;flex-wrap:wrap}
+.sec-label{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.sec-title{font-size:clamp(24px,3vw,34px);font-weight:700;letter-spacing:-.02em}
+.sec-count{font-family:var(--mono);font-size:12px;color:var(--dim);margin-left:auto}
+.sec-sub{font-size:14px;color:var(--muted);margin-bottom:48px;max-width:680px}
 
-/* ── Project grid ── */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1px;background:var(--border)}
-.grid-4{grid-template-columns:repeat(4,1fr)}
-.grid-2{grid-template-columns:repeat(2,1fr)}
-.card{background:var(--bg);padding:32px;display:flex;flex-direction:column;gap:16px;transition:background .15s}
-.card:hover{background:var(--panel)}
-.card-meta{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;color:var(--dim)}
-.card-meta .cat{color:var(--accent-2);font-weight:600}
-.card-title{font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--text-dim);transition:color .15s}
-.card:hover .card-title{color:var(--text)}
-.card-desc{font-size:14px;color:var(--muted);line-height:1.6;flex:1}
-.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
-.card-chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--panel-2);color:var(--muted);border:1px solid var(--border)}
-.card-arrow{color:var(--dim);font-size:18px;transition:color .15s,transform .15s}
-.card:hover .card-arrow{color:var(--accent);transform:translateX(3px)}
+/* ── Chip ── */
+.chip{
+  font-family:var(--mono);font-size:10px;
+  padding:3px 9px;border-radius:999px;
+  border:1px solid var(--border-bright);
+  color:var(--text-dim);background:transparent;
+  letter-spacing:.02em;
+}
+.chip.accent{
+  color:rgba(var(--chip-rgb, 75,188,142),1);
+  border-color:rgba(var(--chip-rgb, 75,188,142),.35);
+  background:rgba(var(--chip-rgb, 75,188,142),.12);
+}
+
+/* ── Gantt Timeline ── */
+.tl-grid{
+  display:grid;
+  grid-template-columns:1fr 80px 1fr;
+  position:relative;
+}
+.tl-lane{position:relative;}
+.tl-axis-col{position:relative;}
+
+.tl-rail{
+  position:absolute;
+  left:50%;top:0;bottom:0;
+  width:1px;
+  background:linear-gradient(180deg,
+    transparent 0,
+    var(--border-bright) 50px,
+    var(--border-bright) calc(100% - 50px),
+    transparent 100%);
+  transform:translateX(-.5px);
+  z-index:0;
+}
+
+.tl-year-marker{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:2;
+  display:flex;
+  justify-content:center;
+}
+.tl-year-pill{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  padding:5px 12px;border-radius:999px;
+  background:var(--bg);
+  box-shadow:0 0 0 3px var(--bg);
+  white-space:nowrap;
+}
+.tl-year-pill.now{
+  color:var(--text-dim);border:1px solid var(--border-bright);
+  box-shadow:0 0 0 3px var(--bg), 0 0 12px rgba(242,244,248,.06);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.tl-year-pill.now::before{content:none;}
+.tl-year-pill.yr{
+  color:var(--muted);border:1px solid var(--border);
+}
+
+/* Gantt card */
+.tl-card{
+  position:absolute;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+  background:linear-gradient(180deg, var(--panel) 0%, var(--bg) 100%);
+  overflow:hidden;
+  padding:7px 8px 6px;
+  transition:border-color .18s, box-shadow .18s, transform .18s;
+  cursor:default;
+}
+.tl-card:hover{
+  border-color:var(--hover-border, var(--border-bright));
+  box-shadow:0 10px 56px rgba(0,0,0,.8), 0 0 40px var(--hover-glow, rgba(255,255,255,.04));
+  transform:translateY(-3px);
+  z-index:20 !important;
+  height:auto !important;
+  overflow:visible;
+}
+.tl-lane.right .tl-card:hover{
+  width:calc(var(--card-w, 120px) * 1.75) !important;
+}
+.tl-card:hover .tc-desc{
+  display:-webkit-box;
+  -webkit-line-clamp:unset;
+  -webkit-box-orient:vertical;
+}
+.tl-card:hover .tc-chips{ display:flex; }
+.tl-card:hover .tc-arrow{ opacity:1; }
+
+/* fade siblings in same lane on hover */
+.tl-lane:has(.tl-card:hover) .tl-card:not(:hover){
+  opacity:0.22;
+  transition:opacity .22s;
+}
+a.tl-card{cursor:pointer;}
+
+/* right lane: left border = type colour */
+.tl-lane.right .tl-card.work    {border-left:2px solid var(--col-work);}
+.tl-lane.right .tl-card.startup {border-left:2px solid var(--col-startup);}
+.tl-lane.right .tl-card.edu     {border-left:2px solid var(--col-edu);}
+.tl-lane.right .tl-card.pub     {border-left:2px solid var(--col-pub);}
+.tl-lane.right .tl-card.proj    {border-left:2px solid var(--col-proj);}
+
+/* left lane: right border = type colour */
+.tl-lane.left .tl-card.work    {border-right:2px solid var(--col-work);}
+.tl-lane.left .tl-card.startup {border-right:2px solid var(--col-startup);}
+.tl-lane.left .tl-card.edu     {border-right:2px solid var(--col-edu);}
+.tl-lane.left .tl-card.pub     {border-right:2px solid var(--col-pub);}
+.tl-lane.left .tl-card.proj    {border-right:2px solid var(--col-proj);}
+
+/* Type-tinted card backgrounds */
+.tl-card.work    {background:linear-gradient(160deg, var(--col-work-soft) 0%, var(--panel) 50%, var(--bg) 100%);}
+.tl-card.startup {background:linear-gradient(160deg, var(--col-startup-soft) 0%, var(--panel) 50%, var(--bg) 100%);}
+.tl-card.edu     {background:linear-gradient(160deg, var(--col-edu-soft) 0%, var(--panel) 50%, var(--bg) 100%);}
+.tl-card.pub     {background:linear-gradient(160deg, var(--col-pub-soft) 0%, var(--panel) 50%, var(--bg) 100%);}
+.tl-card.proj    {background:linear-gradient(160deg, var(--col-proj-soft) 0%, var(--panel) 50%, var(--bg) 100%);}
+
+.tl-card .tc-type{
+  font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim);margin-bottom:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+/* Per-type label colour */
+.tl-card.work    .tc-type {color:var(--col-work);}
+.tl-card.startup .tc-type {color:var(--col-startup);}
+.tl-card.edu     .tc-type {color:var(--col-edu);}
+.tl-card.pub     .tc-type {color:var(--col-pub);}
+.tl-card.proj    .tc-type {color:var(--col-proj);}
+
+.tl-card .tc-title{
+  font-size:11.5px;font-weight:700;letter-spacing:-.01em;color:var(--text);
+  line-height:1.3;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+}
+.tl-card .tc-org{
+  font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.tl-card .tc-desc{
+  font-size:11px;color:var(--text-dim);line-height:1.5;margin-top:5px;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+}
+.tl-card .tc-chips{
+  display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;
+}
+.tl-card .tc-arrow{
+  display:block;margin-top:5px;
+  font-size:10px;color:var(--col-proj);
+  font-family:var(--mono);opacity:0;
+  transition:opacity .15s;
+}
+a.tl-card:hover .tc-arrow{opacity:1;}
 
 /* ── Footer ── */
-.footer{padding:40px 0;border-top:1px solid var(--border)}
-.footer-inner{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.footer{padding:48px 0;border-top:1px solid var(--border);background:var(--bg-soft)}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted);gap:16px;flex-wrap:wrap}
+.footer-inner a{color:var(--col-proj)}
 .footer-inner a:hover{color:var(--text)}
 
-/* ── Section 2 accent override ── */
-.sec-fullstack{--accent:#F97316;--accent-2:#FB923C}
-.sec-fullstack .sec-label{color:var(--accent)}
-.sec-fullstack .card-meta .cat{color:var(--accent-2)}
-.sec-fullstack .card:hover .card-arrow{color:var(--accent)}
-
-@media(max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){
-  .wrap{padding:0 16px}
-  .hero{padding:72px 0 48px}
-  .grid,.grid-4{grid-template-columns:1fr}
-  .footer-inner{flex-direction:column;gap:12px;text-align:center}
+/* ── Mobile ── */
+@media(max-width:860px){
+  .wrap{padding:0 20px}
+  .hero{padding:80px 0 56px}
+  .tl-grid{grid-template-columns:36px 1fr}
+  .tl-lane.left{display:none}
+  .tl-rail{left:18px;transform:none}
+  .footer-inner{flex-direction:column;text-align:center}
 }
 </style>
 </head>
 <body>
 
-<nav class="topbar">
-  <div class="topbar-inner wrap">
-    <span class="tb-logo">Simone Caruso</span>
-    </div>
-  </div>
-</nav>
-
 <section class="hero">
+  <div class="hero-glow hero-glow-1"></div>
+  <div class="hero-glow hero-glow-2"></div>
+  <div class="hero-glow hero-glow-3"></div>
   <div class="wrap">
-    <div class="hero-label">Portfolio Showcase</div>
-    <h1>Simone Caruso<br><span class="dim">Data, Analytics & AI Specialist</span></h1>
-    <p class="hero-desc">Projects spanning through Data Engineering, Data Visualization, Machine Learning and AI, up to full stack web development. Built with real data, shipped to production</p>
+    <div class="hero-eyebrow">Portfolio</div>
+    <h1>Simone Caruso<span class="sub">Data, Analytics &amp; AI Specialist</span></h1>
+    <p class="hero-desc">A chronological view of my journey, in terms of experience, education, projects and products. Each step connects to the data value chain it powered, from ingestion to AI. Everything is simplified for clarity of display purposes</p>
+    <div class="hero-cta">
+      <a class="hero-btn gh" href="https://github.com/simonecaruso-d" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+      <a class="hero-btn li" href="https://www.linkedin.com/in/simone-caruso1997/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+      <a class="hero-btn em" href="mailto:simocaruso1997@libero.it">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+      <div class="hero-loc">
+        🌍 Rome, Italy
+      </div>
+    </div>
     <div class="hero-tags">
-      <span class="tag">Power BI · DAX · M</span>
-      <span class="tag">SQL · NoSQL</span>
-      <span class="tag">Python</span>
-      <span class="tag">ML · GenAI</span>
+      <span class="tag c1">Data Engineering</span>
+      <span class="tag c2">Data Visualization</span>
+      <span class="tag c3">BI &amp; Analytics</span>
+      <span class="tag c4">Machine Learning</span>
+      <span class="tag c5">Generative AI</span>
     </div>
   </div>
 </section>
@@ -122,95 +343,344 @@ section:first-of-type{border-top:none}
 <section>
   <div class="wrap">
     <div class="sec-header">
-      <span class="sec-label">01</span>
-      <span class="sec-title">Data Visualisation</span>
-      <span class="sec-count">4 projects</span>
+      <span class="sec-label">Timeline</span>
     </div>
-    <div class="grid grid-4">
 
-      <a class="card" href="DataVisualization/portfolio/ClientsSegmentation.html">
-        <div class="card-meta"><span class="cat">Power BI</span><span>·</span><span>Analytics</span></div>
-        <div class="card-title">Clients Segmentation</div>
-        <div class="card-desc">Customer segmentation by country, rating, usage behaviour, and purchase patterns. RFM-style breakdown with dynamic slicer drill-through.</div>
-        <div class="card-footer">
-          <div class="card-chips"><span class="chip">Big Data</span><span class="chip">Azure Analytics Service</span></div>
-          <span class="card-arrow">→</span>
-        </div>
-      </a>
-
-      <a class="card" href="DataVisualization/portfolio/BookingAnalytics.html">
-        <div class="card-meta"><span class="cat">Power BI</span><span>·</span><span>Operations</span></div>
-        <div class="card-title">Booking Analytics</div>
-        <div class="card-desc">Reservation trends, occupancy rates, and space utilization for a coworking space. Time-intelligence comparisons and anomaly flagging.</div>
-        <div class="card-footer">
-          <div class="card-chips"><span class="chip">PostgreSQL</span><span class="chip">Row-level Security</span></div>
-          <span class="card-arrow">→</span>
-        </div>
-      </a>
-
-      <a class="card" href="DataVisualization/portfolio/PeopleAnalytics.html">
-        <div class="card-meta"><span class="cat">Power BI</span><span>·</span><span>HR</span></div>
-        <div class="card-title">People Analytics</div>
-        <div class="card-desc">Workforce composition, headcount evolution, and role distribution. Supports HR planning and organisational design decisions.</div>
-        <div class="card-footer">
-          <div class="card-chips"><span class="chip">Process Automation</span><span class="chip">Compliance Auditable</span></div>
-          <span class="card-arrow">→</span>
-        </div>
-      </a>
-
-      <a class="card" href="DataVisualization/portfolio/AnalyticsByRoleAndFocus.html">
-        <div class="card-meta"><span class="cat">Power BI</span><span>·</span><span>Usage</span></div>
-        <div class="card-title">Analytics by Role & Focus</div>
-        <div class="card-desc">Projects and company performance analytics by role and focus area. Supports operations and strategy.</div>
-        <div class="card-footer">
-          <div class="card-chips"><span class="chip">UX First-Approach</span><span class="chip">Data-Driven Design</span></div>
-          <span class="card-arrow">→</span>
-        </div>
-      </a>
-
-    </div>
-  </div>
-</section>
-
-<section class="sec-fullstack">
-  <div class="wrap">
-    <div class="sec-header">
-      <span class="sec-label">02</span>
-      <span class="sec-title">Full-Stack</span>
-      <span class="sec-count">2 projects</span>
-    </div>
-    <div class="grid grid-2">
-
-      <a class="card" href="FullStack/DomaniDono.html">
-        <div class="card-meta"><span class="cat">Web App</span><span>·</span><span>Civic</span></div>
-        <div class="card-title">Domani Dono</div>
-        <div class="card-desc">Civic platform connecting donors with local initiatives. Event-driven donation flows, user matching, and impact tracking.</div>
-        <div class="card-footer">
-          <div class="card-chips"><span class="chip">Process Automation</span><span class="chip">Data Awareness</span></div>
-          <span class="card-arrow">→</span>
-        </div>
-      </a>
-
-      <a class="card" href="FullStack/DomaniPiove.html">
-        <div class="card-meta"><span class="cat">Web App</span><span>·</span><span>Utility</span></div>
-        <div class="card-title">Domani Piove</div>
-        <div class="card-desc">Hyperlocal weather forecast interface with daily planner integration. Fast lookup, clean data display, zero friction.</div>
-        <div class="card-footer">
-          <div class="card-chips"><span class="chip">API & Data Engineering</span><span class="chip">Data Automation</span></div>
-          <span class="card-arrow">→</span>
-        </div>
-      </a>
-
+    <div class="tl-grid" id="tl-grid">
+      <div class="tl-lane left" id="tl-left"></div>
+      <div class="tl-axis-col" id="tl-axis">
+        <div class="tl-rail"></div>
+      </div>
+      <div class="tl-lane right" id="tl-right"></div>
     </div>
   </div>
 </section>
 
 <footer class="footer">
   <div class="wrap footer-inner">
-    <span>Simone Caruso · simocaruso1997@libero.it</span>
     <span>© 2026 · Built with HTML · Hosted on GitHub Pages</span>
   </div>
 </footer>
 
+<script>
+(function () {
+  /* ── Time scale ────────────────────────────────────────────────── */
+  const TL_END_Y = 2026, TL_END_M = 7;  // Jul 2026
+  const PX_PER_MONTH = 12;
+  const TOP_PAD  = 100;  // generous space above first items for the "Last Update" pill
+  const BOT_PAD  = 60;
+  const NOW_PILL_TOP = 16; // fixed CSS top for the "Last Update" pill (pixels from container top)
+
+  function top(year, month) {
+    const monthsFromEnd = (TL_END_Y - year) * 12 + (TL_END_M - month);
+    return TOP_PAD + Math.round(monthsFromEnd * PX_PER_MONTH);
+  }
+
+  // Total height: Sep 2011 → Jul 2026 = 178 months
+  const TOTAL_H = TOP_PAD + 178 * PX_PER_MONTH + BOT_PAD;
+
+  /* ── Item definitions ──────────────────────────────────────────── */
+  const LEFT_ITEMS = [
+    {
+      type:'work', title:'Data & Analytics Specialist', org:'Zoetis · Rome, Italy',
+      desc:'BI & AI modernization across Southern Europe. Power BI migration, Azure Data Platform rollout, GenAI & ML SME',
+      s:[2025,9], e:[2026,5],
+    },
+    {
+      type:'startup', title:'Data Lead', org:'Pie · Fintech · Rome, Italy',
+      desc:'Zero to market: technical foundation, proprietary analysis algorithms, data core for the first scalable financial product',
+      s:[2025,9], e:[2026,5],
+    },
+    {
+      type:'work', title:'Advanced ML Instructor', org:'ProfessionAI · Rome, Italy',
+      desc:'Scalable algorithms, production-ready ML. Hands-on sessions, industry use cases, state-of-the-art methodologies',
+      s:[2025,3], e:[2025,8],
+    },
+    {
+      type:'edu', title:'Post Graduate Degree - Data Intelligence & Decisional Strategies', org:'University of Rome "La Sapienza"',
+      desc:'Advanced analytics, decision science, applied AI in business contexts. 110/110 Summa cum Laude',
+      s:[2024,2], e:[2025,2],
+    },
+    {
+      type:'work', title:'Data & Analytics Specialist', org:'eFM · Rome, Italy',
+      desc:'Primary Data Advisor for C-Level. Led BI, ML and GenAI team and initiatives end-to-end. Standardised reporting frameworks, cross-system integrations and more',
+      s:[2021,11], e:[2025,8],
+    },
+    {
+      type:'pub', title:'AI to counteract KPI overloading in business process monitoring', org:'Business Process Management Journal',
+      desc:'Scientific paper on AI-driven monitoring reducing KPI overload in compliance-sensitive contexts',
+      s:[2023,5], e:[2023,5], narrow:true, minH:90,
+    },
+    {
+      type:'work', title:'Management Controller', org:'UPMC · Palermo, Italy',
+      desc:'SQL database + live Power BI + Python ML for anomaly detection on corruption KPIs. 60% monitoring effort reduction',
+      s:[2021,5], e:[2021,10], minH:72,
+    },
+    {
+      type:'edu', title:"Master's Degree - Management Engineering", org:'University of Palermo',
+      desc:'110/110 Summa cum Laude',
+      s:[2019,10], e:[2021,10],
+    },
+    {
+      type:'edu', title:"Bachelor's Degree - Piano Performance", org:'Conservatory of Palermo',
+      desc:'110/110 Summa cum Laude',
+      s:[2016,10], e:[2022,7],
+    },
+    {
+      type:'work', title:'Management Control Intern', org:'BIC · Berlin, Germany',
+      desc:'Financial statement analysis, billing and administrative workflows, digital engagement tracking',
+      s:[2019,7], e:[2019,9], minH:72,
+    },
+    {
+      type:'edu', title:"Bachelor's Degree - Management Engineering", org:'University of Palermo',
+      desc:'108/110',
+      s:[2016,10], e:[2019,10],
+    },
+    {
+      type:'edu', title:'High School Diploma - Classical Studies', org:'Liceo Classico "G. Garibaldi" · Palermo',
+      desc:'100/100',
+      s:[2011,9], e:[2016,7],
+    },
+  ];
+
+  const RIGHT_ITEMS = [
+    {
+      type:'proj', label:'AI / ML', color:'#F97316',
+      title:'WLDM Research', org:"Behavioural ML - Gambling operator's research",
+      desc:'Player-behaviour modeling: feature engineering, clustering, risk-scoring with explainability',
+      chips:['ML','Clustering','XAI'], href:'AI & ML/WLDM.html',
+      s:[2026,5], e:[2026,5],
+    },
+    {
+      type:'proj', label:'Full Stack', color:'#1c6e7d',
+      title:'Domani Dono', org:'Civic platform matching donors with no-profit initiatives',
+      desc:'Event-driven donation flows, user matching, impact tracking. Process automation with data awareness',
+      chips:['Full-Stack','APIs','Civic Tech'], href:'FullStack/DomaniDono.html',
+      s:[2026,4], e:[2026,4],
+    },
+    {
+      type:'proj', label:'Full Stack', color:'#6BA37A',
+      title:'Domani Piove', org:'Hyperlocal weather forecast with daily planner integration',
+      desc:'Fast lookup, clean data display, zero friction. API-driven backend with automated refresh',
+      chips:['Web','APIs','Automation'], href:'FullStack/DomaniPiove.html',
+      s:[2026,3], e:[2026,3],
+    },
+    {
+      type:'proj', label:'Data Visualization', color:'#38BDF8',
+      title:'Clients Segmentation', org:'RFM segmentation on Azure Analytics Services',
+      desc:'Segmentation by country, rating, usage. Dynamic slicer drill-through on big-data backend',
+      chips:['Azure','RFM','Big Data'], href:'DataVisualization/ClientsSegmentation.html',
+      s:[2026,1], e:[2026,1],
+    },
+    {
+      type:'proj', label:'Data Engineering', color:'#10B981',
+      title:'Wholesaler Upload Demo', org:'Guided file-upload pipeline with validation',
+      desc:'User-facing ingestion flow with schema validation, error surfacing, reconciliation against master catalogue',
+      chips:['Python','Validation','UX'], href:'DataEngineering/WholesalerUploadDemo.html',
+      s:[2026,2], e:[2026,2],
+    },
+    {
+      type:'proj', label:'AI / ML', color:'#6366F1',
+      title:'Newsie', org:'News aggregation & summarisation pipeline',
+      desc:'Heterogeneous source ingestion, deduplication, LLM summarisation, topic clustering, personalised digests',
+      chips:['LLM','NLP','Pipelines'], href:'AI & ML/Newsie.html',
+      s:[2025,7], e:[2025,7],
+    },
+    {
+      type:'proj', label:'AI / ML', color:'#6366F1',
+      title:'Assie', org:'Custom GenAI assistant for guided workflows',
+      desc:'Retrieval + tool-use orchestration with lightweight UX and deterministic guardrails',
+      chips:['LLM','RAG','Tool use'], href:'AI & ML/Assie.html',
+      s:[2025,5], e:[2025,5],
+    },
+    {
+      type:'proj', label:'AI / ML', color:'#F97316',
+      title:'Cashflow Predictions', org:'Forecasting on cashflow streams',
+      desc:'Feature engineering on ingestion pipelines, training and serving for in-product surfaces',
+      chips:['Python','Time series','Forecasting'], href:'AI & ML/CashflowPredictions.html',
+      s:[2025,2], e:[2025,2],
+    },
+    {
+      type:'proj', label:'Data Visualization', color:'#38BDF8',
+      title:'Analytics by Role & Focus', org:'Project & company performance segmentation',
+      desc:'UX-first dashboard supporting operations and strategy, with drill-through across role and focus dimensions',
+      chips:['Power BI','DAX','UX Design'], href:'DataVisualization/AnalyticsByRoleAndFocus.html',
+      s:[2024,10], e:[2024,10], medW:true,
+    },
+    {
+      type:'proj', label:'Data Visualization', color:'#38BDF8',
+      title:'Booking Analytics', org:'Reservation trends & occupancy in coworking spaces',
+      desc:'Time-intelligence comparisons and anomaly flagging on PostgreSQL with row-level security',
+      chips:['Power BI','PostgreSQL','RLS'], href:'DataVisualization/BookingAnalytics.html',
+      s:[2024,5], e:[2024,5], medW:true,
+    },
+    {
+      type:'proj', label:'Data Visualization', color:'#38BDF8',
+      title:'People Analytics', org:'Workforce analytics for HR planning and organisational design',
+      desc:'Supports HR planning and organisational design. Embedded ML scoring, automated refreshes, compliance-auditable',
+      chips:['Power BI','ML','Automation'], href:'DataVisualization/PeopleAnalytics.html',
+      s:[2023,10], e:[2023,10], medW:true,
+    },
+    {
+      type:'proj', label:'Data Engineering', color:'#10B981',
+      title:'HubSpot Deals Data Retrieval', org:'Automated ingestion of deals data from HubSpot APIs',
+      desc:'Resilient ETL with pagination, rate-limit handling, incremental loads into the analytics warehouse',
+      chips:['Python','ETL','REST API'], href:'DataEngineering/HubSpotDealsDataRetrieval.html',
+      s:[2022,12], e:[2022,12], wide:true,
+    },
+    {
+      type:'proj', label:'Data Engineering', color:'#10B981',
+      title:'HubSpot Generic Data Retrieval', org:'Reusable, schema-agnostic HubSpot connector',
+      desc:'Covers custom objects and properties; configuration-driven, low-maintenance',
+      chips:['Python','Framework','Config-driven'], href:'DataEngineering/HubSpotGenericDataRetrieval.html',
+      s:[2022,5], e:[2022,5], wide:true,
+    },
+  ];
+
+  /* ── Render constants (needed by collision math) ───────────────── */
+  const MIN_H      = 38;
+  const MIN_H_PROJ = 50;   // taller minimum for right-side project cards
+  const MIN_COLS_PROJ = 3; // always at least 3 columns on right so cards stay narrow
+  const LANE_G = 6;
+
+  /* ── Column assignment ─────────────────────────────────────────── */
+  function computePositions(items) {
+    for (const it of items) {
+      it.topY = top(it.e[0], it.e[1]);
+      it.botY = top(it.s[0], it.s[1]);
+      // use rendered height for collision so single-point cards don't phantom-stack
+      it.effBotY = Math.max(it.topY + MIN_H + LANE_G, it.botY);
+    }
+    items.sort((a, b) => a.topY - b.topY);
+
+    const colBots = [];
+    for (const it of items) {
+      let placed = false;
+      for (let c = 0; c < colBots.length; c++) {
+        if (it.topY >= colBots[c]) {
+          it.col = c; colBots[c] = it.effBotY; placed = true; break;
+        }
+      }
+      if (!placed) { it.col = colBots.length; colBots.push(it.effBotY); }
+    }
+
+    for (const it of items) {
+      let maxConc = 1;
+      const steps = 16;
+      for (let s = 0; s <= steps; s++) {
+        const sy = it.topY + (it.botY - it.topY) * (s / steps);
+        let c = 0;
+        for (const o of items) { if (o.topY <= sy && o.botY > sy) c++; }
+        if (c > maxConc) maxConc = c;
+      }
+      it.colCount = maxConc;
+    }
+  }
+
+  computePositions(LEFT_ITEMS);
+  computePositions(RIGHT_ITEMS);
+
+  /* ── Render ────────────────────────────────────────────────────── */
+  const LABELS = {
+    work:'Work', startup:'Startup', edu:'Education', pub:'Publication', proj:'Project'
+  };
+
+  const TYPE_RGB = {
+    work:'28,110,125', startup:'42,154,173', edu:'140,122,159',
+    pub:'176,159,200', proj:'75,188,142'
+  };
+
+  function hexToRgb(hex) {
+    const h = hex.replace('#','');
+    return `${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)}`;
+  }
+
+  function buildCard(it, laneW, side) {
+    const minH = it.minH || (side === 'right' ? MIN_H_PROJ : MIN_H);
+    const h    = Math.max(minH, it.botY - it.topY);
+    const minCols = (side === 'right' && !it.wide && !it.medW) ? MIN_COLS_PROJ : it.medW ? 2 : it.narrow ? 2 : 1;
+    const cc   = Math.max(it.colCount || 1, minCols);
+    const colW = Math.floor((laneW - LANE_G * (cc + 1)) / cc);
+    const off  = LANE_G + it.col * (colW + LANE_G);
+
+    const el = document.createElement(it.href ? 'a' : 'div');
+    el.className = 'tl-card ' + it.type;
+    if (it.href) el.href = it.href;
+
+    const rgb = it.color ? hexToRgb(it.color) : (TYPE_RGB[it.type] || '90,100,113');
+
+    const pos = side === 'right' ? `left:${off}px` : `right:${off}px`;
+    const borderOverride = it.color ? (side === 'right' ? `;border-left-color:${it.color}` : `;border-right-color:${it.color}`) : '';
+    const bgOverride = it.color ? `;background:linear-gradient(160deg,${it.color}22 0%,var(--panel) 55%,var(--bg) 100%)` : '';
+    const zIdx = it.col + 1 + (it.zBoost || 0);
+    el.style.cssText = `top:${it.topY}px;${pos};width:${colW}px;height:${h}px;z-index:${zIdx}${borderOverride}${bgOverride}`;
+    el.style.setProperty('--hover-border', `rgba(${rgb},.65)`);
+    el.style.setProperty('--hover-glow',   `rgba(${rgb},.30)`);
+    el.style.setProperty('--chip-rgb',     rgb);
+    el.style.setProperty('--card-w',       `${colW}px`);
+
+    const typeLabel = it.label || LABELS[it.type] || it.type;
+    const typeStyle = it.color ? ` style="color:${it.color}"` : '';
+    let html = `<div class="tc-type"${typeStyle}>${typeLabel}</div>`;
+    html += `<div class="tc-title">${it.title}</div>`;
+    if (it.org)  html += `<div class="tc-org">${it.org}</div>`;
+    if (it.desc) html += `<div class="tc-desc">${it.desc}</div>`;
+    if (it.chips && it.chips.length) {
+      html += `<div class="tc-chips">${it.chips.map((c,i)=>`<span class="chip${i===0?' accent':''}">${c}</span>`).join('')}</div>`;
+    }
+
+    el.innerHTML = html;
+    return el;
+  }
+
+  function renderAxis(axisEl) {
+    // "Last Update" pill — fixed distance from top, not time-mapped
+    const nowEl = document.createElement('div');
+    nowEl.className = 'tl-year-marker';
+    nowEl.style.top = NOW_PILL_TOP + 'px';
+    nowEl.innerHTML = '<span class="tl-year-pill now">Last Update · May 2026</span>';
+    axisEl.appendChild(nowEl);
+
+    for (const yr of [2026, 2025, 2024, 2023, 2022, 2021, 2019, 2016, 2014, 2011]) {
+      const el = document.createElement('div');
+      el.className = 'tl-year-marker';
+      el.style.top = top(yr, 1) + 'px';
+      el.innerHTML = `<span class="tl-year-pill yr">${yr}</span>`;
+      axisEl.appendChild(el);
+    }
+  }
+
+  function render() {
+    const leftEl  = document.getElementById('tl-left');
+    const rightEl = document.getElementById('tl-right');
+    const axisEl  = document.getElementById('tl-axis');
+    const grid    = document.getElementById('tl-grid');
+    if (!leftEl || !rightEl || !axisEl) return;
+
+    leftEl.style.height  = TOTAL_H + 'px';
+    rightEl.style.height = TOTAL_H + 'px';
+    axisEl.style.height  = TOTAL_H + 'px';
+
+    renderAxis(axisEl);
+
+    function renderLanes() {
+      leftEl.innerHTML = rightEl.innerHTML = '';
+      const lW = leftEl.getBoundingClientRect().width;
+      const rW = rightEl.getBoundingClientRect().width;
+      for (const it of LEFT_ITEMS)  leftEl.appendChild(buildCard(it, lW, 'left'));
+      for (const it of RIGHT_ITEMS) rightEl.appendChild(buildCard(it, rW, 'right'));
+    }
+
+    renderLanes();
+    new ResizeObserver(renderLanes).observe(grid);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', render);
+  } else {
+    render();
+  }
+})();
+</script>
 </body>
 </html>

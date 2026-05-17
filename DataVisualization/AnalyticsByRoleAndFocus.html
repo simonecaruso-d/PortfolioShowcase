@@ -12,8 +12,8 @@
   --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
   --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
   --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
-  --accent:#38BDF8; --accent-2:#818CF8; --accent-3:#34D399;
-  --warn:#FBBF24; --danger:#F87171;
+  --accent:#38BDF8; --accent-2:#C084FC; --accent-3:#A3E635;
+  --warn:#F59E0B; --danger:#F97316;
   --radius:6px; --radius-lg:10px;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --sans:'Inter Tight',ui-sans-serif,system-ui,sans-serif;
@@ -27,44 +27,63 @@ a{color:inherit;text-decoration:none}
 .wide{max-width:1440px;margin:0 auto;padding:0 32px}
 section{padding:96px 0;border-top:1px solid var(--border)}
 section:first-of-type{border-top:none}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
-.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:0.02em}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
 .tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
 .tb-back:hover{color:var(--text)}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tb-path{color:var(--text-dim)}
 .tb-path .slash{color:var(--dim);margin:0 8px}
 .tb-path .here{color:var(--accent)}
-.tb-status{margin-left:auto;display:flex;align-items:center;gap:16px;color:var(--muted)}
-.tb-status .dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3)}
-.tb-status .nav{display:flex;gap:18px}
-.tb-status .nav a{color:var(--muted);transition:color .15s}
-.tb-status .nav a:hover{color:var(--text)}
-.hero{padding:128px 0 96px;position:relative}
-.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:32px;display:flex;align-items:center;gap:12px}
-.hero h1{font-size:clamp(44px,7vw,90px);line-height:0.98;letter-spacing:-0.04em;font-weight:700;margin-bottom:32px}
-.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:500;white-space:nowrap}
-.hero .lede{font-size:20px;line-height:1.5;color:var(--text-dim);max-width:100%;margin-bottom:48px;font-weight:400}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:20px;color:var(--muted)}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-3);box-shadow:0 0 8px var(--accent-3);animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--accent-3)}50%{opacity:.5;box-shadow:0 0 4px var(--accent-3)}}
+.tb-nav{display:flex;gap:20px}
+.tb-nav a{color:var(--muted);transition:color .15s}
+.tb-nav a:hover{color:var(--text)}
+.hero{padding:136px 0 96px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(56,189,248,.06) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(192,132,252,.04) 0%,transparent 65%);pointer-events:none}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
+.hero .meta .line{width:48px;height:1px;background:var(--accent);opacity:.6}
+.hero h1{font-size:clamp(52px,8vw,100px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:600;white-space:nowrap}
+.hero .lede{font-size:21px;line-height:1.5;color:var(--text-dim);max-width:90ch;margin-bottom:20px;font-weight:400}
+.hero .sublede{font-size:16px;color:var(--muted);max-width:110ch;margin-bottom:48px;line-height:1.6}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);transition:background .15s,transform .1s}
+.btn-primary:hover{background:#60CCFA;transform:translateY(-1px)}
+.btn-primary svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{font-family:var(--mono);font-size:12px;color:var(--accent);padding:6px 14px;border:1px solid rgba(56,189,248,0.25);border-radius:999px;background:rgba(56,189,248,0.08);display:inline-flex;align-items:center;transition:background .18s,border-color .18s}
-.chip:hover{background:rgba(56,189,248,0.18);border-color:rgba(56,189,248,0.5)}
+.chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
+.chip.accent{color:var(--accent);border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.07)}
+.chip.purple{color:var(--accent-2);border-color:rgba(192,132,252,.25);background:rgba(192,132,252,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(163,230,53,.25);background:rgba(163,230,53,.07)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
 .stat{padding:40px 32px;border-right:1px solid var(--border);position:relative}
 .stat:last-child{border-right:none}
 .stat .label{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
 .stat .label .tag{color:var(--dim)}
-.stat .num{font-size:64px;line-height:1;letter-spacing:-0.04em;font-weight:600;font-feature-settings:'tnum'}
-.stat .num .unit{font-size:24px;color:var(--muted);margin-left:6px;font-weight:500;letter-spacing:0.06em}
-.stat .sub{margin-top:12px;font-size:13px;color:var(--text-dim)}
+.stat .num{font-size:52px;line-height:1;letter-spacing:-.04em;font-weight:700;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:20px;color:var(--muted);margin-left:4px;font-weight:500;letter-spacing:.06em}
+.stat .sub{margin-top:10px;font-size:12px;color:var(--text-dim)}
+.stat .num.cyan{color:var(--accent)}
+.stat .num.purple{color:var(--accent-2)}
+.stat .num.green{color:var(--accent-3)}
+.stat .num.warn{color:var(--warn)}
 .sh{margin-bottom:56px;display:grid;grid-template-columns:200px 1fr;gap:48px;align-items:start}
 .sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.12em}
 .sh-no span{color:var(--accent)}
-.sh-title h2{font-size:48px;line-height:1.05;letter-spacing:-0.03em;font-weight:600;margin-bottom:16px;max-width:18ch}
-.sh-title p{font-size:17px;color:var(--text-dim);max-width:60ch}
+.sh-title h2{font-size:clamp(36px,4vw,56px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin-bottom:18px}
+.sh-title p{font-size:17px;color:var(--text-dim);max-width:72ch;line-height:1.6}
 @media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}.sh-title h2{font-size:36px}}
 .problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 .problem-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
-.problem-col.before{background:rgba(248,113,113,.06);border-color:rgba(248,113,113,.35)}
-.problem-col.after{background:rgba(52,211,153,.06);border-color:rgba(52,211,153,.35)}
+.problem-col.before{background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.35)}
+.problem-col.after{background:rgba(163,230,53,.06);border-color:rgba(163,230,53,.35)}
 .problem-col h3{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
 .problem-col h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--danger)}
 .problem-col.after h3::before{background:var(--accent-3)}
@@ -127,10 +146,10 @@ section:first-of-type{border-top:none}
 .schema-side .col .name{color:var(--text)}
 .schema-side .col .type{color:var(--muted);font-size:11px}
 .schema-side .col .name.pk{color:var(--accent)}
-.schema-side .col .name.fk{color:var(--accent-2)}
+.schema-side .col .name.fk{color:var(--accent)}
 .schema-side .col-tag{font-size:9px;letter-spacing:0.08em;font-weight:700;padding:2px 5px;border-radius:2px;margin-left:6px}
 .schema-side .col-tag.pk{background:rgba(56,189,248,.1);color:var(--accent)}
-.schema-side .col-tag.fk{background:rgba(129,140,248,.1);color:var(--accent-2)}
+.schema-side .col-tag.fk{background:rgba(56,189,248,.1);color:var(--accent)}
 .schema-side .ss-empty{font-family:var(--mono);font-size:12px;color:var(--muted);padding:24px 0;text-align:center;border:1px dashed var(--border);border-radius:6px}
 @media(max-width:900px){.schema-shell{grid-template-columns:1fr}.schema-canvas{border-right:none;border-bottom:1px solid var(--border)}}
 .dax-tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);overflow-x:auto}
@@ -179,70 +198,86 @@ pre.dax .ln{display:inline-block;width:32px;color:var(--dim);text-align:right;ma
 .page-frame .ph{aspect-ratio:16/9;background:repeating-linear-gradient(135deg,var(--panel) 0,var(--panel) 12px,var(--panel-2) 12px,var(--panel-2) 24px);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:0.04em}
 .page-frame .ph .hint{color:var(--dim);font-size:11px}
 @media(max-width:900px){.page-row{grid-template-columns:1fr;gap:24px}.page-frame{width:100%}}
-footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:0.04em}
-.foot-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
-.foot-inner a{color:var(--text-dim);transition:color .15s}
-.foot-inner a:hover{color:var(--accent)}
+.insight{background:var(--panel);border:1px solid var(--border-bright);border-left:3px solid var(--accent);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start}
+.insight svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.insight p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.insight p strong{color:var(--text)}
+footer{border-top:1px solid var(--border);padding:48px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
+.footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.footer-links a{transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:none}
+.flow-step{transition:box-shadow .2s,border-color .2s}
+.flow-step:hover{box-shadow:0 0 18px rgba(163,230,53,.22);border-color:rgba(163,230,53,.45)!important}
 </style>
 </head>
 <body>
 
 <!-- TOP BAR -->
-<div class="topbar">
-  <div class="wide topbar-inner">
-    <a href="index.html" class="tb-back">← Portfolio</a>
-    <span class="tb-path">
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <a class="tb-back" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portfolio
+    </a>
+    <div class="tb-path">
       <span class="slash">/</span>Data Visualization<span class="slash">/</span><span class="here">Analytics By Role &amp; Focus</span>
-    </span>
+    </div>
     <div class="tb-status">
-      <span class="nav">
+      <nav class="tb-nav">
         <a href="#problem">Problem</a>
         <a href="#solution">Solution</a>
         <a href="#architecture">Architecture</a>
         <a href="#dax">DAX</a>
         <a href="#pages">Pages</a>
-      </span>
+      </nav>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="meta">Data Visualization · Power BI &nbsp;·&nbsp; 2024</div>
+    <h1>Financial intelligence,<br><span class="accent">by role</span></h1>
+    <p class="lede">A unified command centre connecting Oracle ERP, HubSpot, SharePoint and more into a live financial platform</p>
+    <p class="sublede">Treasury, Delivery, Sales, and People performance each visible to the right role — without rebuilding a report per domain</p>
+    <div class="chips">
+      <span class="chip accent">Power BI</span>
+      <span class="chip accent">DAX</span>
+      <span class="chip accent">Power Query (M)</span>
+      <span class="chip accent">HubSpot REST API</span>
+      <span class="chip accent">Oracle ERP</span>
+      <span class="chip accent">PostgreSQL Database</span>
     </div>
   </div>
 </div>
 
-<!-- HERO -->
-<header class="hero wrap">
-  <div class="meta">Data Visualization Project · Power BI · 2024</div>
-  <h1>Financial intelligence,<br><span class="accent">by role</span></h1>
-  <p class="lede">A unified command centre connecting Oracle ERP, HubSpot, SharePoint and more into a live financial platform, where Treasury, Delivery, Sales, and People performance are each visible to the right role, without rebuilding a report per domain</p>
-  <div class="chips">
-    <span class="chip">Power BI</span>
-    <span class="chip">DAX</span>
-    <span class="chip">Power Query (M)</span>
-    <span class="chip">Power Automate for Data Warehousing</span>
-    <span class="chip">HubSpot REST API</span>
-    <span class="chip">Oracle ERP</span>
-    <span class="chip">PostgreSQL Database</span>
-    <span class="chip">SharePoint Online</span>
-  </div>
-</header>
-
 <!-- STAT STRIP -->
-<div class="stats">
+<div class="stats reveal">
   <div class="stat">
     <div class="label"><span>DAX measures</span><span class="tag">model</span></div>
-    <div class="num">200+</div>
+    <div class="num cyan">200+</div>
     <div class="sub">Organised in display folders by role and sub-domain</div>
   </div>
   <div class="stat">
     <div class="label"><span>Report pages</span><span class="tag">pages</span></div>
-    <div class="num">15</div>
+    <div class="num purple">15</div>
     <div class="sub">Across Turn-Over, Client Account, Project Management and many more views</div>
   </div>
   <div class="stat">
     <div class="label"><span>Live data sources</span><span class="tag">connections</span></div>
-    <div class="num">4</div>
+    <div class="num green">4</div>
     <div class="sub">Oracle ERP · PostgreSQL DB · HubSpot API · Excel and JSON</div>
   </div>
   <div class="stat">
     <div class="label"><span>KPI domains</span><span class="tag">scope</span></div>
-    <div class="num">5</div>
+    <div class="num warn">5</div>
     <div class="sub">Cash · Delivery · Market · Engagement · Platform</div>
   </div>
 </div>
@@ -250,14 +285,14 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 01 PROBLEM -->
 <section id="problem">
   <div class="wrap">
-    <div class="sh">
+    <div class="sh reveal">
       <div class="sh-no"><span>01</span> · Problem</div>
       <div class="sh-title">
         <h2 style="max-width:none">Fragmented sources, no shared view</h2>
         <p style="max-width:none">Revenue lived in Oracle, pipeline in HubSpot, headcount in SharePoint. Finance, Sales, and Delivery each extracted their own slice and reconciled by hand: no single session ever showed the full picture with no focus on what each role actually needed</p>
       </div>
     </div>
-    <div class="problem-grid">
+    <div class="problem-grid reveal">
       <div class="problem-col before">
         <h3>Before</h3>
         <ul>
@@ -283,7 +318,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 02 SOLUTION -->
 <section id="solution">
   <div class="wrap">
-    <div class="sh">
+    <div class="sh reveal">
       <div class="sh-no"><span>02</span> · Solution</div>
       <div class="sh-title">
         <h2 style="max-width:none">Three roles, five domains</h2>
@@ -327,8 +362,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
   <!-- Power Automate data warehousing callout -->
   <div class="wrap" style="margin-top:56px">
     <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
-      <div style="background:rgba(56,189,248,.06);border-bottom:1px solid rgba(56,189,248,.18);padding:20px 28px;display:flex;align-items:center;gap:16px">
-        <span style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);padding:4px 10px;border-radius:4px;flex-shrink:0">Power Automate</span>
+      <div style="background:rgba(163,230,53,.06);border-bottom:1px solid rgba(163,230,53,.18);padding:20px 28px;display:flex;align-items:center;gap:16px">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--accent-3);letter-spacing:0.12em;text-transform:uppercase;background:rgba(163,230,53,.1);border:1px solid rgba(163,230,53,.25);padding:4px 10px;border-radius:4px;flex-shrink:0">Power Automate</span>
         <span style="font-size:16px;font-weight:600;letter-spacing:-0.01em">Historic Capital Working Days - Data Warehousing pipeline</span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
@@ -346,28 +381,28 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
         <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:18px">Daily flow</div>
         <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap">
           <!-- step 1 -->
-          <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
-            <div style="font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">① Trigger</div>
+          <div class="flow-step" style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--accent-3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">① Trigger</div>
             <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Scheduled - 07:30</div>
             <div style="font-size:12px;color:var(--muted)">Fires after daily Power BI refresh completes</div>
           </div>
           <div style="display:flex;align-items:center;padding:0 10px;color:var(--dim);font-family:var(--mono);font-size:14px">→</div>
           <!-- step 2 -->
-          <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
-            <div style="font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">② Read</div>
+          <div class="flow-step" style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--accent-3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">② Read</div>
             <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">HTTP → Power BI REST API</div>
             <div style="font-size:12px;color:var(--muted)">Fetch current CWD value from Oracle</div>
           </div>
           <div style="display:flex;align-items:center;padding:0 10px;color:var(--dim);font-family:var(--mono);font-size:14px">→</div>
           <!-- step 3 -->
-          <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
-            <div style="font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">③ Append</div>
+          <div class="flow-step" style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--accent-3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">③ Append</div>
             <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">SharePoint list - new row</div>
             <div style="font-size:12px;color:var(--muted)">Date · Team · CWD value · Timestamp</div>
           </div>
           <div style="display:flex;align-items:center;padding:0 10px;color:var(--dim);font-family:var(--mono);font-size:14px">→</div>
           <!-- step 4 -->
-          <div style="background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.25);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
+          <div class="flow-step" style="background:rgba(163,230,53,.06);border:1px solid rgba(163,230,53,.25);border-radius:var(--radius);padding:14px 18px;min-width:160px;flex:1">
             <div style="font-family:var(--mono);font-size:9px;color:var(--accent-3);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px">④ Loaded by Power BI</div>
             <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">CWD Table</div>
             <div style="font-size:12px;color:var(--muted)">Full history analysis</div>
@@ -381,7 +416,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 03 ARCHITECTURE -->
 <section id="architecture">
   <div class="wrap">
-    <div class="sh">
+    <div class="sh reveal">
       <div class="sh-no"><span>03</span> · Architecture</div>
       <div class="sh-title">
         <h2 style="max-width:none">Constellation schema</h2>
@@ -503,10 +538,10 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="275" height="14"/>
             <text x="14" y="18" font-size="13" fill="#E5E9F0" font-weight="700">Activity Detail</text>
             <text x="238" y="18" font-size="9" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="14" y="46" font-size="10" fill="#818CF8">Activity Code</text>
-            <text x="247" y="46" font-size="8" fill="#818CF8" font-weight="700">PK</text>
-            <text x="14" y="60" font-size="10" fill="#818CF8">Project Code</text>
-            <text x="247" y="60" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="14" y="46" font-size="10" fill="#38BDF8">Activity Code</text>
+            <text x="247" y="46" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
+            <text x="14" y="60" font-size="10" fill="#38BDF8">Project Code</text>
+            <text x="247" y="60" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="14" y="74" font-size="10" fill="#B5BCC8">Business Model</text>
             <text x="14" y="88" font-size="10" fill="#B5BCC8">Client Name</text>
             <text x="14" y="102" font-size="10" fill="#B5BCC8">Execution Date</text>
@@ -522,12 +557,12 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="240" height="10"/>
             <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Timesheet</text>
             <text x="208" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="12" y="40" font-size="10" fill="#818CF8">Email</text>
-            <text x="212" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
-            <text x="12" y="54" font-size="10" fill="#818CF8">Activity Code</text>
-            <text x="212" y="54" font-size="8" fill="#818CF8" font-weight="700">FK</text>
-            <text x="12" y="68" font-size="10" fill="#818CF8">Competency Date</text>
-            <text x="212" y="68" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Email</text>
+            <text x="212" y="40" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
+            <text x="12" y="54" font-size="10" fill="#38BDF8">Activity Code</text>
+            <text x="212" y="54" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
+            <text x="12" y="68" font-size="10" fill="#38BDF8">Competency Date</text>
+            <text x="212" y="68" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="82" font-size="10" fill="#B5BCC8">Chargeability</text>
             <text x="12" y="96" font-size="10" fill="#B5BCC8">External Price</text>
             <text x="12" y="110" font-size="10" fill="#B5BCC8">Internal Price</text>
@@ -541,8 +576,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="250" height="10"/>
             <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Offers</text>
             <text x="218" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="12" y="40" font-size="10" fill="#818CF8">Activity Code</text>
-            <text x="222" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Activity Code</text>
+            <text x="222" y="40" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="54" font-size="10" fill="#38BDF8">Bid Code</text>
             <text x="222" y="54" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
             <text x="12" y="68" font-size="10" fill="#B5BCC8">Bid Status</text>
@@ -559,8 +594,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="250" height="10"/>
             <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">HubSpot Deals</text>
             <text x="218" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="12" y="40" font-size="10" fill="#818CF8">Project Code</text>
-            <text x="222" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Project Code</text>
+            <text x="222" y="40" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="54" font-size="10" fill="#38BDF8">Deal Id</text>
             <text x="222" y="54" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
             <text x="12" y="68" font-size="10" fill="#B5BCC8">Creation Date</text>
@@ -577,8 +612,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
             <rect class="tbl-header" y="14" width="250" height="10"/>
             <text x="12" y="16" font-size="11" fill="#E5E9F0" font-weight="600">Invoices</text>
             <text x="218" y="16" font-size="8" fill="#38BDF8" font-weight="700">FACT</text>
-            <text x="12" y="40" font-size="10" fill="#818CF8">Activity Code</text>
-            <text x="222" y="40" font-size="8" fill="#818CF8" font-weight="700">FK</text>
+            <text x="12" y="40" font-size="10" fill="#38BDF8">Activity Code</text>
+            <text x="222" y="40" font-size="8" fill="#38BDF8" font-weight="700">FK</text>
             <text x="12" y="54" font-size="10" fill="#38BDF8">Invoice Id</text>
             <text x="222" y="54" font-size="8" fill="#38BDF8" font-weight="700">PK</text>
             <text x="12" y="68" font-size="10" fill="#B5BCC8">Invoice Type</text>
@@ -602,7 +637,7 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 04 DAX -->
 <section id="dax">
   <div class="wrap">
-    <div class="sh">
+    <div class="sh reveal">
       <div class="sh-no"><span>04</span> · DAX</div>
       <div class="sh-title">
         <h2>The logic, in code</h2>
@@ -687,8 +722,8 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 <!-- 05 PAGES -->
 <section id="pages">
   <div class="wrap">
-    <div class="sh">
-      <div class="sh-no"><span>05</span> · Pages</div>
+    <div class="sh reveal">
+      <div class="sh-no"><span style="color:var(--accent-2)">05</span> · Pages</div>
       <div class="sh-title">
         <h2>15 pages, three lenses</h2>
         <p style="max-width:none">Team Officers monitor performance across all five domains. Client Accounts drill into client-level revenue and deal flow. Project Managers track individual project margins, journey stage, and cash collection</p>
@@ -698,62 +733,62 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 
       <div class="page-row">
         <div class="page-meta">
-          <div class="num">HOME</div>
+          <div class="num" style="color:var(--accent-2)">HOME</div>
           <h3>Home</h3>
           <p>Landing page and navigation hub. Single-screen entry point routing each role to their relevant domain views</p>
           <div class="features"><span>Navigation</span><span>Role Routing</span></div>
         </div>
-        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">Home</span></div><img src="../screenshots/ARFHome.png" alt="Home" style="width:100%;display:block"></div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">Home</span></div><img src="screenshots/ARFHome.png" alt="Home" style="width:100%;display:block"></div>
       </div>
 
       <div class="page-row">
         <div class="page-meta">
-          <div class="num">TO - REDIRECTORY</div>
+          <div class="num" style="color:var(--accent-2)">TO - REDIRECTORY</div>
           <h3>Team Officer Redirectory</h3>
           <p>Overview scorecard for Team Officers: navigation to each domain deep-dive</p>
           <div class="features"><span>Navigation</span><span>Domain Routing</span></div>
         </div>
-        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">TO - Redirectory</span></div><img src="../screenshots/ARFTo.png" alt="Team Officer Redirectory" style="width:100%;display:block"></div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">TO - Redirectory</span></div><img src="screenshots/ARFTo.png" alt="Team Officer Redirectory" style="width:100%;display:block"></div>
       </div>
 
       <div class="page-row">
         <div class="page-meta">
-          <div class="num">TO - DELIVERY</div>
+          <div class="num" style="color:var(--accent-2)">TO - DELIVERY</div>
           <h3>Revenue actuals vs. targets</h3>
           <p>First-margin %, chargeability rate, and FTE-normalised revenue per capita by circle and team. Actual vs plan with YoY comparison</p>
           <div class="features"><span>Bar vs Target</span><span>Line Chart</span></div>
         </div>
-        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">TO - Delivery</span></div><img src="../screenshots/ARFToDelivery.png" alt="TO - Delivery" style="width:100%;display:block"></div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">TO - Delivery</span></div><img src="screenshots/ARFToDelivery.png" alt="TO - Delivery" style="width:100%;display:block"></div>
       </div>
 
       <div class="page-row">
         <div class="page-meta">
-          <div class="num">TO - MARKET</div>
+          <div class="num" style="color:var(--accent-2)">TO - MARKET</div>
           <h3>HubSpot pipeline by stage</h3>
           <p>Proposal amounts vs same-period prior year, deal success ratio, and funnel conversion from Opportunity through to Order</p>
           <div class="features"><span>Funnel</span><span>Combo Chart</span><span>Pie Chart</span></div>
         </div>
-        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">TO - Market</span></div><img src="../screenshots/ARFToMarket.png" alt="TO - Market" style="width:100%;display:block"></div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">TO - Market</span></div><img src="screenshots/ARFToMarket.png" alt="TO - Market" style="width:100%;display:block"></div>
       </div>
 
       <div class="page-row">
         <div class="page-meta">
-          <div class="num">CA - CASH</div>
+          <div class="num" style="color:var(--accent-2)">CA - CASH</div>
           <h3>Cash collection and invoicing</h3>
           <p>Invoiced amounts, payment status, ARNI ageing buckets, and NCA ratio per client account. Full visibility on receivables health</p>
           <div class="features"><span>Ageing Table</span><span>KPI Cards</span></div>
         </div>
-        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">CA - Cash</span></div><img src="../screenshots/ARFCACash.png" alt="CA - Cash" style="width:100%;display:block"></div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">CA - Cash</span></div><img src="screenshots/ARFCACash.png" alt="CA - Cash" style="width:100%;display:block"></div>
       </div>
 
       <div class="page-row">
         <div class="page-meta">
-          <div class="num">PM - PORTFOLIO</div>
+          <div class="num" style="color:var(--accent-2)">PM - PORTFOLIO</div>
           <h3>Portfolio and project view</h3>
           <p>Journey stage tracking, planned vs actual margins, and cash collection status per project</p>
           <div class="features"><span>Journey Steps</span><span>Margin %</span><span>Cashed KPI</span></div>
         </div>
-        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">PM - Portfolio</span></div><img src="../screenshots/ARFPmPortfolio.png" alt="PM - Portfolio" style="width:100%;display:block"></div>
+        <div class="page-frame"><div class="frame-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="filename">PM - Portfolio</span></div><img src="screenshots/ARFPmPortfolio.png" alt="PM - Portfolio" style="width:100%;display:block"></div>
       </div>
 
     </div>
@@ -761,13 +796,32 @@ footer{padding:48px 0 64px;border-top:1px solid var(--border);font-family:var(--
 </section>
 
 <footer>
-  <div class="wrap foot-inner">
-    <span>© 2024 Simone Caruso</span>
-    <span><a href="index.html">← Back to portfolio</a></span>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Simone Caruso</div>
+      <div class="footer-links">
+        <a href="../index.html">Portfolio</a>
+      </div>
+    </div>
   </div>
 </footer>
 
 <script>
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Stagger children in grid/list parents
+document.querySelectorAll('.feat-grid, .tech-grid, .provider-grid').forEach(parent => {
+  [...parent.children].forEach((child, i) => {
+    child.style.transitionDelay = `${i * 60}ms`;
+  });
+});
+
 const tableData = {
   "Activity Detail": {
     kind:'FACT',

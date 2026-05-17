@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
+  --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
+  --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
+  --accent:#6366F1; --accent-dim:#818CF8; --accent-soft:#A78BFA;
+  --accent-2:#F97316;
+  --accent-3:#34D399;
+  --warn:#FBBF24; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:56px 56px;background-position:-1px -1px;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#fff}
+
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:20px;color:var(--muted)}
+.tb-nav{display:flex;gap:20px}
+.tb-nav a{color:var(--muted);transition:color .15s}
+.tb-nav a:hover{color:var(--text)}
+
+.hero{padding:136px 0 96px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(99,102,241,.07) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(249,115,22,.04) 0%,transparent 65%);pointer-events:none}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
+.hero h1{font-size:clamp(56px,9vw,110px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
+.hero h1 .accent{color:var(--accent);font-weight:600}
+.hero h1 .dim{color:var(--muted);font-weight:400}
+.hero .lede{font-size:21px;line-height:1.5;color:var(--text-dim);max-width:90ch;margin-bottom:20px}
+.hero .sublede{font-size:16px;color:var(--muted);max-width:82ch;margin-bottom:48px;line-height:1.6}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
+.chip.purple{color:var(--accent);border-color:rgba(99,102,241,.25);background:rgba(99,102,241,.07)}
+.chip.orange{color:var(--accent-2);border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.07)}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 24px;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.stat .num{font-size:52px;line-height:1;letter-spacing:-.04em;font-weight:700}
+.stat .num .unit{font-size:20px;color:var(--muted);margin-left:4px;font-weight:500}
+.stat .sub{margin-top:10px;font-size:12px;color:var(--text-dim)}
+.stat .num.purple{color:var(--accent)}
+.stat .num.accent-dim{color:var(--accent-dim)}
+.stat .num.accent-soft{color:var(--accent-soft)}
+.stat .num.orange{color:var(--accent-2)}
+.stat .num.green{color:var(--accent-3)}
+.stat .num.warn{color:var(--warn)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}}
+
+.sh{margin-bottom:64px;display:grid;grid-template-columns:180px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.12em;padding-top:10px}
+.sh-no span{color:var(--accent)}
+.sh-title h2{font-size:clamp(44px,5vw,64px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin-bottom:18px}
+.sh-title p{font-size:19px;color:var(--text-dim);max-width:72ch;line-height:1.6}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}}
+
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+.prob-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px}
+.prob-col.before{background:rgba(249,115,22,.05);border-color:rgba(249,115,22,.3)}
+.prob-col.after{background:rgba(52,211,153,.05);border-color:rgba(52,211,153,.3)}
+.prob-col h3{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.prob-col.before h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent-2)}
+.prob-col.after h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent-3)}
+.prob-col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.prob-col li{display:flex;gap:14px;font-size:15px;line-height:1.55;color:var(--text-dim)}
+.prob-col li .marker{color:var(--dim);font-family:var(--mono);flex-shrink:0;margin-top:2px}
+.prob-col.after li .marker{color:var(--accent-3)}
+@media(max-width:760px){.problem-grid{grid-template-columns:1fr}}
+
+.insight{background:var(--panel);border:1px solid var(--border-bright);border-left:3px solid var(--accent);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start}
+.insight svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.insight p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.insight p strong{color:var(--text)}
+
+/* Agent pipeline */
+.agent-pipeline{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.agent-row{display:grid;grid-template-columns:200px 160px 1fr 1fr;border-bottom:1px solid var(--border);transition:background .15s}
+.agent-row.header{background:var(--panel-2)}
+.agent-row:last-child{border-bottom:none}
+.agent-row:not(.header):hover{background:var(--panel-2)}
+.agent-cell{padding:18px 20px;border-right:1px solid var(--border);font-size:13px}
+.agent-cell:last-child{border-right:none}
+.agent-cell.ah{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:14px 20px}
+.agent-name{font-weight:700;color:var(--text);font-size:15px}
+.agent-model{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.agent-role{color:var(--text-dim);font-size:13px;line-height:1.5}
+.agent-task{color:var(--muted);font-size:12px;line-height:1.5}
+@media(max-width:900px){.agent-row{grid-template-columns:1fr}.agent-cell{border-right:none}}
+
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;transition:border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+.feat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:transparent;transition:background .2s}
+.feat-card:hover{border-color:var(--border-bright);box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.feat-card.c-purple::before{background:var(--accent)}
+.feat-card.c-violet::before{background:var(--accent-soft)}
+.feat-card.c-orange::before{background:var(--accent-2)}
+.feat-card.c-green::before{background:var(--accent-3)}
+.feat-card.c-warn::before{background:var(--warn)}
+.feat-card.c-danger::before{background:var(--danger)}
+.feat-card .fc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.c-purple .fc-tag{color:var(--accent)}
+.c-violet .fc-tag{color:var(--accent-soft)}
+.c-orange .fc-tag{color:var(--accent-2)}
+.c-green .fc-tag{color:var(--accent-3)}
+.c-warn .fc-tag{color:var(--warn)}
+.c-danger .fc-tag{color:var(--danger)}
+.feat-card h3{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin-bottom:10px}
+.feat-card p{font-size:14px;color:var(--muted);line-height:1.6}
+.feat-card .fc-items{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.feat-card .fc-item{font-family:var(--mono);font-size:11px;color:var(--text-dim);display:flex;gap:8px;align-items:flex-start;line-height:1.4}
+.feat-card .fc-item::before{content:"→";color:var(--dim);flex-shrink:0}
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.feat-grid{grid-template-columns:1fr}}
+
+/* Flow steps */
+.flow-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.fl-step{background:var(--panel);padding:22px 18px}
+.fl-step .fs-num{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;margin-bottom:10px}
+.fl-step .fs-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.fl-step .fs-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px}
+.fl-step ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.fl-step li{font-family:var(--mono);font-size:10px;color:var(--muted);display:flex;gap:7px;line-height:1.4}
+.fl-step li::before{content:"›";color:var(--dim);flex-shrink:0}
+@media(max-width:900px){.flow-steps{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.flow-steps{grid-template-columns:1fr}}
+
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tech-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s}
+.tech-card:hover{border-color:var(--border-bright)}
+.tech-card .tc-cat{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+.tech-card .tc-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+.tech-card .tc-why{font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:760px){.tech-grid{grid-template-columns:repeat(2,1fr)}}
+
+footer{border-top:1px solid var(--border);padding:48px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
+.footer-brand span{color:var(--accent)}
+.footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.footer-links a{transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <a class="tb-back" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portfolio
+    </a>
+    <div class="tb-path">
+      <span class="slash">/</span>AI &amp; ML<span class="slash">/</span><span class="here">Assie</span>
+    </div>
+    <div class="tb-status">
+      <nav class="tb-nav">
+        <a href="#problem">Problem</a>
+        <a href="#agents">Agents</a>
+        <a href="#flow">Flow</a>
+        <a href="#product">Product</a>
+      </nav>
+    </div>
+  </div>
+</nav>
+
+<div class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="meta" style="font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px">
+      AI & ML · Multi-Agent System &nbsp;·&nbsp; 2025
+    </div>
+    <h1><span class="accent">Assie</span></h1>
+    <p class="lede">A five-agent pipeline that reads Italian public tender documents and rewrites candidate CVs to match</p>
+    <p class="sublede">Built for consulting and public-sector bid teams: Assie synthesizes complex auction calls, interprets requirements per candidate role, drafts and adapts CVs, then lets reviewers refine via conversation before exporting to PDF</p>
+    <div class="chips">
+      <span class="chip purple">Python</span>
+      <span class="chip purple">AutoGen</span>
+      <span class="chip purple">Multi-Agent</span>
+      <span class="chip purple">Gradio</span>
+      <span class="chip purple">Prompt Engineering</span>
+      <span class="chip purple">Process Automation</span>
+    </div>
+  </div>
+</div>
+
+<div class="stats reveal">
+  <div class="stat">
+    <div class="label">Agents</div>
+    <div class="num accent-soft">5</div>
+    <div class="sub">Instructor · Synthetizer · Drafter · Seller · Reviewer</div>
+  </div>
+  <div class="stat">
+    <div class="label">LLM models</div>
+    <div class="num accent-soft">4</div>
+    <div class="sub">Qwen3-30B · DeepSeek-R1 · Llama-4 Maverick · DeepSeek-v3</div>
+  </div>
+  <div class="stat">
+    <div class="label">CV formats</div>
+    <div class="num orange">3</div>
+    <div class="sub">PDF · DOC · DOCX, all parsed via MarkItDown</div>
+  </div>
+  <div class="stat">
+    <div class="label">Output</div>
+    <div class="num green" style="font-size:32px;padding-top:12px">Chat + PDF</div>
+    <div class="sub">Conversational review loop then one-click export</div>
+  </div>
+</div>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>01</span> - Problem</div>
+      <div class="sh-title">
+        <h2>CV adaptation at scale is manual and error-prone</h2>
+        <p>Italian public tenders require tailored CV submissions per candidate per lot. Doing this by hand is slow, inconsistent, and risks inventing data that isn't in the original CV</p>
+      </div>
+    </div>
+    <div class="problem-grid reveal">
+      <div class="prob-col before">
+        <h3>Without Assie</h3>
+        <ul>
+          <li><span class="marker">|</span>Each tender requires hours of manual reading to extract what's actually required per candidate profile</li>
+          <li><span class="marker">|</span>CV adaptation is done by hand: inconsistent across candidates, error-prone under deadline pressure</li>
+          <li><span class="marker">|</span>Risk of embellishing or inventing data</li>
+          <li><span class="marker">|</span>Post-submission feedback loops are slow: edits require re-reading the full tender again</li>
+          <li><span class="marker">|</span>No standard output format: every bid team formats differently</li>
+        </ul>
+      </div>
+      <div class="prob-col after">
+        <h3>With Assie</h3>
+        <ul>
+          <li><span class="marker">→</span>Tender synthesized in one click: key content, activities and scope</li>
+          <li><span class="marker">→</span>Per-candidate CV drafting guided by structured requirement interpretation from the Instructor agent</li>
+          <li><span class="marker">→</span>Seller agent adapts tone and emphasis to bid strategy, without adding data not in the original CV</li>
+          <li><span class="marker">→</span>Conversational Reviewer loop: type feedback, get an updated CV instantly</li>
+          <li><span class="marker">→</span>One-click PDF export of the final reviewed output</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight reveal">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Core constraint driving the design:</strong> the system must never invent data. Every agent's system prompt explicitly prohibits adding information not present in the source CV. The Drafter populates from the CV; the Seller reframes emphasis. This is enforced in prompt, not code, which means it's auditable and adjustable without changing architecture</p>
+    </div>
+  </div>
+</section>
+
+<section id="agents">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>02</span> - Agent Roster</div>
+      <div class="sh-title">
+        <h2>Five agents, one pipeline</h2>
+        <p>Each agent has a single, well-scoped responsibility and a termination signal, so the orchestrator knows exactly when to stop consuming output.</p>
+      </div>
+    </div>
+    <div class="agent-pipeline reveal">
+      <div class="agent-row header">
+        <div class="agent-cell ah">Agent</div>
+        <div class="agent-cell ah">Model</div>
+        <div class="agent-cell ah">Role</div>
+        <div class="agent-cell ah">Responsibility</div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-cell"><div class="agent-name">Synthetizer</div></div>
+        <div class="agent-cell"><div class="agent-model">deepseek-r1:free</div></div>
+        <div class="agent-cell"><div class="agent-role">Sales Account - Tender Compression</div></div>
+        <div class="agent-cell"><div class="agent-task">Reads full tender PDFs and produces a compact synthesis focused on content, scope and activities. Strips dates, legal references, and numeric requirements</div></div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-cell"><div class="agent-name">Instructor</div></div>
+        <div class="agent-cell"><div class="agent-model">qwen3-30b-a3b:free</div></div>
+        <div class="agent-cell"><div class="agent-role">Tender Interpreter - Requirement Translator</div></div>
+        <div class="agent-cell"><div class="agent-task">Translates general tender requirements into precise, per-person CV structuring instructions. Produces a bulleted list of required fields</div></div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-cell"><div class="agent-name">Drafter</div></div>
+        <div class="agent-cell"><div class="agent-model">llama-4-maverick:free</div></div>
+        <div class="agent-cell"><div class="agent-role">CV Elaborator - Content Population</div></div>
+        <div class="agent-cell"><div class="agent-task">Receives the Instructor's requirement list and a parsed CV. Generates a structured output populated strictly from CV data</div></div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-cell"><div class="agent-name">Seller</div></div>
+        <div class="agent-cell"><div class="agent-model">deepseek-chat-v3-0324:free</div></div>
+        <div class="agent-cell"><div class="agent-role">Sales Account - Bid Adaptation</div></div>
+        <div class="agent-cell"><div class="agent-task">Rewrites the draft CV to align with the tender's strategic emphasis and the candidate's assigned role. Makes minimal changes</div></div>
+      </div>
+      <div class="agent-row">
+        <div class="agent-cell"><div class="agent-name">Reviewer</div></div>
+        <div class="agent-cell"><div class="agent-model">deepseek-chat-v3-0324:free</div></div>
+        <div class="agent-cell"><div class="agent-role">CV Revisor - Conversational Editor</div></div>
+        <div class="agent-cell"><div class="agent-task">Accepts user feedback via chat and applies minimal targeted changes to the Seller's output</div></div>
+      </div>
+    </div>
+    <div class="insight reveal" style="margin-top:28px">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Model selection rationale:</strong> each agent uses the model best suited to its task. DeepSeek-R1's reasoning depth handles synthesis and review. Qwen3-30B's instruction-following precision handles requirement interpretation. Llama-4 Maverick's speed handles high-volume drafting. All routed through OpenRouter: swapping models or changing settings like the temperature requires changing one line.</p>
+    </div>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>03</span> - Workflow</div>
+      <div class="sh-title">
+        <h2>Tender in, tailored CVs out</h2>
+        <p>The pipeline runs in two phases: a one-time tender synthesis, then per-candidate profile generation followed by an open-ended conversational review loop.</p>
+      </div>
+    </div>
+    <div class="flow-steps reveal">
+      <div class="fl-step">
+        <div class="fs-num">01</div>
+        <div class="fs-label" style="color:var(--accent-2)">Upload</div>
+        <div class="fs-title">Tender + CV inputs</div>
+        <ul>
+          <li>Upload one or more tender PDFs</li>
+          <li>Enter candidate names (comma-separated)</li>
+          <li>Enter role dictionary per candidate</li>
+          <li>CVs auto-located from directory</li>
+        </ul>
+      </div>
+      <div class="fl-step">
+        <div class="fs-num">02</div>
+        <div class="fs-label" style="color:var(--accent-soft)">Synthesize</div>
+        <div class="fs-title">Tender compression</div>
+        <ul>
+          <li>MarkItDown parses tender PDFs</li>
+          <li>Synthetizer strips boilerplate</li>
+          <li>Output: compact scope summary</li>
+          <li>Used as context for all downstream agents</li>
+        </ul>
+      </div>
+      <div class="fl-step">
+        <div class="fs-num">03</div>
+        <div class="fs-label" style="color:var(--accent-soft)">Draft</div>
+        <div class="fs-title">Per-candidate generation</div>
+        <ul>
+          <li>Instructor interprets requirement per person</li>
+          <li>MarkItDown parses each CV (PDF/DOC/DOCX)</li>
+          <li>Drafter populates required fields from CV</li>
+          <li>Seller adapts to tender + role dictionary</li>
+        </ul>
+      </div>
+      <div class="fl-step">
+        <div class="fs-num">04</div>
+        <div class="fs-label" style="color:var(--accent-soft)">Review</div>
+        <div class="fs-title">Conversational refinement</div>
+        <ul>
+          <li>Profiles displayed in Markdown</li>
+          <li>User types specific feedback</li>
+          <li>Reviewer applies minimal targeted edits</li>
+          <li>Full chat history maintained as context</li>
+        </ul>
+      </div>
+      <div class="fl-step">
+        <div class="fs-num">05</div>
+        <div class="fs-label" style="color:var(--accent-3)">Export</div>
+        <div class="fs-title">PDF generation</div>
+        <ul>
+          <li>Final output from chat or generation</li>
+          <li>fpdf renders to downloadable PDF</li>
+          <li>ASCII-safe: non-standard chars stripped</li>
+          <li>One click from Gradio interface</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="product">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>04</span> - Product Design</div>
+      <div class="sh-title">
+        <h2>Built for non-technical users under deadline</h2>
+        <p>The Gradio interface with glassmorphism styling was deliberate: bid teams are not developers. The UI needs to feel approachable</p>
+      </div>
+    </div>
+    <div class="feat-grid reveal">
+      <div class="feat-card c-violet">
+        <div class="fc-tag">Conversational Review</div>
+        <h3>Chat-Driven Editing</h3>
+        <p>After initial generation, the user interacts with the Reviewer via a chatbot interface. The full conversation history is passed as context so the agent can track and reconcile multiple rounds of feedback.</p>
+        <div class="fc-items">
+          <div class="fc-item">Gradio Chatbot component with copy button</div>
+          <div class="fc-item">Both Chatbot Enter and Button submit supported</div>
+          <div class="fc-item">Reset button clears history without clearing generation</div>
+        </div>
+      </div>
+      <div class="feat-card c-green">
+        <div class="fc-tag">Export</div>
+        <h3>PDF Generation</h3>
+        <p>fpdf renders the final reviewed output to a downloadable PDF. ASCII safety pass strips non-standard characters to avoid encoding errors across different operating systems.</p>
+        <div class="fc-items">
+          <div class="fc-item">Prefers last chat response if conversation exists</div>
+          <div class="fc-item">Falls back to Seller markdown output</div>
+          <div class="fc-item">Temp file served via Gradio File component</div>
+        </div>
+      </div>
+      <div class="feat-card c-orange">
+        <div class="fc-tag">UI</div>
+        <h3>Glassmorphism Gradio</h3>
+        <p>Custom CSS over Gradio's base: blur, transparency, rounded pills, and purple/orange brand palette. Bid teams need a tool that feels like a product, not a script.</p>
+        <div class="fc-items">
+          <div class="fc-item">Glass sections with backdrop-filter blur</div>
+          <div class="fc-item">Pill-shaped buttons with brand colors</div>
+          <div class="fc-item">Branded mascot image (InvestigAssie.png) as header</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Simone Caruso</div>
+      <div class="footer-links">
+        <a href="../index.html">Portfolio</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('.feat-grid, .tech-grid').forEach(parent => {
+  [...parent.children].forEach((child, i) => { child.style.transitionDelay = `${i * 60}ms`; });
+});
+</script>
+</body>
+</html>

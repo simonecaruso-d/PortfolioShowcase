@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Topic-Aligned URL Discovery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
+  --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
+  --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
+  --accent:#14B8A6;
+  --accent-2:#F97316;
+  --accent-3:#34D399;
+  --warn:#FBBF24; --danger:#F87171;
+  --radius:6px; --radius-lg:10px;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-feature-settings:'ss01','cv11'}
+body{
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:56px 56px;
+  background-position:-1px -1px;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent-2);color:#000}
+
+/* ── Layout ── */
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+section{padding:96px 0;border-top:1px solid var(--border)}
+section:first-of-type{border-top:none}
+
+/* ── Topbar ── */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(8,9,12,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar-inner{display:flex;align-items:center;gap:24px;height:48px;font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.tb-back{color:var(--muted);display:flex;align-items:center;gap:8px;transition:color .15s}
+.tb-back:hover{color:var(--text)}
+.tb-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tb-path{color:var(--text-dim)}
+.tb-path .slash{color:var(--dim);margin:0 8px}
+.tb-path .here{color:var(--accent-2)}
+.tb-status{margin-left:auto;display:flex;align-items:center;gap:20px;color:var(--muted)}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 8px var(--accent-2);animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--accent-2)}50%{opacity:.5;box-shadow:0 0 4px var(--accent-2)}}
+.tb-nav{display:flex;gap:20px}
+.tb-nav a{color:var(--muted);transition:color .15s}
+.tb-nav a:hover{color:var(--text)}
+
+/* ── Hero ── */
+.hero{padding:136px 0 96px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(20,184,166,.06) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(52,211,153,.04) 0%,transparent 65%);pointer-events:none}
+.hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
+.hero .meta .line{width:48px;height:1px;background:var(--accent);opacity:.6}
+.hero h1{font-size:clamp(42px,7vw,88px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
+.hero h1 .dim{color:var(--muted);font-weight:400}
+.hero h1 .accent{color:var(--accent);font-style:italic;font-weight:600}
+.hero .lede{font-size:21px;line-height:1.5;color:var(--text-dim);max-width:90ch;margin-bottom:20px;font-weight:400}
+.hero .sublede{font-size:16px;color:var(--muted);max-width:82ch;margin-bottom:48px;line-height:1.6}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);transition:background .15s,transform .1s}
+.btn-primary:hover{background:#5eead4;transform:translateY(-1px)}
+.btn-primary svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-ghost.orange:hover{border-color:var(--accent-2);color:var(--accent-2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
+.chip.accent{color:var(--accent);border-color:rgba(20,184,166,.25);background:rgba(20,184,166,.07)}
+.chip.purple{color:var(--accent-2);border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.07)}
+
+/* ── Stats strip ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
+.stat{padding:40px 24px;border-right:1px solid var(--border);position:relative}
+.stat:last-child{border-right:none}
+.stat .label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+.stat .num{font-size:52px;line-height:1;letter-spacing:-.04em;font-weight:700;font-feature-settings:'tnum'}
+.stat .num .unit{font-size:20px;color:var(--muted);margin-left:4px;font-weight:500}
+.stat .sub{margin-top:10px;font-size:12px;color:var(--text-dim)}
+.stat .num.cyan{color:var(--accent)}
+.stat .num.orange{color:var(--accent-2)}
+.stat .num.green{color:var(--accent-3)}
+.stat .num.warn{color:var(--warn)}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}.stat:nth-child(-n+4){border-bottom:1px solid var(--border)}}
+
+/* ── Section header ── */
+.sh{margin-bottom:64px;display:grid;grid-template-columns:180px 1fr;gap:48px;align-items:start}
+.sh-no{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.12em;padding-top:10px}
+.sh-no span{color:var(--accent-2)}
+.sh-title h2{font-size:clamp(44px,5vw,64px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin-bottom:18px}
+.sh-title p{font-size:19px;color:var(--text-dim);max-width:72ch;line-height:1.6}
+@media(max-width:760px){.sh{grid-template-columns:1fr;gap:16px}}
+
+/* ── Problem/Solution ── */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+.prob-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
+.prob-col.before{background:rgba(249,115,22,.05);border-color:rgba(249,115,22,.3)}
+.prob-col.after{background:rgba(52,211,153,.05);border-color:rgba(52,211,153,.3)}
+.prob-col h3{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.prob-col.before h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent-2)}
+.prob-col.after h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent-3)}
+.prob-col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+.prob-col li{display:flex;gap:14px;font-size:15px;line-height:1.55;color:var(--text-dim)}
+.prob-col li .marker{color:var(--dim);font-family:var(--mono);flex-shrink:0;margin-top:2px}
+.prob-col.after li .marker{color:var(--accent-3)}
+@media(max-width:760px){.problem-grid{grid-template-columns:1fr}}
+
+/* ── Insight bar ── */
+.insight{background:var(--panel);border:1px solid var(--border-bright);border-left:3px solid var(--accent-2);border-radius:var(--radius);padding:20px 24px;display:flex;gap:16px;align-items:flex-start}
+.insight svg{width:18px;height:18px;stroke:var(--accent-2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.insight p{font-size:15px;color:var(--text-dim);line-height:1.6}
+.insight p strong{color:var(--text)}
+
+/* ── Architecture diagram ── */
+.arch-wrap{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;overflow:hidden;position:relative}
+.arch-wrap::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(circle at 10% 50%,rgba(20,184,166,.04),transparent 45%),
+  radial-gradient(circle at 90% 50%,rgba(52,211,153,.04),transparent 45%);pointer-events:none}
+.arch-diagram{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr 40px 1fr;gap:0;align-items:center;position:relative}
+.arch-node{background:var(--panel-2);border:1px solid var(--border-bright);border-radius:var(--radius);padding:18px 16px;text-align:center;position:relative;transition:border-color .2s,box-shadow .2s}
+.arch-node:hover{border-color:var(--accent);box-shadow:0 0 24px rgba(20,184,166,.1)}
+.arch-node .n-icon{font-size:22px;margin-bottom:10px}
+.arch-node .n-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.arch-node .n-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.arch-node .n-sub{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+.arch-node.source{border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.06)}
+.arch-node.source .n-label{color:var(--accent-2)}
+.arch-node.discover{border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.06)}
+.arch-node.discover .n-label{color:var(--accent-2)}
+.arch-node.filter{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.05)}
+.arch-node.filter .n-label{color:var(--warn)}
+.arch-node.score{border-color:rgba(20,184,166,.35);background:rgba(20,184,166,.06)}
+.arch-node.output{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.05)}
+.arch-node.output .n-label{color:var(--warn)}
+.arch-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim)}
+.arch-arrow svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.arch-footer{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px}
+.arch-badge{display:flex;align-items:center;gap:6px;color:var(--muted);padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--bg)}
+.arch-badge .dot{width:6px;height:6px;border-radius:50%}
+@media(max-width:900px){.arch-diagram{grid-template-columns:1fr;grid-template-rows:auto}.arch-arrow svg{transform:rotate(90deg)}}
+
+/* ── Pipeline steps ── */
+.pipeline-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.pl-step{background:var(--panel);padding:24px 20px}
+.pl-step .ps-num{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;margin-bottom:12px}
+.pl-step .ps-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.pl-step .ps-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px}
+.pl-step ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.pl-step li{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.pl-step li::before{content:"›";color:var(--dim);flex-shrink:0}
+@media(max-width:760px){.pipeline-row{grid-template-columns:1fr}}
+
+/* ── Code block ── */
+.code-block{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px}
+.code-bar{height:36px;background:var(--panel-3);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.code-bar .cb-dots{display:flex;gap:6px}
+.code-bar .cbd{width:10px;height:10px;border-radius:50%;background:var(--border-bright)}
+.code-bar .filename{margin-left:6px;color:var(--text-dim)}
+.code-bar .lang{margin-left:auto;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;font-size:10px}
+pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--text-dim)}
+.kw{color:#c084fc}.fn{color:var(--accent)}.str{color:var(--accent-3)}.cm{color:var(--dim);font-style:italic}.num{color:var(--warn)}.cls{color:#fb923c}
+
+/* ── Features grid ── */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;transition:border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+.feat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:transparent;transition:background .2s}
+.feat-card:hover{border-color:var(--border-bright);box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.feat-card.c-cyan::before{background:var(--accent)}
+.feat-card.c-orange::before{background:var(--accent-2)}
+.feat-card.c-green::before{background:var(--accent-3)}
+.feat-card.c-warn::before{background:var(--warn)}
+.feat-card.c-danger::before{background:var(--danger)}
+.feat-card .fc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.c-cyan .fc-tag{color:var(--accent)}
+.c-orange .fc-tag{color:var(--accent-2)}
+.c-green .fc-tag{color:var(--accent-3)}
+.c-warn .fc-tag{color:var(--warn)}
+.c-danger .fc-tag{color:var(--danger)}
+.feat-card h3{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin-bottom:10px}
+.feat-card p{font-size:14px;color:var(--muted);line-height:1.6}
+.feat-card .fc-items{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.feat-card .fc-item{font-family:var(--mono);font-size:11px;color:var(--text-dim);display:flex;gap:8px;align-items:flex-start;line-height:1.4}
+.feat-card .fc-item::before{content:"→";color:var(--dim);flex-shrink:0}
+@media(max-width:900px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.feat-grid{grid-template-columns:1fr}}
+
+/* ── Decision log ── */
+.decision-list{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.decision{display:grid;grid-template-columns:280px 1fr 1fr;border-bottom:1px solid var(--border);transition:background .15s}
+.decision:last-child{border-bottom:none}
+.decision:hover{background:var(--panel-2)}
+.decision>div{padding:22px 24px;border-right:1px solid var(--border)}
+.decision>div:last-child{border-right:none}
+.dec-context .dc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.dec-context .dc-title{font-size:15px;font-weight:600;color:var(--text)}
+.dec-context .dc-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.dec-chosen h4{font-size:13px;font-weight:600;color:var(--accent-2);font-family:var(--mono);letter-spacing:.04em;margin-bottom:8px}
+.dec-chosen p{font-size:13px;color:var(--text-dim);line-height:1.55}
+.dec-why h4{font-size:13px;font-weight:600;color:var(--muted);font-family:var(--mono);letter-spacing:.04em;margin-bottom:8px}
+.dec-why p{font-size:13px;color:var(--muted);line-height:1.55}
+@media(max-width:900px){.decision{grid-template-columns:1fr}.decision>div{border-right:none}}
+
+/* ── Tech stack ── */
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.tech-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:8px;transition:border-color .2s}
+.tech-card:hover{border-color:var(--border-bright)}
+.tech-card .tc-cat{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+.tech-card .tc-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+.tech-card .tc-why{font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:760px){.tech-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── Score blend visual ── */
+.blend-bar{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;margin-bottom:24px}
+.blend-track{height:24px;border-radius:12px;overflow:hidden;display:flex;margin:20px 0}
+.blend-semantic{height:100%;background:linear-gradient(90deg,var(--accent),rgba(20,184,166,.6));width:70%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:#000;font-weight:700;letter-spacing:.06em}
+.blend-lexical{height:100%;background:linear-gradient(90deg,rgba(249,115,22,.6),var(--accent-2));width:30%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:#000;font-weight:700;letter-spacing:.06em}
+.blend-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.blend-formula{font-family:var(--mono);font-size:14px;color:var(--text-dim);margin-top:16px;padding:12px 16px;background:var(--panel-2);border-radius:var(--radius);border:1px solid var(--border)}
+.blend-formula .f-accent{color:var(--accent)}
+.blend-formula .f-orange{color:var(--accent-2)}
+.blend-formula .f-dim{color:var(--dim)}
+
+/* ── Footer ── */
+footer{border-top:1px solid var(--border);padding:48px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
+.footer-brand span{color:var(--accent)}
+.footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.footer-links a{transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+.footer-note{font-family:var(--mono);font-size:11px;color:var(--dim)}
+
+/* ── Scroll animation ── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- ─── Topbar ─── -->
+<nav class="topbar">
+  <div class="topbar-inner wrap">
+    <a class="tb-back" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Portfolio
+    </a>
+    <div class="tb-path">
+      <span class="slash">/</span>AI &amp; ML<span class="slash">/</span><span class="here">URL Discovery &amp; Ranking</span>
+    </div>
+    <div class="tb-status">
+      <nav class="tb-nav">
+        <a href="#problem">Problem</a>
+        <a href="#architecture">Arch</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#scoring">Scoring</a>
+        <a href="#decisions">Decisions</a>
+      </nav>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── Hero ─── -->
+<div class="hero" id="top">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="wrap">
+    <div class="hero-meta meta" style="font-family:var(--mono);font-size:12px;color:var(--accent-2);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px">
+      AI & ML · Semantic URL Discovery &nbsp;·&nbsp; 2026
+    </div>
+    <h1>Topic-Aligned URL Discovery & Semantic Ranking</h1>
+    <p class="lede">A four-stage Python pipeline that surfaces the most relevant pages across hundreds of domains, against thousands of target keywords: in seconds per domain, using only free and open tools</p>
+    <div class="hero-cta">
+      <a class="btn-ghost orange" href="https://github.com/simonecaruso-d/WLDMTht" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub Repo
+      </a>
+    </div>
+    <div class="chips">
+      <span class="chip purple">Python</span>
+      <span class="chip purple">Semantic Search</span>
+      <span class="chip purple">NLP / Embeddings</span>
+      <span class="chip purple">Automation</span>
+      <span class="chip purple">Web Crawling & Scraping</span>
+      <span class="chip purple">Parquet</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Stats strip ─── -->
+<div class="stats reveal">
+  <div class="stat">
+    <div class="label">Pipeline stages</div>
+    <div class="num orange">4</div>
+    <div class="sub">Discover → SPA → Filter → Score</div>
+  </div>
+  <div class="stat">
+    <div class="label">URL cap per domain</div>
+    <div class="num warn">50</div>
+    <div class="sub">MaxCandidatesPerDomain after filter</div>
+  </div>
+  <div class="stat">
+    <div class="label">Scoring blend</div>
+    <div class="num cyan">70/30</div>
+    <div class="sub">Semantic · Lexical</div>
+  </div>
+  <div class="stat">
+    <div class="label">Embedding model</div>
+    <div class="num cyan">MiniLM L6</div>
+    <div class="sub">CPU-only · thousands of docs/min</div>
+  </div>
+</div>
+
+<!-- ─── Problem ─── -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>01</span> - Problem</div>
+      <div class="sh-title">
+        <h2>Crawl everything</h2>
+        <p>Finding topic-relevant pages across hundreds of competitor and partner domains is a needle-in-a-haystack problem. Naive approaches are too slow, too expensive, or too imprecise to scale to an analyst workflow</p>
+      </div>
+    </div>
+    <div class="problem-grid reveal">
+      <div class="prob-col before">
+        <h3>Naive approaches</h3>
+        <ul>
+          <li><span class="marker">|</span>Full crawl is slow, expensive, and gets you rate-limited or blocked</li>
+          <li><span class="marker">|</span>Keyword matching on slugs alone misses multilingual content and product names that never appear in URLs</li>
+          <li><span class="marker">|</span>No deduplication: regional language variants flood the candidate list with near-identical pages</li>
+          <li><span class="marker">|</span>SPA-rendered sites (React, Next.js) return empty HTML shells to non-JS clients</li>
+          <li><span class="marker">|</span>Per-domain tuning doesn't scale: analysts spend hours per site, not minutes</li>
+        </ul>
+      </div>
+      <div class="prob-col after">
+        <h3>This pipeline</h3>
+        <ul>
+          <li><span class="marker">→</span>Sitemap-first discovery: most sites hand you their URL inventory for free: crawl is the fallback, not the default</li>
+          <li><span class="marker">→</span>Sentence embeddings catch semantic neighbors that lexical filters miss, across languages and brand names</li>
+          <li><span class="marker">→</span>rapidfuzz dedup drops near-identical URLs before scoring touches them</li>
+          <li><span class="marker">→</span>Playwright SPA fallback renders JS-heavy homepages and harvests hydrated links</li>
+          <li><span class="marker">→</span>Stage-isolated Parquet caches: tune the scorer without re-crawling; failed runs resume mid-pipeline</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight reveal">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Core design insight:</strong> crawling is expensive because most crawlers don't ask the site first. Sitemaps and robots.txt are free inventories that cover the long tail of URLs. Treating crawl as the fallback slashes network cost and latency before a single embedding is computed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Architecture ─── -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>02</span> - Architecture</div>
+      <div class="sh-title">
+        <h2>Four stages, each independently re-runnable</h2>
+        <p>Every stage writes its own Parquet to cache. Resume failed runs without replaying completed stages. Each output is a clean contract for the next</p>
+      </div>
+    </div>
+    <div class="arch-wrap reveal">
+      <div class="arch-diagram">
+        <div class="arch-node discover">
+          <div class="n-icon">🗺️</div>
+          <div class="n-label">Stage 1</div>
+          <div class="n-name">Discover</div>
+          <div class="n-sub">sitemap + robots.txt + BFS crawl fallback</div>
+        </div>
+        <div class="arch-arrow">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="arch-node source">
+          <div class="n-icon">🎭</div>
+          <div class="n-label">Stage 1b</div>
+          <div class="n-name">SPA Fallback</div>
+          <div class="n-sub">Playwright renders JS-heavy shells</div>
+        </div>
+        <div class="arch-arrow">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="arch-node filter">
+          <div class="n-icon">🔍</div>
+          <div class="n-label">Stage 2</div>
+          <div class="n-name">Filter</div>
+          <div class="n-sub">regex boilerplate drop + rapidfuzz dedup</div>
+        </div>
+        <div class="arch-arrow">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+        <div class="arch-node score">
+          <div class="n-icon">🧠</div>
+          <div class="n-label">Stage 3</div>
+          <div class="n-name">Score</div>
+          <div class="n-sub">embed · cosine sim · lexical blend · gate</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight reveal" style="margin-top:28px">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Why Parquet for intermediate state:</strong> columnar, compressed, typed: and crucially, stage outputs survive process restarts. Full runs against hundreds of domains can take tens of minutes; a mid-run failure shouldn't mean restarting from zero. Every stage reads the previous stage's Parquet and writes its own. Tuning the scorer doesn't re-crawl the web.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Pipeline ─── -->
+<section id="pipeline">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>03</span> - Pipeline</div>
+      <div class="sh-title">
+        <h2>Domains in, ranked URLs out</h2>
+        <p>Each stage has a clear responsibility and a clean handoff. Smoke mode (first 20 domains) lets you tune thresholds cheaply before paying full crawl cost</p>
+      </div>
+    </div>
+    <div class="pipeline-row reveal">
+      <div class="pl-step">
+        <div class="ps-num">01</div>
+        <div class="ps-label" style="color:var(--accent-2)">Discover</div>
+        <div class="ps-title">Sitemap-first URL inventory</div>
+        <ul>
+          <li>Resolves http/https × bare/www variants</li>
+          <li>Parses robots.txt for Sitemap</li>
+          <li>Inspects &lt;link rel="sitemap"&gt; on homepage</li>
+          <li>Probes 20+ common sitemap paths</li>
+          <li>Recursively expands sitemap indexes</li>
+          <li>Falls back to depth-1 BFS crawl</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">01b</div>
+        <div class="ps-label" style="color:var(--accent-2)">SPA Fallback</div>
+        <div class="ps-title">Playwright headless pass</div>
+        <ul>
+          <li>React / Next.js sites ship empty shells</li>
+          <li>Playwright renders homepage fully</li>
+          <li>Harvests links from hydrated DOM</li>
+          <li>Separate stage: ~10× slower, used sparingly</li>
+          <li>Only triggers for domains with no URLs after Stage 1</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">02</div>
+        <div class="ps-label" style="color:var(--warn)">Filter</div>
+        <div class="ps-title">Boilerplate drop + dedup</div>
+        <ul>
+          <li>Drops /privacy, /terms, /login, /cart, /wp-admin, asset extensions</li>
+          <li>rapidfuzz ratio ≥ 85 → language/region duplicates removed</li>
+          <li>Caps at MaxCandidatesPerDomain=50</li>
+          <li>Strong-token override bypasses boilerplate filter for high-signal slugs</li>
+        </ul>
+      </div>
+      <div class="pl-step">
+        <div class="ps-num">03</div>
+        <div class="ps-label">Score</div>
+        <div class="ps-title">Embed · cosine · blend · gate</div>
+        <ul>
+          <li>Async-fetches each candidate page</li>
+          <li>selectolax extracts title, H1, meta description</li>
+          <li>Keywords embedded once, cached to KeywordEmbeddings.npy</li>
+          <li>Page text embedded in batches of 64</li>
+          <li>Cosine sim → max across keyword matrix</li>
+          <li>Final: 0.7 × semantic + 0.3 × lexical</li>
+        </ul>
+      </div>
+    </div>
+    <div class="insight reveal">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p><strong>Strong-token override:</strong> URLs containing high-signal gambling slugs (casino, bet, bonus, megaways, ...) bypass the boilerplate drop regardless of path pattern. This prevents precision loss on domains where the product vocabulary overlaps with generic path structure: a real problem in the gambling vertical where /bonus might otherwise be filtered as a generic marketing page.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Scoring ─── -->
+<section id="scoring">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>04</span> - Scoring Model</div>
+      <div class="sh-title">
+        <h2>Semantic + lexical</h2>
+        <p>Neither pure embedding similarity nor pure keyword matching wins alone. The blend outperforms either in isolation on this dataset. Two gates keep precision high at the tail</p>
+      </div>
+    </div>
+
+    <div class="blend-bar reveal">
+      <p style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Score composition</p>
+      <div class="blend-track">
+        <div class="blend-semantic">SEMANTIC 70%</div>
+        <div class="blend-lexical">LEXICAL 30%</div>
+      </div>
+      <div class="blend-labels">
+        <span>sentence-transformers cosine similarity</span>
+        <span>literal keyword token in title / H1 / slug</span>
+      </div>
+      <div class="blend-formula">
+        <span class="f-dim">FinalScore = </span><span class="f-accent">0.7 × cosineSimilarity</span> <span class="f-dim">+</span> <span class="f-orange">0.3 × lexicalNormalized</span>
+        <span style="margin-left:24px;color:var(--dim);font-size:11px">&nbsp;· drops below SemanticFloor=0.35 · title/H1 gate at score &lt; 0.80</span>
+      </div>
+    </div>
+
+    <div class="feat-grid reveal" style="margin-top:24px">
+      <div class="feat-card c-cyan">
+        <div class="fc-tag">Semantic layer</div>
+        <h3>all-MiniLM-L6-v2</h3>
+        <p>384-dimensional sentence embeddings via sentence-transformers. Keywords embedded once and cached to disk: zero re-embedding cost across runs</p>
+        <div class="fc-items">
+          <div class="fc-item">Strong quality-per-MB: runs CPU-only at thousands of docs/min</div>
+          <div class="fc-item">Batch size 64 for page text</div>
+          <div class="fc-item">Cosine sim against full keyword matrix → takes the max</div>
+          <div class="fc-item">Catches multilingual content and brand names missing from slugs</div>
+        </div>
+      </div>
+      <div class="feat-card c-cyan">
+        <div class="fc-tag">Lexical layer</div>
+        <h3>Token presence bonus</h3>
+        <p>A literal keyword token appearing in the page title, H1, or URL slug adds a normalized bonus to the final score. Cheap signal, high precision when present</p>
+        <div class="fc-items">
+          <div class="fc-item">No regex overhead</div>
+          <div class="fc-item">Applies to title, H1, and slug independently</div>
+          <div class="fc-item">Normalized before blending: doesn't overwhelm semantic score</div>
+          <div class="fc-item">Especially effective on exact-match gambling product names</div>
+        </div>
+      </div>
+      <div class="feat-card c-cyan">
+        <div class="fc-tag">Precision gates</div>
+        <h3>Floor + gambling gate</h3>
+        <p>Two hard filters prevent low-quality rows from polluting the output, keeping analyst review time low even at scale</p>
+        <div class="fc-items">
+          <div class="fc-item">SemanticFloor=0.35</div>
+          <div class="fc-item">Title/H1 gambling gate: rows scoring &lt; 0.80 must contain a strong gambling token in title or H1</div>
+          <div class="fc-item">Strong-token list is auditable and hand-tunable in Config.py</div>
+          <div class="fc-item">Blend weight (0.7/0.3) and both thresholds are smoke-mode tunable</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Engineering decisions ─── -->
+<section id="decisions">
+  <div class="wrap">
+    <div class="sh reveal">
+      <div class="sh-no"><span>05</span> - Design</div>
+      <div class="sh-title">
+        <h2>Every choice has a reason</h2>
+        <p>Key tradeoffs made explicit</p>
+      </div>
+    </div>
+    <div class="decision-list reveal">
+      <div class="decision">
+        <div class="dec-context">
+          <div class="dc-tag">URL discovery</div>
+          <div class="dc-title">Sitemap-first, crawl-fallback</div>
+          <div class="dc-sub">vs crawl-first</div>
+        </div>
+        <div class="dec-chosen">
+          <h4>Chosen</h4>
+          <p>Parse robots.txt, probe 20+ sitemap paths, expand sitemap indexes: only fall back to BFS crawl if no sitemap found</p>
+        </div>
+        <div class="dec-why">
+          <h4>Why</h4>
+          <p>Crawling is expensive because it's unnecessary most of the time. Sites hand you their URL inventory for free if you ask. Crawl-first means paying full network cost for information that's already published and risking rate-limit bans</p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="dec-context">
+          <div class="dc-tag">HTML parsing</div>
+          <div class="dc-title">selectolax over lxml / BeautifulSoup</div>
+          <div class="dc-sub">vs standard parsers</div>
+        </div>
+        <div class="dec-chosen">
+          <h4>Chosen</h4>
+          <p>selectolax for title, H1, and meta description extraction across every candidate page</p>
+        </div>
+        <div class="dec-why">
+          <h4>Why</h4>
+          <p>~5× faster than BeautifulSoup on title/H1/meta extraction. At 50 URLs × hundreds of domains, the difference is minutes of wall-clock time per run</p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="dec-context">
+          <div class="dc-tag">Deduplication</div>
+          <div class="dc-title">rapidfuzz ratio ≥ 85</div>
+          <div class="dc-sub">vs exact match or string edit distance</div>
+        </div>
+        <div class="dec-chosen">
+          <h4>Chosen</h4>
+          <p>rapidfuzz fuzzy ratio to detect and drop near-duplicate URLs (language/region variants like /en/ vs /it/)</p>
+        </div>
+        <div class="dec-why">
+          <h4>Why</h4>
+          <p>Exact match misses the /en-gb/ vs /en-us/ problem. Pure edit distance is slow in Python at scale. rapidfuzz's C++ backend runs orders of magnitude faster than fuzzywuzzy with the same interface and ratio=85 is well-calibrated for URL variants without over-collapsing</p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="dec-context">
+          <div class="dc-tag">Async I/O</div>
+          <div class="dc-title">httpx + asyncio, single process</div>
+          <div class="dc-sub">vs threads or multiprocessing</div>
+        </div>
+        <div class="dec-chosen">
+          <h4>Chosen</h4>
+          <p>httpx async with GlobalConcurrency=40 and PerHostRatePerSec=1.5 for all network I/O</p>
+        </div>
+        <div class="dec-why">
+          <h4>Why</h4>
+          <p>URL discovery and page fetching are I/O-bound, not CPU-bound. Single-process async avoids multiprocessing overhead and shared-state complexity. Per-host rate limiting is a first-class concern: httpx limits are per-host, not global, which keeps individual domains from getting blocked.</p>
+        </div>
+      </div>
+      <div class="decision">
+        <div class="dec-context">
+          <div class="dc-tag">Embedding model</div>
+          <div class="dc-title">all-MiniLM-L6-v2 (384-d)</div>
+          <div class="dc-sub">vs larger models or API embeddings</div>
+        </div>
+        <div class="dec-chosen">
+          <h4>Chosen</h4>
+          <p>sentence-transformers/all-MiniLM-L6-v2, run locally, keyword embeddings cached to .npy</p>
+        </div>
+        <div class="dec-why">
+          <h4>Why</h4>
+          <p>Strong quality-per-MB ratio, runs CPU-only at thousands of docs per minute. API embeddings add latency, cost, and a network dependency per run. Caching keyword embeddings to disk means zero re-embedding cost when only the domain list or thresholds change.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Footer ─── -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Simone Caruso</div>
+      <div class="footer-links">
+        <a href="https://github.com/simonecaruso-d/WLDMTht" target="_blank" rel="noopener">GitHub</a>
+        <a href="../index.html">Portfolio</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+document.querySelectorAll('.feat-grid, .tech-grid').forEach(parent => {
+  [...parent.children].forEach((child, i) => {
+    child.style.transitionDelay = `${i * 60}ms`;
+  });
+});
+</script>
+</body>
+</html>

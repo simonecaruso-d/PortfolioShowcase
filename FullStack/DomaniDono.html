@@ -12,10 +12,10 @@
   --bg:#08090C; --panel:#0E1218; --panel-2:#141923; --panel-3:#1B2230;
   --border:#1F2630; --border-bright:#2D3645; --grid:#13171F;
   --text:#F2F4F8; --text-dim:#D5DAE3; --muted:#9AA3B0; --dim:#5A6471;
-  --accent:#14B8A6;
-  --accent-2:#F97316;
-  --accent-3:#34D399;
-  --warn:#FBBF24; --danger:#F87171;
+  --accent:#1c6e7d;
+  --accent-2:#8c7a9f;
+  --accent-3:#4bbc8e;
+  --warn:#f9f871; --danger:#F87171; --blue:#5B8DD9;
   --radius:6px; --radius-lg:10px;
   --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --sans:'Inter Tight', ui-sans-serif, system-ui, sans-serif;
@@ -56,8 +56,8 @@ section:first-of-type{border-top:none}
 
 /* ── Hero ── */
 .hero{padding:136px 0 96px;position:relative;overflow:hidden}
-.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(56,189,248,.06) 0%,transparent 65%);pointer-events:none}
-.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(129,140,248,.04) 0%,transparent 65%);pointer-events:none}
+.hero-glow{position:absolute;top:-200px;right:-200px;width:800px;height:800px;background:radial-gradient(circle,rgba(28,110,125,.06) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-100px;left:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(140,122,159,.04) 0%,transparent 65%);pointer-events:none}
 .hero .meta{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px}
 .hero .meta .line{width:48px;height:1px;background:var(--accent);opacity:.6}
 .hero h1{font-size:clamp(52px,8vw,100px);line-height:.95;letter-spacing:-.05em;font-weight:800;margin-bottom:36px}
@@ -67,16 +67,16 @@ section:first-of-type{border-top:none}
 .hero .sublede{font-size:16px;color:var(--muted);max-width:82ch;margin-bottom:48px;line-height:1.6}
 .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
 .btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);transition:background .15s,transform .1s}
-.btn-primary:hover{background:#7dd3fc;transform:translateY(-1px)}
+.btn-primary:hover{background:#2a9aad;transform:translateY(-1px)}
 .btn-primary svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-dim);font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:12px 24px;border-radius:var(--radius);border:1px solid var(--border-bright);transition:border-color .15s,color .15s,transform .1s}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
 .btn-ghost svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{font-family:var(--mono);font-size:11px;color:var(--muted);padding:5px 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);letter-spacing:.04em}
-.chip.accent{color:var(--accent);border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.07)}
-.chip.purple{color:var(--accent-2);border-color:rgba(129,140,248,.25);background:rgba(129,140,248,.07)}
-.chip.green{color:var(--accent-3);border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.07)}
+.chip.accent{color:var(--accent);border-color:rgba(28,110,125,.25);background:rgba(28,110,125,.07)}
+.chip.purple{color:var(--accent-2);border-color:rgba(140,122,159,.25);background:rgba(140,122,159,.07)}
+.chip.green{color:var(--accent-3);border-color:rgba(75,188,142,.25);background:rgba(75,188,142,.07)}
 
 /* ── Stats strip ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(180deg,var(--panel) 0%,var(--bg) 100%);max-width:1280px;margin:0 auto;padding:0 32px}
@@ -102,15 +102,15 @@ section:first-of-type{border-top:none}
 /* ── Problem/Solution ── */
 .problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
 .prob-col{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;position:relative}
-.prob-col.before{background:rgba(248,113,113,.05);border-color:rgba(248,113,113,.3)}
-.prob-col.after{background:rgba(52,211,153,.05);border-color:rgba(52,211,153,.3)}
+.prob-col.before{background:rgba(140,122,159,.05);border-color:rgba(140,122,159,.3)}
+.prob-col.after{background:rgba(28,110,125,.05);border-color:rgba(28,110,125,.3)}
 .prob-col h3{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
-.prob-col.before h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--danger)}
-.prob-col.after h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent-3)}
+.prob-col.before h3::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent-2)}
+.prob-col.after h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
 .prob-col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
 .prob-col li{display:flex;gap:14px;font-size:15px;line-height:1.55;color:var(--text-dim)}
 .prob-col li .marker{color:var(--dim);font-family:var(--mono);flex-shrink:0;margin-top:2px}
-.prob-col.after li .marker{color:var(--accent-3)}
+.prob-col.after li .marker{color:var(--accent)}
 @media(max-width:760px){.problem-grid{grid-template-columns:1fr}}
 
 /* ── Insight bar ── */
@@ -122,22 +122,25 @@ section:first-of-type{border-top:none}
 /* ── Architecture diagram ── */
 .arch-wrap{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;overflow:hidden;position:relative}
 .arch-wrap::before{content:"";position:absolute;inset:0;background:
-  radial-gradient(circle at 10% 50%,rgba(56,189,248,.04),transparent 45%),
-  radial-gradient(circle at 90% 50%,rgba(129,140,248,.04),transparent 45%);pointer-events:none}
+  radial-gradient(circle at 10% 50%,rgba(28,110,125,.04),transparent 45%),
+  radial-gradient(circle at 90% 50%,rgba(140,122,159,.04),transparent 45%);pointer-events:none}
 .arch-diagram{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr 40px 1fr 40px 1fr;gap:0;align-items:center;position:relative}
 .arch-node{background:var(--panel-2);border:1px solid var(--border-bright);border-radius:var(--radius);padding:18px 16px;text-align:center;position:relative;transition:border-color .2s,box-shadow .2s}
-.arch-node:hover{border-color:var(--accent);box-shadow:0 0 24px rgba(56,189,248,.1)}
+.arch-node:hover{border-color:var(--accent);box-shadow:0 0 24px rgba(28,110,125,.1)}
 .arch-node .n-icon{font-size:22px;margin-bottom:10px}
 .arch-node .n-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
 .arch-node .n-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
 .arch-node .n-sub{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
-.arch-node.source{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.05)}
+.arch-node.source{border-color:rgba(249,248,113,.35);background:rgba(249,248,113,.05)}
 .arch-node.source .n-label{color:var(--warn)}
-.arch-node.engine{border-color:rgba(56,189,248,.35);background:rgba(56,189,248,.06)}
-.arch-node.ui{border-color:rgba(129,140,248,.35);background:rgba(129,140,248,.06)}
-.arch-node.ui .n-label{color:var(--accent-2)}
-.arch-node.ai{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.06)}
-.arch-node.ai .n-label{color:var(--accent-3)}
+.arch-node.engine{border-color:rgba(249,248,113,.35);background:rgba(249,248,113,.05)}
+.arch-node.engine .n-label{color:var(--warn)}
+.arch-node.analytics{border-color:rgba(140,122,159,.35);background:rgba(140,122,159,.05)}
+.arch-node.analytics .n-label{color:var(--accent-2)}
+.arch-node.ui{border-color:rgba(28,110,125,.35);background:rgba(28,110,125,.06)}
+.arch-node.ui .n-label{color:var(--accent)}
+.arch-node.ai{border-color:rgba(28,110,125,.35);background:rgba(28,110,125,.06)}
+.arch-node.ai .n-label{color:var(--accent)}
 .arch-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim)}
 .arch-arrow svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .arch-footer{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px}
@@ -150,6 +153,9 @@ section:first-of-type{border-top:none}
 .pl-step{background:var(--panel);padding:24px 20px}
 .pl-step .ps-num{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;margin-bottom:12px}
 .pl-step .ps-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.pl-step .ps-label.c-warn{color:var(--warn)}
+.pl-step .ps-label.c-mauve{color:var(--accent-2)}
+.pl-step .ps-label.c-green{color:var(--accent-3)}
 .pl-step .ps-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px}
 .pl-step ul{list-style:none;display:flex;flex-direction:column;gap:6px}
 .pl-step li{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
@@ -164,26 +170,26 @@ section:first-of-type{border-top:none}
 .code-bar .filename{margin-left:6px;color:var(--text-dim)}
 .code-bar .lang{margin-left:auto;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;font-size:10px}
 pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--text-dim)}
-.kw{color:#c084fc}.fn{color:var(--accent)}.str{color:var(--accent-3)}.cm{color:var(--dim);font-style:italic}.num{color:var(--warn)}.cls{color:#fb923c}
+.kw{color:#c084fc}.fn{color:var(--accent)}.str{color:var(--accent-3)}.cm{color:var(--dim);font-style:italic}.num{color:var(--warn)}.cls{color:#8c7a9f}
 
 /* ── Impact quadrant ── */
 .quadrant-shell{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
 .quad{padding:20px 24px;display:flex;flex-direction:column;justify-content:space-between;cursor:default;transition:background .2s;position:relative;overflow:hidden}
 .quad::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .2s}
 .quad:hover::before{opacity:1}
-.quad-hi{background:rgba(52,211,153,.07);border-right:1px solid var(--border)}
-.quad-hi::before{background:rgba(52,211,153,.04)}
-.quad-reach{background:rgba(56,189,248,.07)}
-.quad-reach::before{background:rgba(56,189,248,.04)}
-.quad-scale{background:rgba(129,140,248,.07);border-right:1px solid var(--border)}
-.quad-scale::before{background:rgba(129,140,248,.04)}
-.quad-dev{background:rgba(251,191,36,.05)}
-.quad-dev::before{background:rgba(251,191,36,.03)}
+.quad-hi{background:rgba(75,188,142,.14);border-right:1px solid var(--border)}
+.quad-hi::before{background:rgba(75,188,142,.08)}
+.quad-reach{background:rgba(75,188,142,.09)}
+.quad-reach::before{background:rgba(75,188,142,.05)}
+.quad-scale{background:rgba(75,188,142,.05);border-right:1px solid var(--border)}
+.quad-scale::before{background:rgba(75,188,142,.03)}
+.quad-dev{background:rgba(75,188,142,.02)}
+.quad-dev::before{background:rgba(75,188,142,.01)}
 .quad-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
-.quad-hi .quad-label{color:var(--accent-3)}
-.quad-reach .quad-label{color:var(--accent)}
-.quad-scale .quad-label{color:var(--accent-2)}
-.quad-dev .quad-label{color:var(--warn)}
+.quad-hi .quad-label{color:#2d8a67}
+.quad-reach .quad-label{color:#4bbc8e}
+.quad-scale .quad-label{color:#79d1ad}
+.quad-dev .quad-label{color:#a0dfc3}
 .quad-title{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin-top:8px}
 .quad-desc{font-size:13px;color:var(--text-dim);line-height:1.55;margin-top:8px}
 .quad-corner{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em}
@@ -209,7 +215,7 @@ pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-hei
 .score-fill.s-mature{background:var(--accent)}
 .score-fill.s-eff{background:var(--accent-2)}
 .score-fill.s-glob{background:var(--warn)}
-.score-fill.s-dim{background:#fb923c}
+.score-fill.s-dim{background:#8c7a9f}
 .score-fill.s-trust{background:var(--danger)}
 .score-fill.s-grow{background:#e879f9}
 @media(max-width:1000px){.rt-head,.rt-row{grid-template-columns:160px repeat(4,1fr)}.rt-head .rh:nth-child(n+6),.rt-row .rt-cell:nth-child(n+6){display:none}}
@@ -224,14 +230,14 @@ pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-hei
 .feat-card.c-green::before{background:var(--accent-3)}
 .feat-card.c-warn::before{background:var(--warn)}
 .feat-card.c-danger::before{background:var(--danger)}
-.feat-card.c-orange::before{background:#fb923c}
+.feat-card.c-orange::before{background:#8c7a9f}
 .feat-card .fc-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
 .c-cyan .fc-tag{color:var(--accent)}
 .c-purple .fc-tag{color:var(--accent-2)}
 .c-green .fc-tag{color:var(--accent-3)}
 .c-warn .fc-tag{color:var(--warn)}
 .c-danger .fc-tag{color:var(--danger)}
-.c-orange .fc-tag{color:#fb923c}
+.c-orange .fc-tag{color:#8c7a9f}
 .feat-card h3{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--text);margin-bottom:10px}
 .feat-card p{font-size:14px;color:var(--muted);line-height:1.6}
 .feat-card .fc-items{margin-top:16px;display:flex;flex-direction:column;gap:8px}
@@ -263,9 +269,9 @@ pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-hei
 .biz-card h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:10px;letter-spacing:-.01em}
 .biz-card p{font-size:13px;color:var(--muted);line-height:1.6}
 .biz-card .bz-tag{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:4px 10px;border-radius:3px;text-transform:uppercase}
-.bz-tag.rev{background:rgba(52,211,153,.1);color:var(--accent-3);border:1px solid rgba(52,211,153,.2)}
-.bz-tag.exp{background:rgba(56,189,248,.1);color:var(--accent);border:1px solid rgba(56,189,248,.2)}
-.bz-tag.tech{background:rgba(129,140,248,.1);color:var(--accent-2);border:1px solid rgba(129,140,248,.2)}
+.bz-tag.rev{background:rgba(75,188,142,.1);color:var(--accent-3);border:1px solid rgba(75,188,142,.2)}
+.bz-tag.exp{background:rgba(28,110,125,.1);color:var(--accent);border:1px solid rgba(28,110,125,.2)}
+.bz-tag.tech{background:rgba(140,122,159,.1);color:var(--accent-2);border:1px solid rgba(140,122,159,.2)}
 @media(max-width:760px){.biz-grid{grid-template-columns:1fr}}
 
 /* ── Roadmap ── */
@@ -277,10 +283,10 @@ pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-hei
 .rm-items{padding:16px;display:flex;flex-direction:column;gap:10px}
 .rm-item{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--text-dim);line-height:1.4;position:relative;padding-left:20px}
 .rm-item::before{content:"";position:absolute;left:8px;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:var(--dim)}
-.rm-col.col-done .rm-item::before{background:var(--accent-3)}
-.rm-col.col-now .rm-item::before{background:var(--accent)}
-.rm-col.col-next .rm-item::before{background:var(--accent-2)}
-.rm-col.col-later .rm-item::before{background:var(--dim)}
+.rm-col.col-done .rm-item::before{background:var(--accent)}
+.rm-col.col-now .rm-item::before{background:var(--accent-3)}
+.rm-col.col-next .rm-item::before{background:var(--warn)}
+.rm-col.col-later .rm-item::before{background:var(--accent-2)}
 @media(max-width:760px){.roadmap{grid-template-columns:1fr 1fr}.rm-col{border-right:none;border-bottom:1px solid var(--border)}}
 
 /* ── Tech stack ── */
@@ -295,7 +301,7 @@ pre{padding:24px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-hei
 /* ── Footer ── */
 footer{border-top:1px solid var(--border);padding:48px 0}
 .footer-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
-.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text)}
+.footer-brand{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)}
 .footer-brand span{color:var(--accent)}
 .footer-links{display:flex;gap:24px;font-family:var(--mono);font-size:12px;color:var(--muted)}
 .footer-links a{transition:color .15s}
@@ -323,8 +329,10 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       <nav class="tb-nav">
         <a href="#problem">Problem</a>
         <a href="#architecture">Arch</a>
+        <a href="#pipeline">Pipeline</a>
         <a href="#engine">Engine</a>
         <a href="#product">Product</a>
+        <a href="#preview">Preview</a>
         <a href="#stack">Stack</a>
         <a href="#roadmap">Roadmap</a>
       </nav>
@@ -340,8 +348,8 @@ footer{border-top:1px solid var(--border);padding:48px 0}
     <div class="hero-meta meta" style="font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:14px">
       Full-Stack Data Product &nbsp;·&nbsp; 2026
     </div>
-    <h1>Domani <span class="accent">Dono</span></h1>
-    <p class="lede">An end-to-end donation intelligence platform built around one question: <em>"Where can I donate to maximize social impact, with confidence?"</em></p>
+    <h1>Domani Dono</h1>
+    <p class="lede">An end-to-end donation intelligence platform built around one question: <em>"Where can I donate to maximize social impact?"</em></p>
     <p class="sublede">Not just a directory or a search engine. A decision-support system for donating responsibly</p>
     <div class="hero-cta">
       <a class="btn-primary" href="https://domanidono.streamlit.app/" target="_blank" rel="noopener">
@@ -356,11 +364,11 @@ footer{border-top:1px solid var(--border);padding:48px 0}
     <div class="chips">
       <span class="chip accent">Python</span>
       <span class="chip accent">Streamlit</span>
-      <span class="chip purple">Prompt Engineering</span>
-      <span class="chip green">Data Pipeline</span>
-      <span class="chip green">Open Cooperazione</span>
-      <span class="chip">CI/CD</span>
-      <span class="chip">UI/UX Engineering</span>
+      <span class="chip accent">Prompt Engineering</span>
+      <span class="chip accent">Data Pipeline</span>
+      <span class="chip accent">Open Cooperazione</span>
+      <span class="chip accent">CI/CD</span>
+      <span class="chip accent">UI/UX Engineering</span>
     </div>
   </div>
 </div>
@@ -384,7 +392,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
   </div>
   <div class="stat">
     <div class="label">Data source</div>
-    <div class="num" style="font-size:36px;padding-top:8px;color:var(--warn)">Open<br>Cooperazione</div>
+    <div class="num">Open Cooperazione</div>
     <div class="sub">Italian nonprofit open data harmonized & normalized</div>
   </div>
 </div>
@@ -458,7 +466,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
         <div class="arch-arrow">
           <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </div>
-        <div class="arch-node engine">
+        <div class="arch-node analytics">
           <div class="n-icon">📐</div>
           <div class="n-label">Engine</div>
           <div class="n-name">Impact Intelligence</div>
@@ -483,13 +491,6 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="n-sub">Grounded recommendations · retry logic · fallback</div>
         </div>
       </div>
-      <div class="arch-footer">
-        <div class="arch-badge"><div class="dot" style="background:var(--accent-3)"></div>Modular Python (app / db / configuration / files)</div>
-        <div class="arch-badge"><div class="dot" style="background:var(--accent)"></div>st.cache_data throughout</div>
-        <div class="arch-badge"><div class="dot" style="background:var(--accent-2)"></div>Streamlit fragments for isolated re-render</div>
-        <div class="arch-badge"><div class="dot" style="background:var(--warn)"></div>GitHub Actions CI/CD</div>
-      </div>
-    </div>
     <div class="insight reveal" style="margin-top:28px">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <p><strong>Why Streamlit, not React:</strong> pipeline and UI share the same runtime, the same DataFrames, the same language: no API layer, no serialization, no split deploy. A custom web stack would triple the complexity with zero user-visible benefit at this scale. Hard module boundaries (app / db / configuration) keep each layer independently testable and swappable without that tradeoff changing</p>
@@ -510,7 +511,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
     <div class="pipeline-row reveal">
       <div class="pl-step">
         <div class="ps-num">01</div>
-        <div class="ps-label">Ingestion</div>
+        <div class="ps-label c-warn">Ingestion</div>
         <div class="ps-title">Load from Open Cooperazione</div>
         <ul>
           <li>Registry dataset</li>
@@ -521,7 +522,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       </div>
       <div class="pl-step">
         <div class="ps-num">02</div>
-        <div class="ps-label">Normalization</div>
+        <div class="ps-label c-mauve">Normalization</div>
         <div class="ps-title">Type coercion + text harmonization</div>
         <ul>
           <li>Numeric casting with null safety</li>
@@ -532,7 +533,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       </div>
       <div class="pl-step">
         <div class="ps-num">03</div>
-        <div class="ps-label">Enrichment</div>
+        <div class="ps-label c-green">Enrichment</div>
         <div class="ps-title">Derived metrics + joins</div>
         <ul>
           <li>Year-over-year delta calculation</li>
@@ -654,7 +655,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="fc-item">Category peer benchmarks inline</div>
         </div>
       </div>
-      <div class="feat-card c-warn">
+      <div class="feat-card c-cyan">
         <div class="fc-tag">AI Concierge</div>
         <h3>Donation Recommendation Engine</h3>
         <p>Grounded AI, not hallucinating: reading the actual ranking table (deterministic input) and structuring the allows a trustworthy output</p>
@@ -665,7 +666,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="fc-item">User-friendly transient error handling</div>
         </div>
       </div>
-      <div class="feat-card c-orange">
+      <div class="feat-card c-cyan">
         <div class="fc-tag">Performance</div>
         <h3>UX Engineering</h3>
         <p>Streamlit has real performance constraints. I worked around them deliberately: fragments, caching, and resolution-aware layout all serve snappiness across every device</p>
@@ -676,7 +677,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
           <div class="fc-item">Staged loading with branded progress UI</div>
         </div>
       </div>
-      <div class="feat-card c-danger">
+      <div class="feat-card c-cyan">
         <div class="fc-tag">Resilience</div>
         <h3>Maintainability &amp; Scalability</h3>
         <p>Every layer is independently swappable. Add a data source, swap the AI model, or extend the UI without touching the rest of the stack</p>
@@ -794,7 +795,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
     <div class="roadmap reveal">
       <div class="rm-col col-done">
         <div class="rm-head">
-          <div class="rh-dot" style="background:var(--accent-3)"></div>
+          <div class="rh-dot" style="background:var(--accent)"></div>
           Done
         </div>
         <div class="rm-items">
@@ -811,7 +812,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       </div>
       <div class="rm-col col-now">
         <div class="rm-head">
-          <div class="rh-dot" style="background:var(--accent)"></div>
+          <div class="rh-dot" style="background:var(--accent-3)"></div>
           Next
         </div>
         <div class="rm-items">
@@ -823,7 +824,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       </div>
       <div class="rm-col col-next">
         <div class="rm-head">
-          <div class="rh-dot" style="background:var(--accent-2)"></div>
+          <div class="rh-dot" style="background:var(--warn)"></div>
           Later
         </div>
         <div class="rm-items">
@@ -835,7 +836,7 @@ footer{border-top:1px solid var(--border);padding:48px 0}
       </div>
       <div class="rm-col col-later">
         <div class="rm-head">
-          <div class="rh-dot" style="background:var(--dim)"></div>
+          <div class="rh-dot" style="background:var(--accent-2)"></div>
           Horizon
         </div>
         <div class="rm-items">
@@ -855,11 +856,10 @@ footer{border-top:1px solid var(--border);padding:48px 0}
     <div class="footer-inner">
       <div class="footer-brand">Simone Caruso</div>
       <div class="footer-links">
-        <a href="https://domanidono.streamlit.app/" target="_blank" rel="noopener">Live App ↗</a>
-        <a href="https://github.com/simonecaruso-d/DomaniDono" target="_blank" rel="noopener">GitHub ↗</a>
-        <a href="../index.html">← Portfolio</a>
+        <a href="https://domanidono.streamlit.app/" target="_blank" rel="noopener">Live App</a>
+        <a href="https://github.com/simonecaruso-d/DomaniDono" target="_blank" rel="noopener">GitHub</a>
+        <a href="../index.html">Portfolio</a>
       </div>
-      <div class="footer-note">Full-Stack · Data Product · 2026</div>
     </div>
   </div>
 </footer>
