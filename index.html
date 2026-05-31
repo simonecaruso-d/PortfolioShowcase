@@ -365,7 +365,7 @@ a.tl-card:hover .tc-arrow{opacity:1;}
 <script>
 (function () {
   /* ── Time scale ────────────────────────────────────────────────── */
-  const TL_END_Y = 2026, TL_END_M = 7;  // Jul 2026
+  const TL_END_Y = 2026, TL_END_M = 10;  // Oct 2026
   const PX_PER_MONTH = 12;
   const TOP_PAD  = 100;  // generous space above first items for the "Last Update" pill
   const BOT_PAD  = 60;
@@ -376,15 +376,15 @@ a.tl-card:hover .tc-arrow{opacity:1;}
     return TOP_PAD + Math.round(monthsFromEnd * PX_PER_MONTH);
   }
 
-  // Total height: Sep 2011 → Jul 2026 = 178 months
-  const TOTAL_H = TOP_PAD + 178 * PX_PER_MONTH + BOT_PAD;
+  // Total height: Sep 2011 → Oct 2026 = 181 months
+  const TOTAL_H = TOP_PAD + 181 * PX_PER_MONTH + BOT_PAD;
 
   /* ── Item definitions ──────────────────────────────────────────── */
   const LEFT_ITEMS = [
     {
       type:'work', title:'AI & Data Engineer', org:'Invitalia · Rome, Italy',
       desc:'AI and data engineering initiatives at the national agency for inward investment and enterprise development',
-      s:[2026,6], e:[2026,6],
+      s:[2026,6], e:[2026,9],
     },
     {
       type:'work', title:'Data & Analytics Specialist', org:'Zoetis · Rome, Italy',
