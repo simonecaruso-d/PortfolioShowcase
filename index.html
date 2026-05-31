@@ -382,6 +382,11 @@ a.tl-card:hover .tc-arrow{opacity:1;}
   /* ── Item definitions ──────────────────────────────────────────── */
   const LEFT_ITEMS = [
     {
+      type:'work', title:'AI & Data Engineer', org:'Invitalia · Rome, Italy',
+      desc:'AI and data engineering initiatives at the national agency for inward investment and enterprise development',
+      s:[2026,6], e:[2026,6],
+    },
+    {
       type:'work', title:'Data & Analytics Specialist', org:'Zoetis · Rome, Italy',
       desc:'BI & AI modernization across Southern Europe. Power BI migration, Azure Data Platform rollout, GenAI & ML SME',
       s:[2025,9], e:[2026,5],
@@ -638,7 +643,7 @@ a.tl-card:hover .tc-arrow{opacity:1;}
     const nowEl = document.createElement('div');
     nowEl.className = 'tl-year-marker';
     nowEl.style.top = NOW_PILL_TOP + 'px';
-    nowEl.innerHTML = '<span class="tl-year-pill now">Last Update · May 2026</span>';
+    nowEl.innerHTML = '<span class="tl-year-pill now">Last Update · June 2026</span>';
     axisEl.appendChild(nowEl);
 
     for (const yr of [2026, 2025, 2024, 2023, 2022, 2021, 2019, 2016, 2014, 2011]) {
